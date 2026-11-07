@@ -1,0 +1,13 @@
+# Claude desktop window state
+.claude-chat.json
+
+# Compiled JAWS scripts
+*.jsb
+
+# Installer build output
+/build/
+/dist/
+
+# Windows
+Thumbs.db
+desktop.ini
