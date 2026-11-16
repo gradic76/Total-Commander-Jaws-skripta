@@ -1,0 +1,5 @@
+[Options]
+; Keep JAWS shared default for Total Commander
+IndicateSelected=1
+; Only Numpad Insert acts as JAWS key; Extended Insert goes to Total Commander (mark item)
+JAWSInsertKey=1
