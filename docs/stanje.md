@@ -78,6 +78,17 @@ Zaključak: TC 11.56 sam daje JAWS-u dosta podataka (MSAA). Popis, izbornici, di
   - Insert+Q kaže verziju.
 - Sažetak se izgovara iz HandleCustomRealWindows, umjesto naslova dijaloga, pa nema dvostrukog "Total Commander".
 
+### Red čekanja i pozadinski poslovi (izmjereno 2026-11-16)
+
+- Red čekanja ("Background transfer manager", F5 pa F2) i mali prozori poslova (nakon Background) su standardni dijalozi #32770 s običnim kontrolama (Static, Button, Edit).
+- Naslov sadrži ukupni postotak i posao, npr. "2% Drumless Version Library (Copy)".
+- Popis reda (ListBox) prikazuje poslove, ali LB_GETCOUNT vraća 0: TC ih sam iscrtava. JAWS ih ipak čita.
+- Background posao nije u redu čekanja i teče istovremeno s poslovima u redu. To je ponašanje TC-a.
+- Gumb "-" JAWS ne izgovara (interpunkcija), pa ga skripta zove "minus". Značenje gumba nije provjereno; "+" ručno dodaje stavku u red (HISTORY.TXT).
+- Automatski izgovor postotaka dolazi od traka napretka (ProgressBarChangedEvent) i utišan je.
+- Tab je spor (1 do 2 s po kontroli) i bez naše skripte, što je potvrđeno nultom probom. Uzrok: prozor reda radi u niti koja i kopira, pa na poruke odgovara prosječno za 180 ms (najviše 288 ms), dok glavni prozor odgovara za 0 ms. JAWS pri svakoj promjeni fokusa šalje prozoru mnogo upita, pa se kašnjenja zbrajaju. To je ograničenje TC-a i skripta ga ne može ukloniti.
+- Događaji pristupačnosti nisu poplava: u 5 s bilo je 28 promjena imena i 14 promjena vrijednosti.
+
 ### Tehnički podaci iz JAWS-a
 
 - Ctrl+Insert+F1 na popisu: klasa LCLListBox, Control ID i handle su promjenjivi (potvrđuje mjerenje iz Win32).

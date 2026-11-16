@@ -40,6 +40,11 @@ file %1
 %1 left
 @@
 
+; Name spoken for the "-" button in the background transfer manager
+@msgTcMinus
+minus
+@@
+
 ; Shown when the progress window text could not be read
 @msgTcProgressUnknown
 Progress not available

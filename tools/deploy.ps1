@@ -3,11 +3,13 @@
 # The .jcf is copied only when the user has none, so settings changed in Settings Center are kept.
 param(
     [string]$JawsVersion = "2025",
-    [string]$Lang = "enu"
+    [string]$Lang = "enu",
+    # Alternative source folder, e.g. a temporary variant for a control test
+    [string]$SourceDir = ""
 )
 $ErrorActionPreference = "Stop"
 
-$src = Join-Path $PSScriptRoot "..\src"
+$src = if ($SourceDir) { $SourceDir } else { Join-Path $PSScriptRoot "..\src" }
 $dest = Join-Path $env:APPDATA "Freedom Scientific\JAWS\$JawsVersion\Settings\$Lang"
 $compiler = "C:\Program Files\Freedom Scientific\JAWS\$JawsVersion\scompile.exe"
 

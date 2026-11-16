@@ -281,8 +281,58 @@ while i <= nCount
 endWhile
 EndFunction
 
+; ---------------------------------------------------------------------------
+; Background transfer manager (queue, F5 then F2) and background job windows
+; Standard dialogs whose texts (current file, speed, percent) change constantly.
+; Automatic speech of those changes is silenced; Insert+Page Down speaks the
+; title, which holds the total percent and the job name.
+; ---------------------------------------------------------------------------
+
+handle function TcGetBackgroundDialog (handle hwnd)
+; Cached: the answer for the last matching and the last non-matching real window is remembered.
+var handle h
+let h = GetRealWindow (hwnd)
+if !h then
+	return 0
+endIf
+if h == ghTcBgYes then
+	return h
+endIf
+if h == ghTcBgNo then
+	return 0
+endIf
+if GetWindowClass (h) == wcDialog
+&& FindWindow (h, wcProgressBar)
+&& FindWindow (h, wcEdit) then
+	let ghTcBgYes = h
+	return h
+endIf
+let ghTcBgNo = h
+return 0
+EndFunction
+
+int function NewTextEventShouldBeSilent (handle hFocus, handle hwnd, string buffer, int nAttributes,
+	int nTextColor, int nBackgroundColor, int nEcho, string sFrameName)
+if hwnd != hFocus
+&& TcGetBackgroundDialog (hwnd) then
+	return true
+endIf
+return NewTextEventShouldBeSilent (hFocus, hwnd, buffer, nAttributes, nTextColor, nBackgroundColor, nEcho, sFrameName)
+EndFunction
+
+int function HandleCustomWindows (handle hwnd)
+; The "-" button caption is punctuation, which JAWS does not speak.
+if GetWindowClass (hwnd) == wcButton
+&& GetWindowName (hwnd) == tcMinusCaption then
+	IndicateControlType (WT_BUTTON, msgTcMinus)
+	return true
+endIf
+return HandleCustomWindows (hwnd)
+EndFunction
+
 void function ProgressBarChangedEvent (handle hProgress, string sName, string sValue)
-if TcGetProgressDialog (hProgress) then
+if TcGetProgressDialog (hProgress)
+|| TcGetBackgroundDialog (hProgress) then
 	return
 endIf
 ProgressBarChangedEvent (hProgress, sName, sValue)
@@ -300,6 +350,11 @@ if hDlg then
 	else
 		SayMessage (OT_ERROR, msgTcProgressUnknown)
 	endIf
+	return
+endIf
+let hDlg = TcGetBackgroundDialog (GetFocus ())
+if hDlg then
+	SayMessage (OT_USER_REQUESTED_INFORMATION, GetWindowName (hDlg))
 	return
 endIf
 PerformScript SayBottomLineOfWindow ()
