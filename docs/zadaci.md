@@ -44,6 +44,7 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 6. Vlastita pomoć na Insert+F1.
 7. Hrvatski .jsm u mapi jezika JAWS-a (odluka 2026-11-17: poruke prate jezik JAWS-a). Provjeriti naziv mape za hrvatski.
 8. Instalacijski program (Inno Setup):
+   - po izboru postavlja naše preporučene TC postavke (ini). U njima je ekstenzija uz ime, jer skripta ime uzima iz prvog stupca. Zaseban stupac ekstenzije skripta zasad ne podržava;
    - u .jcf upisuje samo potrebne retke, ne prepisuje datoteku;
    - instalira u sve verzije JAWS-a od 2025 nadalje, u korisničku mapu.
 9. README i dokumentacija.
