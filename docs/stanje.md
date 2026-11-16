@@ -50,10 +50,11 @@ Zaključak: TC 11.56 sam daje JAWS-u dosta podataka (MSAA). Popis, izbornici, di
 1. Strelice čitaju cijeli redak. Željeno: samo ime; detalji na Insert+strelica gore. Insert+strelica gore sad čita isto što i strelice.
 2. Ulaz u popis je opširan: "List box <naslov prozora>", pa "LEFT MultiSelect ListBox <stavka>".
 3. Putanja se izgovara s filtrom "*.*" i nakon stavke, a ne prije nje.
-4. Razmak na mapi: najprije "?" umjesto veličine (TC je još računa), zatim se "selected <stavka>" izgovori dvaput. Drugi razmak ne kaže da je oznaka maknuta, nego samo ponovi redak dvaput.
-5. Insert označi i pomakne se na sljedeću stavku, ali ne kaže je li prethodna označena; čuje se samo sljedeća stavka.
+4. Razmak: pri označavanju kaže "selected <stavka>" (na mapi prvo "?" dok TC računa veličinu, a redak se čuje dvaput). Pri micanju oznake kaže samo redak, bez riječi da oznake više nema.
+5. Insert označi i pomakne se na sljedeću stavku, ali ne kaže je li prethodna označena; čuje se samo sljedeća stavka. Što bi tu trebalo reći, još je otvoreno.
+5a. Oba Inserta su JAWS tipka (default.jcf: JAWSInsertKey=3, 1 = numerički, 2 = prošireni, 3 = oba), pa TC-ova naredba Insert radi samo kroz Pass key through. Prvi zadatak: u TC-u jedan Insert prepustiti TC-u.
 6. Insert+Page Down čita statusne trake obiju ploča zaredom. Treba samo aktivnu, ili aktivnu pa drugu, jasno odvojeno.
-7. Ctrl+C / Ctrl+X / Ctrl+V: JAWS kaže samo "Copied", "cut", "Pasted", bez broja i imena stavki. Nakon lijepljenja čulo se "Prekinute akcije: 1", porijeklo nepoznato.
+7. Ctrl+C / Ctrl+X / Ctrl+V: JAWS kaže samo "Copied", "cut", "Pasted". Ctrl+V pokreće Explorerovo kopiranje, a ne TC-ovo, pa je "Prekinute akcije: 1" iz Explorera. U TC-u se kopira i premješta s F5 i F6, pa ovo nije prioritet.
 8. F5 dijalog: fokus prvo javi "Combo box Total Commander", tj. ime polja je naslov dijaloga, a ne "Copy 1 file(s) to". Potvrdni okviri se javljaju kao "3 state button" umjesto "checkbox".
 9. Dijalog prepisivanja: pri otvaranju se čuje samo "Total Commander, Overwrite Button". Ne kaže se koja datoteka ni usporedba veličina i datuma. Insert+B pročita prozor napretka u pozadini, a ne podatke dijaloga prepisivanja.
 10. Napredak kopiranja: postoci s više traka izgovaraju se nasumično ("8%, 86%, 0%, 14%"), bez oznake koja je traka (trenutna datoteka ili ukupno). Naslov dijaloga je samo "Total Commander".
