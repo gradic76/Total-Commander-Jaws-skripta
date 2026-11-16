@@ -45,6 +45,11 @@ file %1
 minus
 @@
 
+; Pack files dialog: name for the compression ratio button, %1 = current ratio
+@msgTcCompressionRatio
+Compression ratio %1
+@@
+
 ; Shown when the progress window text could not be read
 @msgTcProgressUnknown
 Progress not available

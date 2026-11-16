@@ -16,6 +16,9 @@ const
 	wcDialog = "#32770",
 	wcProgressBar = "msctls_progress32",
 	wcEdit = "Edit",
+	; Pack files dialog (Alt+F5); its compression ratio button caption is a single digit
+	wcTcPackDlg = "TDLGZIP",
+	tcDigits = "0123456789",
 	; Button captions JAWS does not speak at default punctuation level
 	tcMinusCaption = "-",
 	; Max screen lines read from the progress window

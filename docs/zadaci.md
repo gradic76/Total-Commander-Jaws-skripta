@@ -16,7 +16,8 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 ## Uz napredak, poslije reda čekanja
 
 - Alt+F5 (pakiranje) i Alt+F6 (raspakiranje): vjerojatno drugi prozori, izmjeriti.
-- Move (F6): vjerojatno isti prozor kao Copy, provjeriti.
+- Move (F6): prema autoru isti prozor napretka kao Copy i Delete, i Delete se dobro čitao. Uzgred potvrditi i Insert+Page Down.
+- Red čekanja: Tab spor zbog TC-a (vidi stanje.md). U dokumentaciju upisati kao poznato ograničenje i savjetovati Foreground.
 
 ## Sljedeće, ovim redom
 

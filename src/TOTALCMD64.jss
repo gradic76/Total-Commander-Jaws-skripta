@@ -321,11 +321,27 @@ return NewTextEventShouldBeSilent (hFocus, hwnd, buffer, nAttributes, nTextColor
 EndFunction
 
 int function HandleCustomWindows (handle hwnd)
-; The "-" button caption is punctuation, which JAWS does not speak.
-if GetWindowClass (hwnd) == wcButton
-&& GetWindowName (hwnd) == tcMinusCaption then
-	IndicateControlType (WT_BUTTON, msgTcMinus)
-	return true
+var string sName
+if GetWindowClass (hwnd) == wcButton then
+	let sName = GetObjectName ()
+	; TC check boxes are three-state buttons; JAWS calls them "3 state button".
+	if GetWindowSubtypeCode (hwnd) == WT_3STATE then
+		IndicateControlType (WT_CHECKBOX, sName)
+		IndicateControlState (WT_CHECKBOX, GetControlAttributes ())
+		return true
+	endIf
+	; The "-" button caption is punctuation, which JAWS does not speak.
+	if GetWindowName (hwnd) == tcMinusCaption then
+		IndicateControlType (WT_BUTTON, msgTcMinus)
+		return true
+	endIf
+	; Pack dialog: the compression ratio button shows only the digit; its label is painted.
+	if GetWindowClass (GetParent (hwnd)) == wcTcPackDlg
+	&& StringLength (sName) == 1
+	&& StringContains (tcDigits, sName) then
+		IndicateControlType (WT_BUTTON, FormatString (msgTcCompressionRatio, sName))
+		return true
+	endIf
 endIf
 return HandleCustomWindows (hwnd)
 EndFunction
