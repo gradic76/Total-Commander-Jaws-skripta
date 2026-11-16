@@ -9,6 +9,10 @@ const
 	wcTcMain = "TTOTAL_CMD",
 	wcTcOverwrite = "TOverWriteForm",
 	wcButton = "Button",
+	; Copy/move progress window; matched as a prefix (seen: TDLG2FILEACTIONMIN)
+	wcTcProgressPrefix = "TDLG2FILEACTION",
+	; Max screen lines read from the progress window
+	tcProgressMaxLines = 12,
 
 	; Delimiter used internally between lines read from the off-screen model.
 	; File paths cannot contain it.

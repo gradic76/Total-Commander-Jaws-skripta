@@ -60,26 +60,53 @@ endWhile
 return hFound
 EndFunction
 
-string function TcReadGroupLines (handle hGroup)
-; Returns the first three screen lines of a group box, joined by tcLineDelim.
+int function TcIsWindowInside (handle hwnd, handle hContainer)
+var handle h
+let h = hwnd
+while h
+	if h == hContainer then
+		return true
+	endIf
+	let h = GetParent (h)
+endWhile
+return false
+EndFunction
+
+string function TcReadWindowLines (handle hwnd, int nMax, handle hContainer)
+; Reads up to nMax screen lines from the off-screen model, starting at hwnd,
+; using the Invisible cursor. Lines are joined by tcLineDelim.
+; If hContainer is given, reading stops when the cursor leaves that window.
+; Reading also stops when NextLine no longer moves the cursor (last line).
 var
 	string sLines,
+	int nRow,
 	int i
 SaveCursor ()
 InvisibleCursor ()
-if !MoveToWindow (hGroup) then
+if !MoveToWindow (hwnd) then
 	RestoreCursor ()
 	return cscNull
 endIf
 let sLines = GetLine ()
 let i = 1
-while i < 3
+while i < nMax
+	let nRow = GetCursorRow ()
 	NextLine ()
-	let sLines = sLines + tcLineDelim + GetLine ()
-	let i = i + 1
+	if GetCursorRow () == nRow
+	|| (hContainer && !TcIsWindowInside (GetCurrentWindow (), hContainer)) then
+		let i = nMax
+	else
+		let sLines = sLines + tcLineDelim + GetLine ()
+		let i = i + 1
+	endIf
 endWhile
 RestoreCursor ()
 return sLines
+EndFunction
+
+string function TcReadGroupLines (handle hGroup)
+; Returns the three screen lines of a file group box: caption, path, size and date.
+return TcReadWindowLines (hGroup, 3, 0)
 EndFunction
 
 string function TcCleanCaption (string sCaption)
@@ -151,11 +178,143 @@ endIf
 return HandleCustomRealWindows (hwnd)
 EndFunction
 
+; ---------------------------------------------------------------------------
+; Copy/move progress window (TDLG2FILEACTION*)
+; Painted lines: "<operation>: <speed>, <time left>", From, To, file percent,
+; total percent, speed, "<files done> / <files> <size done> / <size>".
+; JAWS speaks every progress bar change; that is silenced here and
+; Insert+Page Down speaks a summary on demand.
+; ---------------------------------------------------------------------------
+
+handle function TcGetProgressDialog (handle hwnd)
+var handle h
+let h = hwnd
+while h
+	if StringContains (GetWindowClass (h), wcTcProgressPrefix) == 1 then
+		return h
+	endIf
+	let h = GetParent (h)
+endWhile
+return 0
+EndFunction
+
+string function TcProgressSummary (handle hDlg)
+var
+	string sLines,
+	string sLine,
+	string sTitle,
+	string sHeader,
+	string sFilePct,
+	string sTotalPct,
+	string sCounts,
+	string sTime,
+	string sOut,
+	int nCount,
+	int i
+let sLines = TcReadWindowLines (hDlg, tcProgressMaxLines, hDlg)
+if !sLines then
+	return cscNull
+endIf
+let sTitle = GetWindowName (hDlg)
+let nCount = StringSegmentCount (sLines, tcLineDelim)
+let i = 1
+while i <= nCount
+	let sLine = StringTrimTrailingBlanks (StringTrimLeadingBlanks (StringSegment (sLines, tcLineDelim, i)))
+	if sLine && sLine != sTitle then
+		if StringRight (sLine, 1) == "%" then
+			; first percent line is the current file, second is the total
+			if !sFilePct then
+				let sFilePct = sLine
+			elIf !sTotalPct then
+				let sTotalPct = sLine
+			endIf
+		elIf !sHeader && !StringContains (sLine, "\\") then
+			let sHeader = sLine
+		elIf !sCounts && StringContains (sLine, " / ") && !StringContains (sLine, "\\") then
+			let sCounts = sLine
+		endIf
+	endIf
+	let i = i + 1
+endWhile
+; A single percent line means there is only the total bar.
+if sFilePct && !sTotalPct then
+	let sTotalPct = sFilePct
+	let sFilePct = cscNull
+endIf
+if StringContains (sHeader, ",") then
+	let sTime = StringTrimLeadingBlanks (StringSegment (sHeader, ",", -1))
+endIf
+if sTotalPct then
+	let sOut = FormatString (msgTcProgressTotal, sTotalPct)
+endIf
+if sFilePct then
+	let sOut = sOut + ", " + FormatString (msgTcProgressFile, sFilePct)
+endIf
+if sCounts then
+	let sOut = sOut + ", " + sCounts
+endIf
+if sTime then
+	let sOut = sOut + ", " + FormatString (msgTcProgressLeft, sTime)
+endIf
+return sOut
+EndFunction
+
+void function TcSayWindowLines (handle hDlg)
+; Speaks every painted line of a dialog, without leaving it.
+; Used where the default Insert+B reads the owner window instead of the dialog.
+var
+	string sLines,
+	string sLine,
+	string sTitle,
+	int nCount,
+	int i
+let sLines = TcReadWindowLines (hDlg, tcProgressMaxLines, hDlg)
+let sTitle = GetWindowName (hDlg)
+let nCount = StringSegmentCount (sLines, tcLineDelim)
+let i = 1
+while i <= nCount
+	let sLine = StringTrimTrailingBlanks (StringSegment (sLines, tcLineDelim, i))
+	if sLine && sLine != sTitle then
+		SayMessage (OT_USER_REQUESTED_INFORMATION, sLine)
+	endIf
+	let i = i + 1
+endWhile
+EndFunction
+
+void function ProgressBarChangedEvent (handle hProgress, string sName, string sValue)
+if TcGetProgressDialog (hProgress) then
+	return
+endIf
+ProgressBarChangedEvent (hProgress, sName, sValue)
+EndFunction
+
+Script SayBottomLineOfWindow ()
+var
+	handle hDlg,
+	string sSummary
+let hDlg = TcGetProgressDialog (GetFocus ())
+if hDlg then
+	let sSummary = TcProgressSummary (hDlg)
+	if sSummary then
+		SayMessage (OT_USER_REQUESTED_INFORMATION, sSummary)
+	else
+		SayMessage (OT_ERROR, msgTcProgressUnknown)
+	endIf
+	return
+endIf
+PerformScript SayBottomLineOfWindow ()
+EndScript
+
 Script ReadBoxInTabOrder ()
 var handle hDlg
 let hDlg = TcGetOverwriteDialog (GetFocus ())
 if hDlg then
 	TcSayOverwriteDetails (hDlg)
+	return
+endIf
+let hDlg = TcGetProgressDialog (GetFocus ())
+if hDlg then
+	TcSayWindowLines (hDlg)
 	return
 endIf
 PerformScript ReadBoxInTabOrder ()

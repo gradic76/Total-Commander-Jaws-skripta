@@ -24,4 +24,24 @@ Total Commander JAWS scripts, version %1
 @msgTcOverwriteGroup
 %1 %2, %3.
 @@
+; Insert+Page Down in the progress window, parts joined by ", "
+; %1 = total percent as shown, e.g. "6 %"
+@msgTcProgressTotal
+Total %1
+@@
+
+; %1 = current file percent as shown
+@msgTcProgressFile
+file %1
+@@
+
+; %1 = remaining time as shown, e.g. "43 m"
+@msgTcProgressLeft
+%1 left
+@@
+
+; Shown when the progress window text could not be read
+@msgTcProgressUnknown
+Progress not available
+@@
 EndMessages

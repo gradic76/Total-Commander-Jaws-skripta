@@ -8,14 +8,19 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 - Dijalog prepisivanja: sažetak pri otvaranju, Insert+B s putanjama (TOTALCMD64.jss).
 - Insert+Q kaže verziju skripte.
 - Razvojna instalacija: tools\deploy.ps1.
+- Prozor napretka (TDLG2FILEACTION*), provjereno uhom 2026-11-16:
+  - automatski postoci su utišani;
+  - Insert+Page Down kaže sažetak;
+  - Insert+B čita samo retke tog prozora.
+
+## Uz napredak, poslije reda čekanja
+
+- Alt+F5 (pakiranje) i Alt+F6 (raspakiranje): vjerojatno drugi prozori, izmjeriti.
+- Move (F6): vjerojatno isti prozor kao Copy, provjeriti.
 
 ## Sljedeće, ovim redom
 
-1. Prozor napretka kopiranja (TDLG2FILEACTIONMIN). Postoci s dviju traka izgovaraju se nasumično. Plan:
-   - utišati automatske postotke;
-   - dodati prečac koji kaže ukupno i trenutnu datoteku.
-
-   Treba izmjeriti trake dok kopiranje traje: autor pokrene kopiranje veće mape i ostavi prozor otvoren.
+1. Pozadinsko kopiranje (Background) i red čekanja (F2 Queue): izmjeriti i riješiti.
 2. Označavanje:
    - razmak dvaput kaže "selected" i ne javlja micanje oznake;
    - Insert ne kaže ništa o upravo označenoj stavci (što reći, još je otvoreno);
