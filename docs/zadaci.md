@@ -13,9 +13,15 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
   - Insert+Page Down kaže sažetak;
   - Insert+B čita samo retke tog prozora.
 
+- Pakiranje (Alt+F5), provjereno uhom 2026-11-16:
+  - dijalog čitljiv; "check box" umjesto "3 state button" (za cijeli TC);
+  - "Compression ratio 6 button";
+  - napredak je isti prozor TDLG2FILEACTIONMIN, pa Insert+Page Down i Insert+B rade bez izmjena.
+
 ## Uz napredak, poslije reda čekanja
 
-- Alt+F5 (pakiranje) i Alt+F6 (raspakiranje): vjerojatno drugi prozori, izmjeriti.
+- Raspakiranje (Alt+F9 ili Alt+F6): izmjeriti dijalog i napredak.
+- Dijalog Pack files pri otvaranju dvaput izgovori polje ("Pack 1 file(s) to the archive Edit" i naziv). Provjeriti i druge dijaloge.
 - Move (F6): prema autoru isti prozor napretka kao Copy i Delete, i Delete se dobro čitao. Uzgred potvrditi i Insert+Page Down.
 - Red čekanja: Tab spor zbog TC-a (vidi stanje.md). U dokumentaciju upisati kao poznato ograničenje i savjetovati Foreground.
 
