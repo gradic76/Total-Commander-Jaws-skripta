@@ -16,6 +16,11 @@ const
 	wcDialog = "#32770",
 	wcProgressBar = "msctls_progress32",
 	wcEdit = "Edit",
+	; File panels. In Full view a row is tab separated:
+	; "<name>\t<size or DIR>\t<date time>\t<attributes>" (measured 2026-11-17).
+	wcTcFileList = "LCLListBox",
+	tcDirMarker = "<DIR>",
+	tcColumnDelim = "\t",
 	; Pack files dialog (Alt+F5); its compression ratio button caption is a single digit
 	wcTcPackDlg = "TDLGZIP",
 	tcDigits = "0123456789",

@@ -45,6 +45,11 @@ file %1
 minus
 @@
 
+; File list, arrow keys: folder item, %1 = folder name
+@msgTcFolder
+%1 folder
+@@
+
 ; Pack files dialog: name for the compression ratio button, %1 = current ratio
 @msgTcCompressionRatio
 Compression ratio %1

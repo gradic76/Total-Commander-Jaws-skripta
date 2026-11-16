@@ -376,6 +376,68 @@ endIf
 PerformScript SayBottomLineOfWindow ()
 EndScript
 
+; ---------------------------------------------------------------------------
+; File panels (LCLListBox)
+; JAWS speaks the item through ActiveItemChangedEvent; the item name is the whole row.
+; Arrows speak only the file name; Insert+Up Arrow speaks the whole row and position.
+; ---------------------------------------------------------------------------
+
+int function TcIsFileListFocused ()
+return IsPCCursor ()
+	&& GetWindowClass (GetFocus ()) == wcTcFileList
+EndFunction
+
+string function TcListRowName (string sRow)
+; The name is the first tab separated column. Rows without columns
+; (e.g. Brief view) are returned whole.
+return StringSegment (sRow, tcColumnDelim, 1)
+EndFunction
+
+int function TcListRowIsDir (string sRow)
+return StringSegment (sRow, tcColumnDelim, 2) == tcDirMarker
+EndFunction
+
+string function TcListRowForSpeech (string sRow)
+; Whole row with columns separated by commas, for Insert+Up Arrow.
+return StringReplaceSubstrings (sRow, tcColumnDelim, ", ")
+EndFunction
+
+void function TcSayListItemName ()
+var string sRow
+let sRow = GetObjectName ()
+if GetControlAttributes () & CTRL_SELECTED then
+	IndicateControlState (WT_LISTBOXITEM, CTRL_SELECTED)
+endIf
+if TcListRowIsDir (sRow) then
+	Say (FormatString (msgTcFolder, TcListRowName (sRow)), OT_LINE)
+else
+	Say (TcListRowName (sRow), OT_LINE)
+endIf
+EndFunction
+
+Void Function ActiveItemChangedEvent (handle curHwnd, int curObjectId, int curChildId,
+	handle prevHwnd, int prevObjectId, int prevChildId)
+if GetWindowClass (curHwnd) == wcTcFileList
+&& curHwnd == GetFocus ()
+&& IsPCCursor () then
+	TcSayListItemName ()
+	return
+endIf
+ActiveItemChangedEvent (curHwnd, curObjectId, curChildId, prevHwnd, prevObjectId, prevChildId)
+EndFunction
+
+Script SayLine ()
+if TcIsFileListFocused () then
+	if GetControlAttributes () & CTRL_SELECTED then
+		IndicateControlState (WT_LISTBOXITEM, CTRL_SELECTED)
+	endIf
+	Say (TcListRowForSpeech (GetObjectName ()), OT_LINE)
+	Say (PositionInGroup (), OT_POSITION)
+	return
+endIf
+PerformScript SayLine ()
+EndScript
+
 Script ReadBoxInTabOrder ()
 var handle hDlg
 let hDlg = TcGetOverwriteDialog (GetFocus ())
