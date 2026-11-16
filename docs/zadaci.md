@@ -33,16 +33,16 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
    - Insert ne kaže ništa o upravo označenoj stavci (što reći, još je otvoreno);
    - na mapi se čuje "?" dok TC računa veličinu.
 3. Popis datoteka:
-   - strelice čitaju samo ime, uz "mapa" za mape;
-   - Insert+strelica gore čita cijeli redak;
-   - kraći ulazak u popis;
+   - gotovo 2026-11-17, provjereno uhom: strelice čitaju samo ime, uz "folder" za mape; Insert+strelica gore čita cijeli redak i položaj;
+   - mapa s izračunatom veličinom (nakon razmaka) prikazuje broj umjesto <DIR>, pa se "folder" ne čuje. Naći drugi znak;
+   - kraći ulazak u popis (Tab, Alt+Tab): još čita cijeli redak;
    - putanja bez "*.*".
 4. Insert+Page Down čita samo statusnu traku aktivne ploče.
 5. F5 dijalog:
    - ime polja je naslov dijaloga, a ne "Copy 1 file(s) to";
    - potvrdni okviri se javljaju kao "3 state button".
 6. Vlastita pomoć na Insert+F1.
-7. Odabir jezika poruka prema jeziku TC-a (.jsm en i hr).
+7. Hrvatski .jsm u mapi jezika JAWS-a (odluka 2026-11-17: poruke prate jezik JAWS-a). Provjeriti naziv mape za hrvatski.
 8. Instalacijski program (Inno Setup):
    - u .jcf upisuje samo potrebne retke, ne prepisuje datoteku;
    - instalira u sve verzije JAWS-a od 2025 nadalje, u korisničku mapu.

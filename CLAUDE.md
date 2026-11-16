@@ -17,7 +17,12 @@ JAWS skripte koje slijepim korisnicima JAWS for Windows omogućuju i olakšavaju
 ## Pravila rada
 
 - Ne pretpostavljaj nazive klasa prozora, ID-ove kontrola ni ponašanje TC-a: provjeri na stvarnom programu (ili pitaj korisnika da provjeri s JAWS-om) i zapiši nalaz.
-- Poruke koje skripta izgovara nikad ne piši izravno u kod: idu u .jsm datoteke po jeziku, ili se čitaju iz TC lokalizacije.
+- Prepoznavanje ide po strukturi i znakovima, nikad po riječima:
+  - prozore i kontrole prepoznaj po klasi, roditelju, strukturi i položaju;
+  - podatke unutar teksta prepoznaj po znakovima (tabulator, %, " / ", \, zarez, "<");
+  - natpise koje treba izgovoriti uzmi iz samog TC-a, jer tako prate jezik TC-a;
+  - vrste i stanja kontrola prepusti JAWS-u (IndicateControlType, IndicateControlState), jer tako prate jezik JAWS-a.
+- Vlastitih riječi neka bude što manje. Idu samo u .jsm, nikad u kod. Jezik .jsm prati jezik JAWS-a (mapa enu, hrv...).
 - Ne mijenjaj korisnikov postojeći wincmd.ini bez izričitog pristanka.
 - Sve što se doda mora biti dokumentirano u README i u pomoći skripte (Insert+F1).
 
@@ -27,7 +32,7 @@ JAWS skripte koje slijepim korisnicima JAWS for Windows omogućuju i olakšavaju
 
 1. Rad u Total Commanderu s JAWS-om bez gubljenja informacija: uvijek se zna gdje si, što je fokusirano i što je označeno.
 2. Pouzdane osnovne radnje upravitelja datoteka: kretanje po mapama, označavanje, kopiranje, izrezivanje, lijepljenje, premještanje, brisanje.
-3. Poruke na jeziku sučelja TC-a, koliko god je moguće preuzete iz TC lokalizacije.
+3. Što manje ovisnosti o jeziku: TC-ovi natpisi prate jezik TC-a, a naše malobrojne poruke jezik JAWS-a (odluka 2026-11-17).
 4. Jednostavna instalacija za druge korisnike, uz po izboru unaprijed podešeno pojednostavljeno sučelje TC-a.
 
 ### Faza 0: snimka zatečenog stanja (prije pisanja koda)
@@ -47,7 +52,7 @@ JAWS skripte koje slijepim korisnicima JAWS for Windows omogućuju i olakšavaju
 6. F5, F6, F8 i dijalozi koji iz njih proizlaze (potvrda, prepisivanje, napredak): čitljivi i upotrebljivi.
 7. Statusna traka (broj i veličina označenih) dostupna na JAWS-ovu standardnu naredbu za statusnu traku.
 8. Nove prečace dodajemo samo tamo gdje faza 0 pokaže potrebu.
-9. Poruke na engleskom i hrvatskom (.jsm), uz izbor prema jeziku TC sučelja; tekstove iz TC .lng datoteke koristiti gdje je moguće.
+9. Poruke na engleskom i hrvatskom (.jsm u mapama jezika JAWS-a).
 10. Instalacijski program: pronalazi instalirane verzije JAWS-a 2025+, kopira i kompajlira skripte u korisničke postavke te verzije; po izboru postavlja pojednostavljene TC postavke.
 11. README (hrvatski i engleski) i pomoć skripte.
 
@@ -61,8 +66,8 @@ JAWS skripte koje slijepim korisnicima JAWS for Windows omogućuju i olakšavaju
 ### Otvorena pitanja
 
 1. Točna verzija TC-a (11.x?) i od koje verzije podržavamo.
-2. Kako čitati TC lokalizaciju: format .lng datoteka, gdje TC zapisuje odabrani jezik (wincmd.ini, LanguageIni) i koliko se tekstova može koristiti u skripti. Treba provjeriti.
-3. Što kad za jezik TC-a nema .jsm prijevoda: zadano engleski?
+2. Riješeno 2026-11-17: TC .lng se ne čita. Natpisi se uzimaju s ekrana, a poruke prate jezik JAWS-a.
+3. Što kad za jezik JAWS-a nema našeg .jsm prijevoda: provjeriti vraća li JAWS sam na enu.
 4. Naziv mape jezika za hrvatski u JAWS-u (lokalizacija nije službena): provjeriti na tvojoj instalaciji.
 5. Pojednostavljene TC postavke: prijedlog je zaseban ini koji TC dobiva parametrom /i= preko vlastitog prečaca, tako da se korisnikov wincmd.ini ne dira. Koje postavke točno (jedan ili dva profila)?
 6. Alat za instalacijski program: prijedlog Inno Setup (besplatan, čitljiv s JAWS-om, podržava hrvatski i engleski). Treba potvrditi da se kompajliranje skripti (scompile.exe) može pouzdano pozvati iz njega.

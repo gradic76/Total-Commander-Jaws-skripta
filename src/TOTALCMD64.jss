@@ -394,7 +394,7 @@ return StringSegment (sRow, tcColumnDelim, 1)
 EndFunction
 
 int function TcListRowIsDir (string sRow)
-return StringSegment (sRow, tcColumnDelim, 2) == tcDirMarker
+return StringLeft (StringSegment (sRow, tcColumnDelim, 2), 1) == tcDirMarkerStart
 EndFunction
 
 string function TcListRowForSpeech (string sRow)

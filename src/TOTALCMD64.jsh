@@ -19,7 +19,9 @@ const
 	; File panels. In Full view a row is tab separated:
 	; "<name>\t<size or DIR>\t<date time>\t<attributes>" (measured 2026-11-17).
 	wcTcFileList = "LCLListBox",
-	tcDirMarker = "<DIR>",
+	; Folders and links show a translated marker in angle brackets instead of a size
+	; (<DIR>, <LINK>, French <RÉP>), so only its first character is checked.
+	tcDirMarkerStart = "<",
 	tcColumnDelim = "\t",
 	; Pack files dialog (Alt+F5); its compression ratio button caption is a single digit
 	wcTcPackDlg = "TDLGZIP",
