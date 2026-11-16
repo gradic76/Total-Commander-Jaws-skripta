@@ -20,7 +20,7 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 
 ## Uz napredak, poslije reda čekanja
 
-- Raspakiranje (Alt+F9 ili Alt+F6): izmjeriti dijalog i napredak.
+- Raspakiranje: dijalog i napredak čitljivi kao i drugdje (autor uhom, 2026-11-16; strukturu nisam mjerio).
 - Dijalog Pack files pri otvaranju dvaput izgovori polje ("Pack 1 file(s) to the archive Edit" i naziv). Provjeriti i druge dijaloge.
 - Move (F6): prema autoru isti prozor napretka kao Copy i Delete, i Delete se dobro čitao. Uzgred potvrditi i Insert+Page Down.
 - Red čekanja: Tab spor zbog TC-a (vidi stanje.md). U dokumentaciju upisati kao poznato ograničenje i savjetovati Foreground.
