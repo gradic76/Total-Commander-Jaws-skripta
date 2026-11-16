@@ -60,6 +60,18 @@ Zaključak: TC 11.56 sam daje JAWS-u dosta podataka (MSAA). Popis, izbornici, di
 10. Napredak kopiranja: postoci s više traka izgovaraju se nasumično ("8%, 86%, 0%, 14%"), bez oznake koja je traka (trenutna datoteka ili ukupno). Naslov dijaloga je samo "Total Commander".
 11. Insert+F1 daje JAWS-ovu općenitu pomoć za program bez podrške.
 
+### Dijalog prepisivanja (izmjereno 2026-11-16)
+
+- Klasa TOverWriteForm, naslov "Total Commander". Vlasnik je prozor napretka TDLG2FILEACTIONMIN, a njegov vlasnik glavni prozor.
+- Na ekranu (snimka):
+  - "Overwrite:": ciljna datoteka (putanja skraćena s ...), "14.637.686 bytes, 05.12.2012 08:55:26" i ikona crvenog X;
+  - narančasta strelica između okvira, vjerojatno pokazuje noviju datoteku, nije provjereno;
+  - "With file:": izvorna datoteka, veličina, datum i ikona zelene kvačice;
+  - potvrdni okviri Thumbnails i Custom fields, gumb "+";
+  - gumbi Overwrite, Overwrite all, Skip, Cancel, Overwrite all older, Skip all, Rename, Append i More Options >>.
+- Okviri "Overwrite:" i "With file:" su prozori klase Button (vjerojatno group box) s djetetom klase Window (ikona). Putanja, veličina i datum nisu ni u tekstu prozora ni u MSAA/UIA, nego se samo iscrtavaju.
+- Za skriptu ostaje JAWS-ov off-screen model (iscrtani tekst). Treba provjeriti vidi li ga JAWS kursor.
+
 ### Tehnički podaci iz JAWS-a
 
 - Ctrl+Insert+F1 na popisu: klasa LCLListBox, Control ID i handle su promjenjivi (potvrđuje mjerenje iz Win32).
