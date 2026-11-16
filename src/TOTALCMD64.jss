@@ -136,22 +136,19 @@ while bLower <= true
 endWhile
 EndFunction
 
-void function FocusChangedEventEx (handle hwndFocus, int nObject, int nChild,
-	handle hwndPrevFocus, int nPrevObject, int nPrevChild,
-	int nChangeDepth)
-var
-	handle hDlg,
-	string sSummary
-let hDlg = TcGetOverwriteDialog (hwndFocus)
-; Speak the summary only when focus enters the dialog, not when moving inside it.
-if hDlg
-&& TcGetOverwriteDialog (hwndPrevFocus) != hDlg then
-	let sSummary = TcOverwriteSummary (hDlg)
+int function HandleCustomRealWindows (handle hwnd)
+; Called by the default focus handling when focus enters a new real window.
+; For the overwrite dialog, speak the file summary instead of the dialog title
+; ("Total Commander"), which the progress window owning it has usually just spoken.
+var string sSummary
+if GetWindowClass (hwnd) == wcTcOverwrite then
+	let sSummary = TcOverwriteSummary (hwnd)
 	if sSummary then
 		SayMessage (OT_DIALOG_TEXT, sSummary)
+		return true
 	endIf
 endIf
-FocusChangedEventEx (hwndFocus, nObject, nChild, hwndPrevFocus, nPrevObject, nPrevChild, nChangeDepth)
+return HandleCustomRealWindows (hwnd)
 EndFunction
 
 Script ReadBoxInTabOrder ()

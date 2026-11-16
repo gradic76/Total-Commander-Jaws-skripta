@@ -70,7 +70,13 @@ Zaključak: TC 11.56 sam daje JAWS-u dosta podataka (MSAA). Popis, izbornici, di
   - potvrdni okviri Thumbnails i Custom fields, gumb "+";
   - gumbi Overwrite, Overwrite all, Skip, Cancel, Overwrite all older, Skip all, Rename, Append i More Options >>.
 - Okviri "Overwrite:" i "With file:" su prozori klase Button (vjerojatno group box) s djetetom klase Window (ikona). Putanja, veličina i datum nisu ni u tekstu prozora ni u MSAA/UIA, nego se samo iscrtavaju.
-- Za skriptu ostaje JAWS-ov off-screen model (iscrtani tekst). Treba provjeriti vidi li ga JAWS kursor.
+- JAWS kursor vidi iscrtani tekst u retcima: natpis okvira, putanja, "veličina, datum".
+- Riješeno 2026-11-16 (TOTALCMD64.jss, provjerio autor uhom):
+  - pri otvaranju se čuje "Total Commander", zatim "Overwrite 01.mp3. Existing: ... New: ...", zatim fokusirani gumb;
+  - Insert+B čita oba okvira s putanjama;
+  - Tab ne ponavlja sažetak;
+  - Insert+Q kaže verziju.
+- Sažetak se izgovara iz HandleCustomRealWindows, umjesto naslova dijaloga, pa nema dvostrukog "Total Commander".
 
 ### Tehnički podaci iz JAWS-a
 
