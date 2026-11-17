@@ -905,3 +905,45 @@ if TcIsFileListFocused () then
 endIf
 PerformScript SayBottomLineOfWindow ()
 EndScript
+
+string function TcPathFilter (string sLine)
+; The file filter at the end of a path line: "e:\Music\*.mp3" -> "*.mp3".
+return StringSegment (sLine, "\\", -1)
+EndFunction
+
+string function TcPathWithoutFilter (string sLine)
+; "e:\Music\Rock\*.*" -> "e:\Music\Rock"; a drive root keeps its backslash ("e:\").
+var string sPath
+let sPath = StringChopRight (sLine, StringLength (TcPathFilter (sLine)) + 1)
+if !StringContains (sPath, "\\") then
+	let sPath = sPath + "\\"
+endIf
+return sPath
+EndFunction
+
+Script TcSayPath ()
+; Alt+Shift+P: path of the active panel; pressed twice, copies it to the clipboard.
+var
+	string sLine,
+	string sPath
+if !TcIsFileListFocused () then
+	TypeCurrentScriptKey ()
+	return
+endIf
+let sLine = TcPanelPath (GetFocus ())
+if !sLine then
+	SayMessage (OT_ERROR, msgTcNotAvailable)
+	return
+endIf
+let sPath = TcPathWithoutFilter (sLine)
+if IsSameScript () then
+	CopyToClipboard (sPath)
+	SayMessage (OT_JAWS_MESSAGE, cmsg52_S)
+	return
+endIf
+; a filter other than "*.*" is worth hearing ("e:\Music *.mp3")
+if TcPathFilter (sLine) != tcAllFilesFilter then
+	let sPath = sPath + " " + TcPathFilter (sLine)
+endIf
+SayMessage (OT_USER_REQUESTED_INFORMATION, sPath)
+EndScript

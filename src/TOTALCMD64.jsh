@@ -24,6 +24,8 @@ const
 	wcTcFileList = "LCLListBox",
 	; Parent folder item at the top of a file list
 	tcUpDir = "..",
+	; Filter shown in the path line when all files are listed
+	tcAllFilesFilter = "*.*",
 	; Kinds of panel text lines
 	tcPanelLinePath = 1,
 	tcPanelLineStatus = 2,
