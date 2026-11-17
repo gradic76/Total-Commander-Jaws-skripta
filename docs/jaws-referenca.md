@@ -54,3 +54,13 @@ Treće strane (pročitano):
 - Instalacijski program mora upisati JAWSInsertKey=1 u korisnikovu TOTALCMD64.jcf kao jedan redak, a ne prepisati cijelu datoteku. Isto vrijedi za ostale .jcf postavke.
 - Instalira se samo u korisničku mapu, za svaku pronađenu verziju od 2025 nadalje, i nikad u ProgramData.
 - Verzija skripte na Insert+Q, prema Leejevoj praksi, kao dio pomoći.
+
+## Naučeno u radu (2026-11-17)
+
+- scompile.exe prevodi samo skripte u JAWS-ovoj mapi postavki. Na grešku vraća izlazni kod različit od 0, pa deploy.ps1 tada staje, a stara .jsb ostaje.
+- Funkcija koja vraća tekst (string) mora biti definirana prije prve upotrebe. Inače prevoditelj pretpostavi int i javi grešku.
+- Funkcija koja poziva samu sebe (rekurzija) se prevede, ali ne radi. Koristiti petlje.
+- COM radi: CreateObject ("Shell.Application") i poziv metoda točkom (oShell.NameSpace (17).Title).
+- JAWS sam umeće "selected" u izgovor o označenoj stavci na fokusu, čak i unutar našeg Say. Ne dodavati ga ručno.
+- Kad aplikacija prepiše redak stavke na fokusu, JAWS javlja FocusChangedEventEx za istu stavku (nChild == nPrevChild) i izgovori cijeli redak.
+- Ispitivanje izgovora: povijest govora. Insert+Razmak pa Shift+H je briše, Insert+Razmak pa Ctrl+H je kopira u međuspremnik, a Claude je pročita. Za traženje izvora govora koriste se privremene oznake ("A", "S", "F"...) u probnoj verziji (deploy.ps1 -SourceDir).

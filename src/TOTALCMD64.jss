@@ -559,13 +559,176 @@ string function TcListRowForSpeech (string sRow)
 return StringReplaceSubstrings (sRow, tcColumnDelim, ", ")
 EndFunction
 
+string function TcDriveMenuName (string sKey)
+; Name of a drive menu item, asked from the Windows shell (as Explorer shows it):
+; a drive letter gives e.g. "Glazba" or "BD-ROM pogon" (the " (E:)" suffix is removed);
+; TC's special items "+", "*" and "\" give This PC, Documents and Network.
+; The menu's own labels are painted in a way JAWS cannot read (measured 2026-11-17).
+var
+	object oShell,
+	object oFolder,
+	object oItem,
+	string sName,
+	string sSuffix
+let oShell = CreateObject ("Shell.Application")
+if !oShell then
+	return cscNull
+endIf
+if sKey == tcDriveKeyComputer then
+	return oShell.NameSpace (ssfDrives).Title
+elIf sKey == tcDriveKeyDocuments then
+	return oShell.NameSpace (ssfPersonal).Title
+elIf sKey == tcDriveKeyNetwork then
+	return oShell.NameSpace (ssfNetwork).Title
+endIf
+if StringLength (sKey) != 1
+|| !StringContains (tcDriveLetters, StringLower (sKey)) then
+	return cscNull
+endIf
+let oFolder = oShell.NameSpace (ssfDrives)
+if !oFolder then
+	return cscNull
+endIf
+let oItem = oFolder.ParseName (sKey + ":\\")
+if !oItem then
+	return cscNull
+endIf
+let sName = oItem.Name
+let sSuffix = " (" + StringUpper (sKey) + ":)"
+if StringRight (sName, StringLength (sSuffix)) == sSuffix then
+	let sName = StringChopRight (sName, StringLength (sSuffix))
+endIf
+return sKey + " " + sName
+EndFunction
+
+string function TcPathLineAmong (handle hParent)
+; The visible direct child of hParent that is the path line: its last path segment
+; is the file filter, e.g. "e:\Music\*.*".
+var
+	handle hChild,
+	string sText
+let hChild = GetFirstChild (hParent)
+while hChild
+	if IsWindowVisible (hChild) then
+		let sText = GetWindowName (hChild)
+		if StringContains (sText, "\\")
+		&& StringContains (StringSegment (sText, "\\", -1), "*") then
+			return sText
+		endIf
+	endIf
+	let hChild = GetNextWindow (hChild)
+endWhile
+return cscNull
+EndFunction
+
+string function TcFindPathLine (handle hPanel)
+; The path line is a child of the panel, or a grandchild when folder tabs are shown
+; (inside SysTabControl32, measured 2026-11-17). JAWS script functions cannot call
+; themselves (recursion compiled but did not work), so the two levels are searched in loops.
+var
+	handle hChild,
+	string sText
+let sText = TcPathLineAmong (hPanel)
+if sText then
+	return sText
+endIf
+let hChild = GetFirstChild (hPanel)
+while hChild
+	if IsWindowVisible (hChild) then
+		let sText = TcPathLineAmong (hChild)
+		if sText then
+			return sText
+		endIf
+	endIf
+	let hChild = GetNextWindow (hChild)
+endWhile
+return cscNull
+EndFunction
+
+string function TcPanelPath (handle hList)
+; The path line above a file list, e.g. "e:\Music\Rock\*.*". Each panel is a child window
+; of the main window that horizontally contains its list; the path is the visible child whose
+; last path segment is the file filter (contains "*"). This excludes the command line prompt
+; ("e:\Music>"), whose container spans both panels (measured 2026-11-17).
+var
+	handle hPanel,
+	string sPath,
+	int nListLeft,
+	int nListRight,
+	int nLeft,
+	int nRight,
+	int nTop,
+	int nBottom
+GetWindowRect (hList, nListLeft, nListRight, nTop, nBottom)
+let hPanel = GetFirstChild (GetParent (hList))
+while hPanel
+	if hPanel != hList
+	&& IsWindowVisible (hPanel) then
+		GetWindowRect (hPanel, nLeft, nRight, nTop, nBottom)
+		if nLeft <= nListLeft && nRight >= nListRight then
+			let sPath = TcFindPathLine (hPanel)
+			if sPath then
+				return sPath
+			endIf
+		endIf
+	endIf
+	let hPanel = GetNextWindow (hPanel)
+endWhile
+return cscNull
+EndFunction
+
+string function TcParentFolderName (handle hList)
+; Name of the folder ".." leads to, for any path TC shows (measured 2026-11-17):
+; "e:\Music\Rock\*.*" -> "Music"; "e:\Music\*.*" -> "e:";
+; a top folder ("e:\*.*", "\\Dokumenti\*.*") -> This PC, where TC goes from there
+; ("\\Ovaj PC\*.*"); This PC itself -> nothing.
+var
+	string sPath,
+	string sPart,
+	string sLast,
+	string sPrev,
+	string sThisPc,
+	int nCount,
+	int i
+let sPath = TcPanelPath (hList)
+let nCount = StringSegmentCount (sPath, "\\")
+; the last segment is the file filter; empty segments come from the leading "\\"
+let i = 1
+while i < nCount
+	let sPart = StringSegment (sPath, "\\", i)
+	if sPart then
+		let sPrev = sLast
+		let sLast = sPart
+	endIf
+	let i = i + 1
+endWhile
+if sPrev then
+	return sPrev
+endIf
+if !sLast then
+	return cscNull
+endIf
+let sThisPc = TcDriveMenuName (tcDriveKeyComputer)
+if sLast == sThisPc then
+	return cscNull
+endIf
+return sThisPc
+EndFunction
+
 void function TcSayListItemName ()
 ; JAWS inserts "selected" by itself into speech about a marked focused item
 ; (measured 2026-11-17), so the state is never added here.
 ; Folders are not marked, as in Explorer (decision 2026-11-17): folders are listed
 ; first, and Insert+Up Arrow speaks the whole row including TC's <DIR> marker.
+; ".." gets the name of the folder it leads to, which some voices need anyway
+; since they do not speak "..".
+var string sName
 let gsTcLastRow = GetObjectName ()
-Say (TcListRowName (gsTcLastRow), OT_LINE)
+let sName = TcListRowName (gsTcLastRow)
+if sName == tcUpDir then
+	let sName = sName + " " + TcParentFolderName (GetFocus ())
+endIf
+Say (sName, OT_LINE)
 EndFunction
 
 void function FocusChangedEventEx (handle hwndFocus, int nObject, int nChild,
@@ -596,6 +759,21 @@ EndFunction
 
 Void Function ActiveItemChangedEvent (handle curHwnd, int curObjectId, int curChildId,
 	handle prevHwnd, int prevObjectId, int prevChildId)
+var
+	string sItem,
+	string sName
+; Drive menu (Alt+F1/Alt+F2): the event comes from the open drop-down list (ComboLBox);
+; items are named "[-e-]", "[-+-]" and so on.
+let sItem = GetObjectName ()
+if GetWindowClass (curHwnd) == wcComboList
+&& StringContains (sItem, tcDriveItemStart) then
+	let sName = TcDriveMenuName (StringSegment (sItem, "-", 2))
+	if sName then
+		Say (sName, OT_LINE)
+		Say (PositionInGroup (), OT_POSITION)
+		return
+	endIf
+endIf
 if GetWindowClass (curHwnd) == wcTcFileList
 && curHwnd == GetFocus ()
 && IsPCCursor () then

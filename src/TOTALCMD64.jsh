@@ -22,6 +22,19 @@ const
 	; File panels. In Full view a row is tab separated:
 	; "<name>\t<size or DIR>\t<date time>\t<attributes>" (measured 2026-11-17).
 	wcTcFileList = "LCLListBox",
+	; Parent folder item at the top of a file list
+	tcUpDir = "..",
+	; Drop-down list of the drive box (Alt+F1/Alt+F2); its items read "[-e-]"
+	wcComboList = "ComboLBox",
+	tcDriveItemStart = "[-",
+	tcDriveLetters = "abcdefghijklmnopqrstuvwxyz",
+	; TC's special drive menu items and the Windows shell folders they open
+	tcDriveKeyComputer = "+",
+	tcDriveKeyDocuments = "*",
+	tcDriveKeyNetwork = "\\",
+	ssfDrives = 17,
+	ssfPersonal = 5,
+	ssfNetwork = 18,
 	tcColumnDelim = "\t",
 	; Column numbers in a Full view row
 	tcColumnSize = 2,
