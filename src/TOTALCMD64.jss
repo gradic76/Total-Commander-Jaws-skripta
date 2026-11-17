@@ -166,10 +166,18 @@ endWhile
 EndFunction
 
 ; ---------------------------------------------------------------------------
-; Message dialogs (TExtMsgForm): long name, delete confirmations and similar.
+; Message dialogs (TExtMsgForm: long name, delete confirmations and similar;
+; TCheckMsgBox: simple Yes/No questions such as copying from a virtual folder).
 ; The question is only painted above the buttons, so it is read from the
 ; off-screen model and spoken in place of the dialog title.
 ; ---------------------------------------------------------------------------
+
+int function TcIsMessageDialog (handle hwnd)
+var string sClass
+let sClass = GetWindowClass (hwnd)
+return sClass == wcTcMsgForm
+	|| sClass == wcTcCheckMsgBox
+EndFunction
 
 int function TcButtonsTop (handle hDlg)
 ; Top screen row of the highest visible button in the dialog, or 0.
@@ -238,7 +246,7 @@ if GetWindowClass (hwnd) == wcTcOverwrite then
 		return true
 	endIf
 endIf
-if GetWindowClass (hwnd) == wcTcMsgForm then
+if TcIsMessageDialog (hwnd) then
 	let sSummary = TcMessageText (hwnd)
 	if sSummary then
 		SayMessage (OT_DIALOG_TEXT, sSummary)
@@ -868,7 +876,7 @@ if hDlg then
 	return
 endIf
 let hDlg = GetRealWindow (GetFocus ())
-if GetWindowClass (hDlg) == wcTcMsgForm then
+if TcIsMessageDialog (hDlg) then
 	TcSayWindowLines (hDlg)
 	return
 endIf

@@ -26,7 +26,7 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 - Izbornik pogona (Alt+F1/F2): "e Glazba", "f BD-ROM pogon", "Ovaj PC", "Dokumenti", "Mreža", s imenima iz Windows ljuske. Provjereno uhom 2026-11-17.
 - "..": kaže i kamo vodi, npr. ".. Sređivanje", ".. Ovaj PC" (pogoni i virtualne mape). Provjereno uhom u obje ploče, s karticama i bez.
 - Alt+Shift+S (veličina) i Alt+Shift+D (datum) u popisu, provjereno uhom 2026-11-17. Obitelj Alt+Shift+slovo, podložno promjeni.
-- Dijalozi poruka (TExtMsgForm, npr. predugo ime): pitanje se čita pri otvaranju, Insert+B čita cijeli dijalog. Provjereno uhom 2026-11-17.
+- Dijalozi poruka (TExtMsgForm, npr. predugo ime; TCheckMsgBox, npr. kopiranje iz virtualne mape kao "\\Preuzimanja"): pitanje se čita pri otvaranju, Insert+B čita cijeli dijalog. Provjereno uhom 2026-11-17.
 - Raspakiranje: dijalog i napredak čitljivi kao i drugdje (autor uhom, 2026-11-16; strukturu nisam mjerio).
 - Zasebna cjelina "brbljanje viška": ulazak u popis (Tab, povratak iz dijaloga) čita cijeli redak i "List box <naslov>"; dijalozi ponavljaju naslove; između dijaloga se izgovara cijeli naslov glavnog prozora. Dijalog Pack files pri otvaranju dvaput izgovori polje ("Pack 1 file(s) to the archive Edit" i naziv). Provjeriti i druge dijaloge.
 - Move (F6): prema autoru isti prozor napretka kao Copy i Delete, i Delete se dobro čitao. Uzgred potvrditi i Insert+Page Down.
