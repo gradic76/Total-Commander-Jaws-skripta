@@ -20,8 +20,10 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 
 ## Uz napredak, poslije reda čekanja
 
+- Periodično javljanje napretka provjereno 2026-11-17 na kopiranju od 80 s: svakih 10 % "Total N %, ime datoteke". Ime je ono iscrtano, pa ga TC zna skratiti.
+- Novi dijalog na kraju kopiranja: gumbi "Keep name" i "Keep all", pitanje se ne čita. Izmjeriti.
 - Raspakiranje: dijalog i napredak čitljivi kao i drugdje (autor uhom, 2026-11-16; strukturu nisam mjerio).
-- Dijalog Pack files pri otvaranju dvaput izgovori polje ("Pack 1 file(s) to the archive Edit" i naziv). Provjeriti i druge dijaloge.
+- Zasebna cjelina "brbljanje viška": ulazak u popis (Tab, povratak iz dijaloga) čita cijeli redak i "List box <naslov>"; dijalozi ponavljaju naslove. Dijalog Pack files pri otvaranju dvaput izgovori polje ("Pack 1 file(s) to the archive Edit" i naziv). Provjeriti i druge dijaloge.
 - Move (F6): prema autoru isti prozor napretka kao Copy i Delete, i Delete se dobro čitao. Uzgred potvrditi i Insert+Page Down.
 - Red čekanja: Tab spor zbog TC-a (vidi stanje.md). U dokumentaciju upisati kao poznato ograničenje i savjetovati Foreground.
 
