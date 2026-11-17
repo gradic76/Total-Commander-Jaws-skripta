@@ -57,7 +57,7 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 
 - Mogućnost: kratki zvuk za mape na strelicama (ako se pokaže potreba).
 - Ideje iz NVDA dodatka extendedTotalCmd (GPL-2.0, uzimamo samo ideje, ne kod):
-  - Alt+Shift+P: GOTOVO 2026-11-17, provjereno uhom u obje ploče, u Dokumentima i na Ovaj PC ("\Ovaj PC", ostaje TC-ov oblik). Potvrda kopiranja je JAWS-ova poruka "Copied" (cmsg52_S);
+  - Alt+Shift+P: GOTOVO 2026-11-17, provjereno uhom u obje ploče, u Dokumentima i na Ovaj PC ("\\Ovaj PC", ostaje TC-ov oblik). Potvrda kopiranja je JAWS-ova poruka "Copied" (cmsg52_S);
   - tipka za aktivnu ploču;
   - ime trenutne kartice mape;
   - zvuk na početku i kraju popisa;
