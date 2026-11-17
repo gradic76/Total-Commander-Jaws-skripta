@@ -718,9 +718,16 @@ endIf
 return sThisPc
 EndFunction
 
+void function TcSayMarkedState ()
+; "selected" for a marked file. JAWS's own TC setting IndicateSelected=1 made JAWS say it
+; by itself, but also in menus ("selected Files"); TOTALCMD64.jcf sets the default 2,
+; so the file list says it here (decision 2026-11-17).
+if GetControlAttributes () & CTRL_SELECTED then
+	IndicateControlState (WT_LISTBOXITEM, CTRL_SELECTED)
+endIf
+EndFunction
+
 void function TcSayListItemName ()
-; JAWS inserts "selected" by itself into speech about a marked focused item
-; (measured 2026-11-17), so the state is never added here.
 ; Folders are not marked, as in Explorer (decision 2026-11-17): folders are listed
 ; first, and Insert+Up Arrow speaks the whole row including TC's <DIR> marker.
 ; ".." gets the name of the folder it leads to, which some voices need anyway
@@ -731,6 +738,7 @@ let sName = TcListRowName (gsTcLastRow)
 if sName == tcUpDir then
 	let sName = sName + " " + TcParentFolderName (GetFocus ())
 endIf
+TcSayMarkedState ()
 Say (sName, OT_LINE)
 EndFunction
 
@@ -839,6 +847,7 @@ EndScript
 
 Script SayLine ()
 if TcIsFileListFocused () then
+	TcSayMarkedState ()
 	Say (TcListRowForSpeech (GetObjectName ()), OT_LINE)
 	Say (PositionInGroup (), OT_POSITION)
 	return

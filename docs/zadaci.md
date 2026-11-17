@@ -18,6 +18,8 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
   - "Compression ratio 6 button";
   - napredak je isti prozor TDLG2FILEACTIONMIN, pa Insert+Page Down i Insert+B rade bez izmjena.
 
+- Izbornici: "selected" uklonjen (IndicateSelected=0), provjereno uhom 2026-11-17. Točkice izbora se ne čuju jer ih TC samo iscrtava (vidi stanje.md). Mogućnosti: JAWS kursor (proba u tijeku), zamoliti autora TC-a da postavi MFS_CHECKED.
+
 ## Uz napredak, poslije reda čekanja
 
 - Periodično javljanje napretka provjereno 2026-11-17 na kopiranju od 80 s: svakih 10 % "Total N %, ime datoteke". Ime je ono iscrtano, pa ga TC zna skratiti.

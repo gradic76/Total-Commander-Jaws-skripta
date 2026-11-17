@@ -1,5 +1,8 @@
 [Options]
-; Keep JAWS shared default for Total Commander
-IndicateSelected=1
+; JAWS's shared totalcmd64.jcf sets IndicateSelected=1, which adds "selected" in menus
+; and the drive menu; 2 adds "Not Selected" to every unmarked item (measured 2026-11-17).
+; 0 is expected to say neither; the scripts say
+; "selected" for marked files themselves.
+IndicateSelected=0
 ; Only Numpad Insert acts as JAWS key; Extended Insert goes to Total Commander (mark item)
 JAWSInsertKey=1

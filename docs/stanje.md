@@ -92,3 +92,9 @@ Zaključak: TC 11.56 sam daje JAWS-u dosta podataka (MSAA). Popis, izbornici, di
 ### Tehnički podaci iz JAWS-a
 
 - Ctrl+Insert+F1 na popisu: klasa LCLListBox, Control ID i handle su promjenjivi (potvrđuje mjerenje iz Win32).
+
+### Izbornici (izmjereno 2026-11-17)
+
+- U 64-bitnom TC-u glavni izbornik je uvijek iscrtan od TC-a (owner-draw, HISTORY.TXT 10.09.17), kao i izbornik pogona (19.11.08).
+- Točkice izbora (npr. Show > Full, All Files, Name) samo su iscrtane: GetMenuState ni dok je izbornik otvoren ne vraća "checked" (MFS_CHECKED). Zato ih JAWS ne može izgovoriti.
+- "selected" ispred stavki izbornika dolazio je od JAWS-ove postavke IndicateSelected=1 iz njegove totalcmd64.jcf. Vrijednost 2 dodaje "Not Selected" svakoj neoznačenoj stavci popisa. Vrijednost 0 ne dodaje ništa, pa naša TOTALCMD64.jcf koristi 0, a skripta sama kaže "selected" na označenim datotekama. Provjereno uhom.
