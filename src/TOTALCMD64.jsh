@@ -28,6 +28,12 @@ const
 	tcDigits = "0123456789",
 	; Button captions JAWS does not speak at default punctuation level
 	tcMinusCaption = "-",
+	; Progress window: automatic announcement every N percent of the total,
+	; checked at most once per this many milliseconds
+	tcProgressAnnounceStep = 10,
+	tcProgressCheckTicks = 1000,
+	; minimum time between two announcements (an announcement takes 3 to 4 s to speak)
+	tcProgressMinGapTicks = 6000,
 	; Max screen lines read from the progress window
 	tcProgressMaxLines = 12,
 
@@ -39,4 +45,9 @@ globals
 	; Last real windows checked by TcGetBackgroundDialog, so that frequent
 	; events (text changes many times per second) do not search child windows again.
 	handle ghTcBgYes,
-	handle ghTcBgNo
+	handle ghTcBgNo,
+	; Progress window announcement state
+	handle ghTcProgressDlg,
+	int giTcProgressStep,
+	int giTcProgressTimer,
+	int giTcProgressSpokenTick

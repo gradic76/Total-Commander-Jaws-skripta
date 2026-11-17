@@ -198,22 +198,25 @@ endWhile
 return 0
 EndFunction
 
-string function TcProgressSummary (handle hDlg)
+int function TcParseProgress (handle hDlg, string ByRef sTotalPct, string ByRef sFilePct,
+	string ByRef sCounts, string ByRef sTime, string ByRef sFileName)
+; Reads the painted lines of the progress window and picks out its parts.
+; Returns false when nothing could be read.
 var
 	string sLines,
 	string sLine,
 	string sTitle,
 	string sHeader,
-	string sFilePct,
-	string sTotalPct,
-	string sCounts,
-	string sTime,
-	string sOut,
 	int nCount,
 	int i
+let sTotalPct = cscNull
+let sFilePct = cscNull
+let sCounts = cscNull
+let sTime = cscNull
+let sFileName = cscNull
 let sLines = TcReadWindowLines (hDlg, tcProgressMaxLines, hDlg)
 if !sLines then
-	return cscNull
+	return false
 endIf
 let sTitle = GetWindowName (hDlg)
 let nCount = StringSegmentCount (sLines, tcLineDelim)
@@ -228,9 +231,14 @@ while i <= nCount
 			elIf !sTotalPct then
 				let sTotalPct = sLine
 			endIf
-		elIf !sHeader && !StringContains (sLine, "\\") then
+		elIf StringContains (sLine, "\\") then
+			; first path line is the source ("From"); its last segment is the file name
+			if !sFileName then
+				let sFileName = StringSegment (sLine, "\\", -1)
+			endIf
+		elIf !sHeader then
 			let sHeader = sLine
-		elIf !sCounts && StringContains (sLine, " / ") && !StringContains (sLine, "\\") then
+		elIf !sCounts && StringContains (sLine, " / ") then
 			let sCounts = sLine
 		endIf
 	endIf
@@ -243,6 +251,25 @@ if sFilePct && !sTotalPct then
 endIf
 if StringContains (sHeader, ",") then
 	let sTime = StringTrimLeadingBlanks (StringSegment (sHeader, ",", -1))
+endIf
+return true
+EndFunction
+
+int function TcPercentValue (string sPct)
+; "30 %" or "30%" -> 30
+return StringToInt (StringTrimTrailingBlanks (StringReplaceSubstrings (sPct, "%", cscNull)))
+EndFunction
+
+string function TcProgressSummary (handle hDlg)
+var
+	string sTotalPct,
+	string sFilePct,
+	string sCounts,
+	string sTime,
+	string sFileName,
+	string sOut
+if !TcParseProgress (hDlg, sTotalPct, sFilePct, sCounts, sTime, sFileName) then
+	return cscNull
 endIf
 if sTotalPct then
 	let sOut = FormatString (msgTcProgressTotal, sTotalPct)
@@ -346,9 +373,73 @@ endIf
 return HandleCustomWindows (hwnd)
 EndFunction
 
+void function TcAnnounceProgressStep (handle hDlg)
+; Speaks the total percent and the current file name each time the total
+; passes another tcProgressAnnounceStep percent.
+var
+	string sTotalPct,
+	string sFilePct,
+	string sCounts,
+	string sTime,
+	string sFileName,
+	int nStep
+if !TcParseProgress (hDlg, sTotalPct, sFilePct, sCounts, sTime, sFileName)
+|| !sTotalPct then
+	return
+endIf
+let nStep = TcPercentValue (sTotalPct) / tcProgressAnnounceStep
+if hDlg != ghTcProgressDlg then
+	; new progress window: remember the starting step without speaking
+	let ghTcProgressDlg = hDlg
+	let giTcProgressStep = nStep
+	let giTcProgressSpokenTick = GetTickCount ()
+	return
+endIf
+; On fast jobs several steps pass per second; keep a minimum gap between
+; announcements so each one can be heard to the end.
+if nStep > giTcProgressStep
+&& GetTickCount () - giTcProgressSpokenTick >= tcProgressMinGapTicks then
+	let giTcProgressStep = nStep
+	let giTcProgressSpokenTick = GetTickCount ()
+	; A newer announcement replaces an unfinished older one, so speech never lags behind.
+	StopSpeech ()
+	if sFileName then
+		SayMessage (OT_STATUS, FormatString (msgTcProgressTotal, sTotalPct) + ", " + sFileName)
+	else
+		SayMessage (OT_STATUS, FormatString (msgTcProgressTotal, sTotalPct))
+	endIf
+endIf
+EndFunction
+
+void function TcProgressTimer ()
+; Runs every tcProgressCheckTicks while focus stays in a progress window.
+var handle hDlg
+let hDlg = TcGetProgressDialog (GetFocus ())
+if !hDlg then
+	let giTcProgressTimer = 0
+	return
+endIf
+TcAnnounceProgressStep (hDlg)
+let giTcProgressTimer = ScheduleFunction ("TcProgressTimer", tcProgressCheckTicks / 100)
+EndFunction
+
+void function TcStartProgressTimer ()
+if !giTcProgressTimer then
+	let giTcProgressTimer = ScheduleFunction ("TcProgressTimer", tcProgressCheckTicks / 100)
+endIf
+EndFunction
+
 void function ProgressBarChangedEvent (handle hProgress, string sName, string sValue)
-if TcGetProgressDialog (hProgress)
-|| TcGetBackgroundDialog (hProgress) then
+var handle hDlg
+let hDlg = TcGetProgressDialog (hProgress)
+if hDlg then
+	; Bar changes are not spoken; they only start the timer for periodic announcements.
+	if TcGetProgressDialog (GetFocus ()) == hDlg then
+		TcStartProgressTimer ()
+	endIf
+	return
+endIf
+if TcGetBackgroundDialog (hProgress) then
 	return
 endIf
 ProgressBarChangedEvent (hProgress, sName, sValue)
