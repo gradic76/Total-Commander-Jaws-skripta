@@ -564,7 +564,34 @@ void function TcSayListItemName ()
 ; (measured 2026-11-17), so the state is never added here.
 ; Folders are not marked, as in Explorer (decision 2026-11-17): folders are listed
 ; first, and Insert+Up Arrow speaks the whole row including TC's <DIR> marker.
-Say (TcListRowName (GetObjectName ()), OT_LINE)
+let gsTcLastRow = GetObjectName ()
+Say (TcListRowName (gsTcLastRow), OT_LINE)
+EndFunction
+
+void function FocusChangedEventEx (handle hwndFocus, int nObject, int nChild,
+	handle hwndPrevFocus, int nPrevObject, int nPrevChild,
+	int nChangeDepth)
+; When TC rewrites the focused row (folder size computed after Space), JAWS reports
+; a focus change to the same item and would speak the whole row. Only the new size
+; is spoken, and only if the row really changed since it was last spoken.
+var
+	string sRow,
+	string sSize
+if hwndFocus == hwndPrevFocus
+&& nChild == nPrevChild
+&& GetWindowClass (hwndFocus) == wcTcFileList
+&& IsPCCursor () then
+	let sRow = GetObjectName ()
+	if sRow != gsTcLastRow then
+		let gsTcLastRow = sRow
+		let sSize = StringSegment (sRow, tcColumnDelim, 2)
+		if StringContainsChars (sSize, tcDigits) then
+			Say (sSize, OT_LINE)
+		endIf
+	endIf
+	return
+endIf
+FocusChangedEventEx (hwndFocus, nObject, nChild, hwndPrevFocus, nPrevObject, nPrevChild, nChangeDepth)
 EndFunction
 
 Void Function ActiveItemChangedEvent (handle curHwnd, int curObjectId, int curChildId,

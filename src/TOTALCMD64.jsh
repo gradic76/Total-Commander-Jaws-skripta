@@ -54,4 +54,6 @@ globals
 	int giTcProgressTimer,
 	int giTcProgressSpokenTick,
 	; File list: time the last mark change was spoken
-	int giTcStateSpokenTick
+	int giTcStateSpokenTick,
+	; File list: row text when the focused item was last spoken
+	string gsTcLastRow

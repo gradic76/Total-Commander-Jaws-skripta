@@ -31,7 +31,7 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 
 1. Pozadinsko kopiranje (Background) i red čekanja (F2 Queue): izmjeriti i riješiti.
 2. Označavanje, gotovo 2026-11-17 i provjereno uhom: "selected ime" (JAWS sam umeće "selected"), "Not Selected ime" pri micanju; Insert kaže "selected ime" pa sljedeću stavku. Ostaje:
-   - razmak na mapi: JAWS interno, mimo skripti, izgovori cijeli redak s "?", pa s izračunatom veličinom. NameChanged, Value, Description i HighLighted nisu izvor (izmjereno). Ide u cjelinu "brbljanje viška".
+   - razmak na mapi: riješeno 2026-11-17. Izvor je bio FocusChangedEventEx za istu stavku (TC prepisuje redak); sada se kaže samo nova veličina. Provjereno na izračunatoj mapi; izgovor veličine na neizračunatoj mapi još treba čuti.
 3. Popis datoteka:
    - gotovo 2026-11-17, provjereno uhom: strelice čitaju samo ime, mape bez oznake kao u Exploreru (odluka 2026-11-17), a "<DIR>" se čuje na Insert+strelica gore; Insert+strelica gore čita cijeli redak i položaj;
    - kraći ulazak u popis (Tab, Alt+Tab): još čita cijeli redak;
