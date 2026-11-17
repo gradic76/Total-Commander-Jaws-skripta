@@ -554,10 +554,6 @@ string function TcListRowName (string sRow)
 return StringSegment (sRow, tcColumnDelim, 1)
 EndFunction
 
-int function TcListRowIsDir (string sRow)
-return StringLeft (StringSegment (sRow, tcColumnDelim, 2), 1) == tcDirMarkerStart
-EndFunction
-
 string function TcListRowForSpeech (string sRow)
 ; Whole row with columns separated by commas, for Insert+Up Arrow.
 return StringReplaceSubstrings (sRow, tcColumnDelim, ", ")
@@ -566,13 +562,9 @@ EndFunction
 void function TcSayListItemName ()
 ; JAWS inserts "selected" by itself into speech about a marked focused item
 ; (measured 2026-11-17), so the state is never added here.
-var string sRow
-let sRow = GetObjectName ()
-if TcListRowIsDir (sRow) then
-	Say (FormatString (msgTcFolder, TcListRowName (sRow)), OT_LINE)
-else
-	Say (TcListRowName (sRow), OT_LINE)
-endIf
+; Folders are not marked, as in Explorer (decision 2026-11-17): folders are listed
+; first, and Insert+Up Arrow speaks the whole row including TC's <DIR> marker.
+Say (TcListRowName (GetObjectName ()), OT_LINE)
 EndFunction
 
 Void Function ActiveItemChangedEvent (handle curHwnd, int curObjectId, int curChildId,

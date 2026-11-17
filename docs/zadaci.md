@@ -33,8 +33,7 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 2. Označavanje, gotovo 2026-11-17 i provjereno uhom: "selected ime" (JAWS sam umeće "selected"), "Not Selected ime" pri micanju; Insert kaže "selected ime" pa sljedeću stavku. Ostaje:
    - razmak na mapi: JAWS interno, mimo skripti, izgovori cijeli redak s "?", pa s izračunatom veličinom. NameChanged, Value, Description i HighLighted nisu izvor (izmjereno). Ide u cjelinu "brbljanje viška".
 3. Popis datoteka:
-   - gotovo 2026-11-17, provjereno uhom: strelice čitaju samo ime, uz "folder" za mape; Insert+strelica gore čita cijeli redak i položaj;
-   - mapa s izračunatom veličinom (nakon razmaka) prikazuje broj umjesto <DIR>, pa se "folder" ne čuje. Naći drugi znak;
+   - gotovo 2026-11-17, provjereno uhom: strelice čitaju samo ime, mape bez oznake kao u Exploreru (odluka 2026-11-17), a "<DIR>" se čuje na Insert+strelica gore; Insert+strelica gore čita cijeli redak i položaj;
    - kraći ulazak u popis (Tab, Alt+Tab): još čita cijeli redak;
    - putanja bez "*.*".
 4. Insert+Page Down čita samo statusnu traku aktivne ploče.
@@ -51,5 +50,6 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 
 ## Kasnije
 
+- Mogućnost: kratki zvuk za mape na strelicama (ako se pokaže potreba).
 - Usporedba datoteka u dijalogu prepisivanja ("nova je veća i novija"). Za to treba čitati format datuma.
 - Ostali prikazi, Lister (F3), arhive, FTP, višestruko preimenovanje, usporedba mapa.
