@@ -26,6 +26,8 @@ const
 	; (<DIR>, <LINK>, French <RÉP>), so only its first character is checked.
 	tcDirMarkerStart = "<",
 	tcColumnDelim = "\t",
+	; After a mark change is spoken, a repeat event for the same item within this time is ignored
+	tcStateEchoTicks = 1500,
 	; Pack files dialog (Alt+F5); its compression ratio button caption is a single digit
 	wcTcPackDlg = "TDLGZIP",
 	tcDigits = "0123456789",
@@ -53,4 +55,6 @@ globals
 	handle ghTcProgressDlg,
 	int giTcProgressStep,
 	int giTcProgressTimer,
-	int giTcProgressSpokenTick
+	int giTcProgressSpokenTick,
+	; File list: time the last mark change was spoken
+	int giTcStateSpokenTick

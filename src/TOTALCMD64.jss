@@ -564,11 +564,10 @@ return StringReplaceSubstrings (sRow, tcColumnDelim, ", ")
 EndFunction
 
 void function TcSayListItemName ()
+; JAWS inserts "selected" by itself into speech about a marked focused item
+; (measured 2026-11-17), so the state is never added here.
 var string sRow
 let sRow = GetObjectName ()
-if GetControlAttributes () & CTRL_SELECTED then
-	IndicateControlState (WT_LISTBOXITEM, CTRL_SELECTED)
-endIf
 if TcListRowIsDir (sRow) then
 	Say (FormatString (msgTcFolder, TcListRowName (sRow)), OT_LINE)
 else
@@ -581,17 +580,39 @@ Void Function ActiveItemChangedEvent (handle curHwnd, int curObjectId, int curCh
 if GetWindowClass (curHwnd) == wcTcFileList
 && curHwnd == GetFocus ()
 && IsPCCursor () then
+	; The same item fires again when TC rewrites its row (e.g. folder size after Space);
+	; skip it if the mark change was just spoken.
+	if curChildId == prevChildId
+	&& GetTickCount () - giTcStateSpokenTick < tcStateEchoTicks then
+		return
+	endIf
 	TcSayListItemName ()
 	return
 endIf
 ActiveItemChangedEvent (curHwnd, curObjectId, curChildId, prevHwnd, prevObjectId, prevChildId)
 EndFunction
 
+void function ObjStateChangedEvent (handle hObj, optional int iObjType, int nChangedState, int nState, int nOldState)
+; Marking a file (Space, Insert): speak the new state and the name,
+; including when the mark is removed, which JAWS does not announce.
+if hObj == GetFocus ()
+&& GetWindowClass (hObj) == wcTcFileList
+&& IsPCCursor () then
+	; "selected" is prefixed by JAWS itself; only removal needs to be said.
+	if !(nState & CTRL_SELECTED) then
+		Say (cscNotSelected, OT_ITEM_STATE)
+	endIf
+	TcSayListItemName ()
+	let giTcStateSpokenTick = GetTickCount ()
+	return
+endIf
+ObjStateChangedEvent (hObj, iObjType, nChangedState, nState, nOldState)
+EndFunction
+
+
+
 Script SayLine ()
 if TcIsFileListFocused () then
-	if GetControlAttributes () & CTRL_SELECTED then
-		IndicateControlState (WT_LISTBOXITEM, CTRL_SELECTED)
-	endIf
 	Say (TcListRowForSpeech (GetObjectName ()), OT_LINE)
 	Say (PositionInGroup (), OT_POSITION)
 	return
