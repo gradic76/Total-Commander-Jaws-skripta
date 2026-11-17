@@ -24,6 +24,9 @@ const
 	wcTcFileList = "LCLListBox",
 	; Parent folder item at the top of a file list
 	tcUpDir = "..",
+	; Kinds of panel text lines
+	tcPanelLinePath = 1,
+	tcPanelLineStatus = 2,
 	; Drop-down list of the drive box (Alt+F1/Alt+F2); its items read "[-e-]"
 	wcComboList = "ComboLBox",
 	tcDriveItemStart = "[-",

@@ -34,12 +34,12 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 
 1. Pozadinsko kopiranje (Background) i red čekanja (F2 Queue): izmjeriti i riješiti.
 2. Označavanje, gotovo 2026-11-17 i provjereno uhom: "selected ime" (JAWS sam umeće "selected"), "Not Selected ime" pri micanju; Insert kaže "selected ime" pa sljedeću stavku. Ostaje:
-   - razmak na mapi: riješeno 2026-11-17. Izvor je bio FocusChangedEventEx za istu stavku (TC prepisuje redak); sada se kaže samo nova veličina. Provjereno na izračunatoj mapi; izgovor veličine na neizračunatoj mapi još treba čuti.
+   - razmak na neizračunatoj mapi: JAWS i dalje izgovori cijeli redak s "?", pa s izračunatom veličinom. NIJE riješeno. Izmjereno: FocusChangedEventEx za istu stavku stiže (nChild == nPrevChild, isti prozor), ali redak ne izgovara on; nisu ni ValueChanged, NameChanged, Description, HighLighted ni skripta za razmak (nije vezana). Vjerojatno unutarnja obrada JAWS-a. Ide u cjelinu "brbljanje viška".
 3. Popis datoteka:
    - gotovo 2026-11-17, provjereno uhom: strelice čitaju samo ime, mape bez oznake kao u Exploreru (odluka 2026-11-17), a "<DIR>" se čuje na Insert+strelica gore; Insert+strelica gore čita cijeli redak i položaj;
    - kraći ulazak u popis (Tab, Alt+Tab): još čita cijeli redak;
    - putanja bez "*.*".
-4. Insert+Page Down čita samo statusnu traku aktivne ploče.
+4. Gotovo 2026-11-17, provjereno uhom: Insert+Page Down u popisu čita samo statusnu traku aktivne ploče (i s karticama). Alt+Shift+S kaže samo veličinu stavke na fokusu (odluka: svaka tipka jedno).
 5. F5 dijalog:
    - ime polja je naslov dijaloga, a ne "Copy 1 file(s) to";
    - potvrdni okviri se javljaju kao "3 state button".
@@ -61,6 +61,5 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
   - zvuk na početku i kraju popisa;
   - javljanje kod Ctrl+A i micanja svih oznaka;
   - tonovi dok traje izračun veličine mape.
-- Alt+Shift+S uz označene stavke: broj i ukupna veličina označenih (uz statusnu traku).
 - Usporedba datoteka u dijalogu prepisivanja ("nova je veća i novija"). Za to treba čitati format datuma.
 - Ostali prikazi, Lister (F3), arhive, FTP, višestruko preimenovanje, usporedba mapa.

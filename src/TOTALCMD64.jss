@@ -515,28 +515,6 @@ endIf
 ProgressBarChangedEvent (hProgress, sName, sValue)
 EndFunction
 
-Script SayBottomLineOfWindow ()
-var
-	handle hDlg,
-	string sSummary
-let hDlg = TcGetProgressDialog (GetFocus ())
-if hDlg then
-	let sSummary = TcProgressSummary (hDlg)
-	if sSummary then
-		SayMessage (OT_USER_REQUESTED_INFORMATION, sSummary)
-	else
-		SayMessage (OT_ERROR, msgTcProgressUnknown)
-	endIf
-	return
-endIf
-let hDlg = TcGetBackgroundDialog (GetFocus ())
-if hDlg then
-	SayMessage (OT_USER_REQUESTED_INFORMATION, GetWindowName (hDlg))
-	return
-endIf
-PerformScript SayBottomLineOfWindow ()
-EndScript
-
 ; ---------------------------------------------------------------------------
 ; File panels (LCLListBox)
 ; JAWS speaks the item through ActiveItemChangedEvent; the item name is the whole row.
@@ -601,9 +579,31 @@ endIf
 return sKey + " " + sName
 EndFunction
 
-string function TcPathLineAmong (handle hParent)
-; The visible direct child of hParent that is the path line: its last path segment
-; is the file filter, e.g. "e:\Music\*.*".
+; ---------------------------------------------------------------------------
+; Panel text lines (measured 2026-11-17)
+; Each panel is a child window of the main window that horizontally contains its
+; file list. Its lines are recognized by signs, not words:
+; - path line: the last path segment is the file filter, e.g. "e:\Music\*.*"
+;   (this excludes the command line prompt "e:\Music>", whose container spans both panels);
+; - status line: contains " / " and no backslash,
+;   e.g. "0 b / 79 k in 0 / 7 file(s), 0 / 7 dir(s)".
+; With folder tabs shown the lines sit one level deeper (inside SysTabControl32).
+; ---------------------------------------------------------------------------
+
+int function TcIsPanelLine (string sText, int nKind)
+if nKind == tcPanelLinePath then
+	return StringContains (sText, "\\")
+		&& StringContains (StringSegment (sText, "\\", -1), "*")
+endIf
+if nKind == tcPanelLineStatus then
+	return StringContains (sText, " / ")
+		&& !StringContains (sText, "\\")
+endIf
+return false
+EndFunction
+
+string function TcPanelLineAmong (handle hParent, int nKind)
+; The visible direct child of hParent whose text is a panel line of the given kind.
 var
 	handle hChild,
 	string sText
@@ -611,8 +611,7 @@ let hChild = GetFirstChild (hParent)
 while hChild
 	if IsWindowVisible (hChild) then
 		let sText = GetWindowName (hChild)
-		if StringContains (sText, "\\")
-		&& StringContains (StringSegment (sText, "\\", -1), "*") then
+		if TcIsPanelLine (sText, nKind) then
 			return sText
 		endIf
 	endIf
@@ -621,21 +620,20 @@ endWhile
 return cscNull
 EndFunction
 
-string function TcFindPathLine (handle hPanel)
-; The path line is a child of the panel, or a grandchild when folder tabs are shown
-; (inside SysTabControl32, measured 2026-11-17). JAWS script functions cannot call
+string function TcFindPanelLine (handle hPanel, int nKind)
+; Searches the panel's children and grandchildren. JAWS script functions cannot call
 ; themselves (recursion compiled but did not work), so the two levels are searched in loops.
 var
 	handle hChild,
 	string sText
-let sText = TcPathLineAmong (hPanel)
+let sText = TcPanelLineAmong (hPanel, nKind)
 if sText then
 	return sText
 endIf
 let hChild = GetFirstChild (hPanel)
 while hChild
 	if IsWindowVisible (hChild) then
-		let sText = TcPathLineAmong (hChild)
+		let sText = TcPanelLineAmong (hChild, nKind)
 		if sText then
 			return sText
 		endIf
@@ -645,14 +643,11 @@ endWhile
 return cscNull
 EndFunction
 
-string function TcPanelPath (handle hList)
-; The path line above a file list, e.g. "e:\Music\Rock\*.*". Each panel is a child window
-; of the main window that horizontally contains its list; the path is the visible child whose
-; last path segment is the file filter (contains "*"). This excludes the command line prompt
-; ("e:\Music>"), whose container spans both panels (measured 2026-11-17).
+string function TcPanelLine (handle hList, int nKind)
+; A text line of the panel that holds the file list hList.
 var
 	handle hPanel,
-	string sPath,
+	string sText,
 	int nListLeft,
 	int nListRight,
 	int nLeft,
@@ -666,15 +661,23 @@ while hPanel
 	&& IsWindowVisible (hPanel) then
 		GetWindowRect (hPanel, nLeft, nRight, nTop, nBottom)
 		if nLeft <= nListLeft && nRight >= nListRight then
-			let sPath = TcFindPathLine (hPanel)
-			if sPath then
-				return sPath
+			let sText = TcFindPanelLine (hPanel, nKind)
+			if sText then
+				return sText
 			endIf
 		endIf
 	endIf
 	let hPanel = GetNextWindow (hPanel)
 endWhile
 return cscNull
+EndFunction
+
+string function TcPanelPath (handle hList)
+return TcPanelLine (hList, tcPanelLinePath)
+EndFunction
+
+string function TcPanelStatus (handle hList)
+return TcPanelLine (hList, tcPanelLineStatus)
 EndFunction
 
 string function TcParentFolderName (handle hList)
@@ -825,6 +828,8 @@ endIf
 EndFunction
 
 Script TcSaySize ()
+; Size of the item in focus only. The marked items' count and size are in the
+; status line (Insert+Page Down) (decision 2026-11-17).
 TcSayListColumn (tcColumnSize)
 EndScript
 
@@ -859,4 +864,35 @@ if GetWindowClass (hDlg) == wcTcMsgForm then
 	return
 endIf
 PerformScript ReadBoxInTabOrder ()
+EndScript
+
+Script SayBottomLineOfWindow ()
+; Insert+Page Down: progress summary, background job title, or in the file list
+; the status line of the active panel only (JAWS would read both panels).
+var
+	handle hDlg,
+	string sText
+let hDlg = TcGetProgressDialog (GetFocus ())
+if hDlg then
+	let sText = TcProgressSummary (hDlg)
+	if sText then
+		SayMessage (OT_USER_REQUESTED_INFORMATION, sText)
+	else
+		SayMessage (OT_ERROR, msgTcProgressUnknown)
+	endIf
+	return
+endIf
+let hDlg = TcGetBackgroundDialog (GetFocus ())
+if hDlg then
+	SayMessage (OT_USER_REQUESTED_INFORMATION, GetWindowName (hDlg))
+	return
+endIf
+if TcIsFileListFocused () then
+	let sText = TcPanelStatus (GetFocus ())
+	if sText then
+		SayMessage (OT_USER_REQUESTED_INFORMATION, sText)
+		return
+	endIf
+endIf
+PerformScript SayBottomLineOfWindow ()
 EndScript
