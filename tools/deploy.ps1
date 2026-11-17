@@ -16,7 +16,7 @@ $compiler = "C:\Program Files\Freedom Scientific\JAWS\$JawsVersion\scompile.exe"
 if (-not (Test-Path $dest)) { throw "JAWS user settings folder not found: $dest" }
 if (-not (Test-Path $compiler)) { throw "Script compiler not found: $compiler" }
 
-foreach ($ext in "jss", "jsh", "jsm") {
+foreach ($ext in "jss", "jsh", "jsm", "jkm", "jsd") {
     Copy-Item (Join-Path $src "TOTALCMD64.$ext") $dest -Force
 }
 $jcf = Join-Path $dest "TOTALCMD64.jcf"

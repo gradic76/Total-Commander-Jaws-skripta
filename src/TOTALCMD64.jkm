@@ -1,0 +1,8 @@
+; Total Commander JAWS scripts: key assignments
+; Copyright (c) 2026 author. MIT License.
+; Alt+Shift+letter family: free in Total Commander 11.56 and in JAWS 2025 defaults.
+; Subject to change (decision 2026-11-17).
+
+[Common Keys]
+Alt+Shift+S=TcSaySize
+Alt+Shift+D=TcSayDate

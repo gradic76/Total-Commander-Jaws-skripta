@@ -23,6 +23,9 @@ const
 	; "<name>\t<size or DIR>\t<date time>\t<attributes>" (measured 2026-11-17).
 	wcTcFileList = "LCLListBox",
 	tcColumnDelim = "\t",
+	; Column numbers in a Full view row
+	tcColumnSize = 2,
+	tcColumnDate = 3,
 	; After a mark change is spoken, a repeat event for the same item within this time is ignored
 	tcStateEchoTicks = 1500,
 	; Pack files dialog (Alt+F5); its compression ratio button caption is a single digit

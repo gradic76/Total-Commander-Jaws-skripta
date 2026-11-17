@@ -630,6 +630,30 @@ EndFunction
 
 
 
+void function TcSayListColumn (int nColumn)
+; Speaks one tab separated column of the focused file list row,
+; or passes the key on to Total Commander outside the file list.
+var string sValue
+if !TcIsFileListFocused () then
+	TypeCurrentScriptKey ()
+	return
+endIf
+let sValue = StringTrimTrailingBlanks (StringSegment (GetObjectName (), tcColumnDelim, nColumn))
+if sValue then
+	SayMessage (OT_USER_REQUESTED_INFORMATION, sValue)
+else
+	SayMessage (OT_ERROR, msgTcNotAvailable)
+endIf
+EndFunction
+
+Script TcSaySize ()
+TcSayListColumn (tcColumnSize)
+EndScript
+
+Script TcSayDate ()
+TcSayListColumn (tcColumnDate)
+EndScript
+
 Script SayLine ()
 if TcIsFileListFocused () then
 	Say (TcListRowForSpeech (GetObjectName ()), OT_LINE)

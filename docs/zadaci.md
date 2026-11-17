@@ -21,6 +21,7 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 ## Uz napredak, poslije reda čekanja
 
 - Periodično javljanje napretka provjereno 2026-11-17 na kopiranju od 80 s: svakih 10 % "Total N %, ime datoteke". Ime je ono iscrtano, pa ga TC zna skratiti.
+- Alt+Shift+S (veličina) i Alt+Shift+D (datum) u popisu, provjereno uhom 2026-11-17. Obitelj Alt+Shift+slovo, podložno promjeni.
 - Dijalozi poruka (TExtMsgForm, npr. predugo ime): pitanje se čita pri otvaranju, Insert+B čita cijeli dijalog. Provjereno uhom 2026-11-17.
 - Raspakiranje: dijalog i napredak čitljivi kao i drugdje (autor uhom, 2026-11-16; strukturu nisam mjerio).
 - Zasebna cjelina "brbljanje viška": ulazak u popis (Tab, povratak iz dijaloga) čita cijeli redak i "List box <naslov>"; dijalozi ponavljaju naslove; između dijaloga se izgovara cijeli naslov glavnog prozora. Dijalog Pack files pri otvaranju dvaput izgovori polje ("Pack 1 file(s) to the archive Edit" i naziv). Provjeriti i druge dijaloge.
@@ -51,5 +52,13 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 ## Kasnije
 
 - Mogućnost: kratki zvuk za mape na strelicama (ako se pokaže potreba).
+- Ideje iz NVDA dodatka extendedTotalCmd (GPL-2.0, uzimamo samo ideje, ne kod):
+  - Alt+Shift+P: puna putanja trenutne mape, dvaput kopira u međuspremnik;
+  - tipka za aktivnu ploču;
+  - ime trenutne kartice mape;
+  - zvuk na početku i kraju popisa;
+  - javljanje kod Ctrl+A i micanja svih oznaka;
+  - tonovi dok traje izračun veličine mape.
+- Alt+Shift+S uz označene stavke: broj i ukupna veličina označenih (uz statusnu traku).
 - Usporedba datoteka u dijalogu prepisivanja ("nova je veća i novija"). Za to treba čitati format datuma.
 - Ostali prikazi, Lister (F3), arhive, FTP, višestruko preimenovanje, usporedba mapa.

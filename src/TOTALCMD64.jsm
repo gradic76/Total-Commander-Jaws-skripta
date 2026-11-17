@@ -50,6 +50,11 @@ minus
 Compression ratio %1
 @@
 
+; Alt+Shift+S / Alt+Shift+D when the row has no such column (e.g. Brief view)
+@msgTcNotAvailable
+Not available
+@@
+
 ; Shown when the progress window text could not be read
 @msgTcProgressUnknown
 Progress not available
