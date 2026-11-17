@@ -42,9 +42,9 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
    - kraći ulazak u popis (Tab, Alt+Tab): još čita cijeli redak;
    - putanja bez "*.*".
 4. Gotovo 2026-11-17, provjereno uhom: Insert+Page Down u popisu čita samo statusnu traku aktivne ploče (i s karticama). Alt+Shift+S kaže samo veličinu stavke na fokusu (odluka: svaka tipka jedno).
-5. F5 dijalog:
-   - ime polja je naslov dijaloga, a ne "Copy 1 file(s) to";
-   - potvrdni okviri se javljaju kao "3 state button".
+5. F5 dijalog (TInpComboDlg), gotovo 2026-11-17 i provjereno uhom: pri otvaranju samo polje s natpisom (bez "Combo box Total Commander"), Insert+B čita cijeli dijalog. Ostaje:
+   - zbroj "7,75 M 4 1": brojevi datoteka i mapa nemaju oznaku (na ekranu su ikone). Treba dvije riječi u .jsm ili oznake grafika;
+   - TInpComboDlg vjerojatno koriste i drugi dijalozi s poljem (npr. F7): provjeriti da im ne nedostaje najava.
 6. Vlastita pomoć na Insert+F1.
 7. Hrvatski .jsm u mapi jezika JAWS-a (odluka 2026-11-17: poruke prate jezik JAWS-a). Provjeriti naziv mape za hrvatski.
 8. Instalacijski program (Inno Setup):

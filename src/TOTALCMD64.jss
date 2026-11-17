@@ -253,6 +253,11 @@ if TcIsMessageDialog (hwnd) then
 		return true
 	endIf
 endIf
+; Copy/move dialog (F5/F6): JAWS announced it as "Combo box Total Commander";
+; the focused field's own label ("Copy 1 file(s) to") already says what it is.
+if GetWindowClass (hwnd) == wcTcCopyDlg then
+	return true
+endIf
 return HandleCustomRealWindows (hwnd)
 EndFunction
 
@@ -876,7 +881,8 @@ if hDlg then
 	return
 endIf
 let hDlg = GetRealWindow (GetFocus ())
-if TcIsMessageDialog (hDlg) then
+if TcIsMessageDialog (hDlg)
+|| GetWindowClass (hDlg) == wcTcCopyDlg then
 	TcSayWindowLines (hDlg)
 	return
 endIf

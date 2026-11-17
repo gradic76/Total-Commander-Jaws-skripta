@@ -12,6 +12,8 @@ const
 	wcTcMsgForm = "TExtMsgForm",
 	; Simple question dialog, e.g. "Copy 1 file(s) to D:\\" when copying from a virtual folder
 	wcTcCheckMsgBox = "TCheckMsgBox",
+	; Copy/move dialog (F5/F6) from a normal folder
+	wcTcCopyDlg = "TInpComboDlg",
 	tcMsgMaxLines = 20,
 	wcButton = "Button",
 	; Copy/move progress window; matched as a prefix (seen: TDLG2FILEACTIONMIN)
