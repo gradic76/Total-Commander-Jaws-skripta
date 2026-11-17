@@ -8,6 +8,9 @@ const
 	; Window classes, measured on Total Commander 11.56 x64
 	wcTcMain = "TTOTAL_CMD",
 	wcTcOverwrite = "TOverWriteForm",
+	; Generic message dialog (long name warning, confirmations); message text is painted
+	wcTcMsgForm = "TExtMsgForm",
+	tcMsgMaxLines = 20,
 	wcButton = "Button",
 	; Copy/move progress window; matched as a prefix (seen: TDLG2FILEACTIONMIN)
 	wcTcProgressPrefix = "TDLG2FILEACTION",

@@ -72,10 +72,11 @@ endWhile
 return false
 EndFunction
 
-string function TcReadWindowLines (handle hwnd, int nMax, handle hContainer)
+string function TcReadWindowLines (handle hwnd, int nMax, handle hContainer, optional int nStopRow)
 ; Reads up to nMax screen lines from the off-screen model, starting at hwnd,
 ; using the Invisible cursor. Lines are joined by tcLineDelim.
 ; If hContainer is given, reading stops when the cursor leaves that window.
+; If nStopRow is given, reading stops at the first line at or below that screen row.
 ; Reading also stops when NextLine no longer moves the cursor (last line).
 var
 	string sLines,
@@ -93,6 +94,7 @@ while i < nMax
 	let nRow = GetCursorRow ()
 	NextLine ()
 	if GetCursorRow () == nRow
+	|| (nStopRow && GetCursorRow () >= nStopRow)
 	|| (hContainer && !TcIsWindowInside (GetCurrentWindow (), hContainer)) then
 		let i = nMax
 	else
@@ -163,6 +165,67 @@ while bLower <= true
 endWhile
 EndFunction
 
+; ---------------------------------------------------------------------------
+; Message dialogs (TExtMsgForm): long name, delete confirmations and similar.
+; The question is only painted above the buttons, so it is read from the
+; off-screen model and spoken in place of the dialog title.
+; ---------------------------------------------------------------------------
+
+int function TcButtonsTop (handle hDlg)
+; Top screen row of the highest visible button in the dialog, or 0.
+var
+	handle hwnd,
+	int nBest,
+	int nLeft,
+	int nRight,
+	int nTop,
+	int nBottom
+let hwnd = GetFirstChild (hDlg)
+while hwnd
+	if GetWindowClass (hwnd) == wcButton
+	&& IsWindowVisible (hwnd) then
+		GetWindowRect (hwnd, nLeft, nRight, nTop, nBottom)
+		if !nBest || nTop < nBest then
+			let nBest = nTop
+		endIf
+	endIf
+	let hwnd = GetNextWindow (hwnd)
+endWhile
+return nBest
+EndFunction
+
+string function TcMessageText (handle hDlg)
+; The painted message of a TExtMsgForm: every line above the buttons, joined by spaces.
+var
+	string sLines,
+	string sLine,
+	string sTitle,
+	string sText,
+	int nStop,
+	int nCount,
+	int i
+let nStop = TcButtonsTop (hDlg)
+if !nStop then
+	return cscNull
+endIf
+let sLines = TcReadWindowLines (hDlg, tcMsgMaxLines, hDlg, nStop)
+let sTitle = GetWindowName (hDlg)
+let nCount = StringSegmentCount (sLines, tcLineDelim)
+let i = 1
+while i <= nCount
+	let sLine = StringTrimTrailingBlanks (StringTrimLeadingBlanks (StringSegment (sLines, tcLineDelim, i)))
+	if sLine && sLine != sTitle then
+		if sText then
+			let sText = sText + " " + sLine
+		else
+			let sText = sLine
+		endIf
+	endIf
+	let i = i + 1
+endWhile
+return sText
+EndFunction
+
 int function HandleCustomRealWindows (handle hwnd)
 ; Called by the default focus handling when focus enters a new real window.
 ; For the overwrite dialog, speak the file summary instead of the dialog title
@@ -170,6 +233,13 @@ int function HandleCustomRealWindows (handle hwnd)
 var string sSummary
 if GetWindowClass (hwnd) == wcTcOverwrite then
 	let sSummary = TcOverwriteSummary (hwnd)
+	if sSummary then
+		SayMessage (OT_DIALOG_TEXT, sSummary)
+		return true
+	endIf
+endIf
+if GetWindowClass (hwnd) == wcTcMsgForm then
+	let sSummary = TcMessageText (hwnd)
 	if sSummary then
 		SayMessage (OT_DIALOG_TEXT, sSummary)
 		return true
@@ -295,7 +365,7 @@ var
 	string sTitle,
 	int nCount,
 	int i
-let sLines = TcReadWindowLines (hDlg, tcProgressMaxLines, hDlg)
+let sLines = TcReadWindowLines (hDlg, tcMsgMaxLines, hDlg)
 let sTitle = GetWindowName (hDlg)
 let nCount = StringSegmentCount (sLines, tcLineDelim)
 let i = 1
@@ -538,6 +608,11 @@ if hDlg then
 endIf
 let hDlg = TcGetProgressDialog (GetFocus ())
 if hDlg then
+	TcSayWindowLines (hDlg)
+	return
+endIf
+let hDlg = GetRealWindow (GetFocus ())
+if GetWindowClass (hDlg) == wcTcMsgForm then
 	TcSayWindowLines (hDlg)
 	return
 endIf
