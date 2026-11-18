@@ -473,6 +473,21 @@ if GetWindowClass (hwnd) == wcButton then
 		return true
 	endIf
 endIf
+; Focus entering a file panel (Tab, Alt+Tab, back from a dialog or menu): JAWS said
+; "LEFT MultiSelect ListBox", the whole row and the position. Only the panel name
+; given by TC ("LEFT"/"RIGHT", the list's own name), the item name (as on the arrows)
+; and the position are spoken (decision 2026-11-18).
+var string sPanel
+if GetWindowClass (hwnd) == wcTcFileList
+&& IsPCCursor () then
+	let sPanel = GetObjectName (false, 1)
+	if sPanel then
+		Say (sPanel, OT_CONTROL_NAME)
+	endIf
+	TcSayListItemName ()
+	Say (PositionInGroup (), OT_POSITION)
+	return true
+endIf
 return HandleCustomWindows (hwnd)
 EndFunction
 
