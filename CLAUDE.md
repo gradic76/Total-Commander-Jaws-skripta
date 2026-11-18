@@ -28,6 +28,7 @@ JAWS skripte koje slijepim korisnicima JAWS for Windows omogućuju i olakšavaju
   - A, zadani: prošireni Insert ide TC-u (označi i pomakni), numerički Insert je JAWS tipka. Numerička tipkovnica isključena.
   - B: prošireni Insert je JAWS tipka; dvaput pritisnut propušta Insert TC-u (JAWSKey=JAWSKey u .jkm, kao JAWS-ov laptop raspored za Caps Lock). Numerička tipkovnica uključena, pa TC dobiva Num plus, minus, zvjezdicu i kosu crtu.
   - Razlika je samo u JAWSInsertKey (.jcf) i jednom retku .jkm. Postavlja je tools\deploy.ps1 -Profile, a kasnije installer, koji u korisnikovu .jcf upisuje samo naše retke.
+- Skripta mora raditi s tvorničkim postavkama TC-a. Razvoj i testovi idu na kopiji s tvorničkim postavkama (D:\TotalCommanderPortable(OS)). Installer TC-ove postavke ne dira; preporučene postavke su samo neobavezna preporuka, ako uopće zatrebaju (odluka 2026-11-18).
 - Ne mijenjaj korisnikov postojeći wincmd.ini bez izričitog pristanka.
 - Sve što se doda mora biti dokumentirano u README i u pomoći skripte (Insert+F1).
 
@@ -58,7 +59,7 @@ JAWS skripte koje slijepim korisnicima JAWS for Windows omogućuju i olakšavaju
 7. Statusna traka (broj i veličina označenih) dostupna na JAWS-ovu standardnu naredbu za statusnu traku.
 8. Nove prečace dodajemo samo tamo gdje faza 0 pokaže potrebu.
 9. Poruke na engleskom i hrvatskom (.jsm u mapama jezika JAWS-a).
-10. Instalacijski program: pronalazi instalirane verzije JAWS-a 2025+, kopira i kompajlira skripte u korisničke postavke te verzije; po izboru postavlja pojednostavljene TC postavke.
+10. Instalacijski program: pronalazi instalirane verzije JAWS-a 2025+, kopira i kompajlira skripte u korisničke postavke te verzije; nudi profil tipkovnice A ili B; TC-ove postavke ne dira.
 11. README (hrvatski i engleski) i pomoć skripte.
 
 ### Kasnije (nakon 0.1)
@@ -74,6 +75,6 @@ JAWS skripte koje slijepim korisnicima JAWS for Windows omogućuju i olakšavaju
 2. Riješeno 2026-11-17: TC .lng se ne čita. Natpisi se uzimaju s ekrana, a poruke prate jezik JAWS-a.
 3. Što kad za jezik JAWS-a nema našeg .jsm prijevoda: provjeriti vraća li JAWS sam na enu.
 4. Naziv mape jezika za hrvatski u JAWS-u (lokalizacija nije službena): provjeriti na tvojoj instalaciji.
-5. Pojednostavljene TC postavke: prijedlog je zaseban ini koji TC dobiva parametrom /i= preko vlastitog prečaca, tako da se korisnikov wincmd.ini ne dira. Koje postavke točno (jedan ili dva profila)?
+5. Riješeno 2026-11-18: skripta radi s tvorničkim postavkama TC-a; installer ih ne dira. Preporučene postavke (npr. TitleExtraText) samo kao neobavezna preporuka u dokumentaciji.
 6. Alat za instalacijski program: prijedlog Inno Setup (besplatan, čitljiv s JAWS-om, podržava hrvatski i engleski). Treba potvrditi da se kompajliranje skripti (scompile.exe) može pouzdano pozvati iz njega.
 7. Tko testira na drugim računalima i verzijama JAWS-a prije objave.
