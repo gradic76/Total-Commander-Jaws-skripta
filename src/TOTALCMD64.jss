@@ -234,6 +234,18 @@ endWhile
 return sText
 EndFunction
 
+int function HandleCustomAppWindows (handle hwnd)
+; When focus enters Total Commander (e.g. Alt+Tab), JAWS announced the main window as
+; "List box <user>^ - Total Commander (x64) 11.56 - <licensee>". Only the program name
+; is spoken; Insert+T still reads the whole title (decision 2026-11-18).
+if GetWindowClass (hwnd) == wcTcMain
+&& StringContains (GetWindowName (hwnd), tcProductName) then
+	Say (tcProductName, OT_WINDOW_NAME)
+	return true
+endIf
+return HandleCustomAppWindows (hwnd)
+EndFunction
+
 int function HandleCustomRealWindows (handle hwnd)
 ; Called by the default focus handling when focus enters a new real window.
 ; For the overwrite dialog, speak the file summary instead of the dialog title
@@ -253,9 +265,17 @@ if TcIsMessageDialog (hwnd) then
 		return true
 	endIf
 endIf
-; Copy/move dialog (F5/F6): JAWS announced it as "Combo box Total Commander";
+; Back in the main window after a dialog: the same long title, as in HandleCustomAppWindows.
+if GetWindowClass (hwnd) == wcTcMain
+&& StringContains (GetWindowName (hwnd), tcProductName) then
+	Say (tcProductName, OT_WINDOW_NAME)
+	return true
+endIf
+; Copy/move dialog (F5/F6) and input dialogs such as F7: JAWS announced them as
+; "Combo box Total Commander";
 ; the focused field's own label ("Copy 1 file(s) to") already says what it is.
-if GetWindowClass (hwnd) == wcTcCopyDlg then
+if GetWindowClass (hwnd) == wcTcCopyDlg
+|| GetWindowClass (hwnd) == wcTcComboInputDlg then
 	return true
 endIf
 return HandleCustomRealWindows (hwnd)

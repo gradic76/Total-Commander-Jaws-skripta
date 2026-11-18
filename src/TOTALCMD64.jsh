@@ -7,6 +7,8 @@ const
 
 	; Window classes, measured on Total Commander 11.56 x64
 	wcTcMain = "TTOTAL_CMD",
+	; Program name, a proper name (not translated); spoken instead of the long window title
+	tcProductName = "Total Commander",
 	wcTcOverwrite = "TOverWriteForm",
 	; Generic message dialog (long name warning, confirmations); message text is painted
 	wcTcMsgForm = "TExtMsgForm",
@@ -14,6 +16,8 @@ const
 	wcTcCheckMsgBox = "TCheckMsgBox",
 	; Copy/move dialog (F5/F6) from a normal folder
 	wcTcCopyDlg = "TInpComboDlg",
+	; Input dialog with a combo box, e.g. F7 new folder
+	wcTcComboInputDlg = "TCOMBOINPUT",
 	tcMsgMaxLines = 20,
 	wcButton = "Button",
 	; Copy/move progress window; matched as a prefix (seen: TDLG2FILEACTIONMIN)
