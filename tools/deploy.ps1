@@ -29,11 +29,14 @@ foreach ($ext in "jss", "jsh", "jsm", "jsd") {
     Copy-Item (Join-Path $src "TOTALCMD64.$ext") $dest -Force
 }
 
-# Key map: profile B adds the double press of the JAWS key.
+# Key map: the Insert marking key depends on the profile.
 $jkmLines = [IO.File]::ReadAllLines((Join-Path $src "TOTALCMD64.jkm"))
 if ($Profile -eq "B") {
     $jkmLines += "; Profile B: JAWS key pressed twice passes Insert to Total Commander (mark item)"
-    $jkmLines += "JAWSKey=JAWSKey"
+    $jkmLines += "JAWSKey=TcJawsKeyTwice"
+} else {
+    $jkmLines += "; Profile A: Extended Insert marks the item; the scripts say the marked count"
+    $jkmLines += "ExtInsert=TcInsertMark"
 }
 [IO.File]::WriteAllLines((Join-Path $dest "TOTALCMD64.jkm"), $jkmLines)
 

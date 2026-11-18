@@ -57,6 +57,10 @@ const
 	; JAWS sound played at the first and last item of a file list (JAWS sound, not the
 	; Windows default beep, so it comes with the speech; decision 2026-11-18)
 	tcListEdgeSound = "TouchKeyboardChildPanelBoundary.wav",
+	; Insert marking: tenths of a second before the result is spoken, and how long the
+	; list events stay quiet after Insert (milliseconds)
+	tcMarkResultDelay = 3,
+	tcInsertQuietTicks = 800,
 	; Column numbers in a Full view row
 	tcColumnSize = 2,
 	tcColumnDate = 3,
@@ -94,5 +98,7 @@ globals
 	int giTcStateSpokenTick,
 	; File list: row text when the focused item was last spoken
 	string gsTcLastRow,
+	; Time of the last Insert marking (TcMarkAndMove)
+	int giTcInsertTick,
 	; Set while a help text of the scripts is shown in the virtual viewer
 	int gbTcHelpShown

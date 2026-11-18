@@ -766,6 +766,12 @@ endIf
 return sThisPc
 EndFunction
 
+int function TcInsertMarkPending ()
+; True shortly after Insert marked an item and moved on (TcMarkAndMove).
+return giTcInsertTick
+	&& GetTickCount () - giTcInsertTick < tcInsertQuietTicks
+EndFunction
+
 void function TcSayMarkedState ()
 ; "selected" for a marked file. JAWS's own TC setting IndicateSelected=1 made JAWS say it
 ; by itself, but also in menus ("selected Files"); TOTALCMD64.jcf sets the default 2,
@@ -842,6 +848,10 @@ if GetWindowClass (curHwnd) == wcTcFileList
 	&& GetTickCount () - giTcStateSpokenTick < tcStateEchoTicks then
 		return
 	endIf
+	; After Insert the marking result is spoken by TcSayMarkResult.
+	if TcInsertMarkPending () then
+		return
+	endIf
 	TcSayListItemName ()
 	return
 endIf
@@ -854,7 +864,11 @@ void function ObjStateChangedEvent (handle hObj, optional int iObjType, int nCha
 if hObj == GetFocus ()
 && GetWindowClass (hObj) == wcTcFileList
 && IsPCCursor () then
-	; "selected" is prefixed by JAWS itself; only removal needs to be said.
+	; After Insert the marking result is spoken by TcSayMarkResult.
+	if TcInsertMarkPending () then
+		return
+	endIf
+	; "selected" comes from TcSayListItemName; only removal needs to be said here.
 	if !(nState & CTRL_SELECTED) then
 		Say (cscNotSelected, OT_ITEM_STATE)
 	endIf
@@ -1103,4 +1117,60 @@ if !TcIsFileListFocused () then
 	return
 endIf
 SayMessage (OT_USER_REQUESTED_INFORMATION, FormatString (msgTcActivePanel, GetObjectName (false, 1)))
+EndScript
+
+; ---------------------------------------------------------------------------
+; Insert marking (decision 2026-11-18): TC marks the item and moves to the next one.
+; Instead of "selected <previous item>" the scripts say how many items are now marked,
+; taken from the status line, and the item landed on.
+; Status line: "<size> / <total> in <files> / <all> file(s), <dirs> / <all> dir(s)";
+; the part from the selected file count on is spoken, without the size and without words
+; of our own: "2 / 9 file(s), 0 / 7 dir(s)".
+; ---------------------------------------------------------------------------
+
+string function TcStatusCounts (string sStatus)
+var
+	string sBefore,
+	string sFiles
+if StringSegmentCount (sStatus, "/") < 3 then
+	return sStatus
+endIf
+let sBefore = StringTrimTrailingBlanks (StringSegment (sStatus, "/", 2))
+let sFiles = StringSegment (sBefore, " ", -1)
+; drop "<size> / <total> in " and keep "<files> / ..."
+return sFiles + " " + StringChopLeft (sStatus, StringContains (sStatus, "/") + StringLength (StringSegment (sStatus, "/", 2)))
+EndFunction
+
+void function TcSayMarkResult ()
+var string sStatus
+if !TcIsFileListFocused () then
+	return
+endIf
+let sStatus = TcPanelStatus (GetFocus ())
+if sStatus then
+	Say (TcStatusCounts (sStatus), OT_ITEM_STATE)
+endIf
+TcSayListItemName ()
+EndFunction
+
+void function TcMarkAndMove ()
+; Passes the key to TC, then speaks the result once TC has updated the list and status line.
+TypeCurrentScriptKey ()
+if !TcIsFileListFocused () then
+	return
+endIf
+let giTcInsertTick = GetTickCount ()
+ScheduleFunction ("TcSayMarkResult", tcMarkResultDelay)
+EndFunction
+
+Script TcInsertMark ()
+; Profile A: Extended Insert.
+TcMarkAndMove ()
+EndScript
+
+Script TcJawsKeyTwice ()
+; Profile B: the JAWS key pressed twice passes Insert to TC, as JAWS's own JAWSKey script does.
+if IsSameScript () then
+	TcMarkAndMove ()
+endIf
 EndScript

@@ -72,7 +72,7 @@ Total Commander script keys:
 %5: status line of the active panel; in the progress window, a progress summary.
 %6: in the overwrite, progress and message dialogs, reads the whole dialog.
 %7: script version.
-Extended Insert marks the item; Numpad Insert remains the JAWS key.
+Insert marks the item and moves to the next one; the scripts then say how many items are marked and the item reached.
 @@
 
 ; Insert+F1 in the file list; %1 = key for the whole row, %2 = key for the key list
