@@ -48,7 +48,8 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 6. Pomoć, gotovo 2026-11-18 i provjereno uhom: Insert+H popis tipki, Insert+F1 pomoć za popis datoteka, dvaput Insert+F1 opća pomoć; tipke se zovu "Insert...". Nakon zatvaranja preglednog prozora JAWS interno pročita cijeli redak, a skripta ga nakon 0,2 s prekine kratkom najavom ploče. Pratiti u hodu.
 7. Hrvatski .jsm u mapi jezika JAWS-a (odluka 2026-11-17: poruke prate jezik JAWS-a). Provjeriti naziv mape za hrvatski.
 8. Instalacijski program (Inno Setup):
-   - po izboru postavlja naše preporučene TC postavke (ini). U njima je ekstenzija uz ime, jer skripta ime uzima iz prvog stupca. Zaseban stupac ekstenzije skripta zasad ne podržava;
+   - po izboru postavlja naše preporučene TC postavke (ini).
+   - preporučene postavke uključuju TitleExtraText=-Total Commander ([Configuration]): ime programa na početku naslova, pa ga Windowsov popis za Alt+Tab čita prvo (odluka 2026-11-18; kod autora upisano, kopija TotalCommander.ini.bak-20261118); U njima je ekstenzija uz ime, jer skripta ime uzima iz prvog stupca. Zaseban stupac ekstenzije skripta zasad ne podržava;
    - u .jcf upisuje samo potrebne retke, ne prepisuje datoteku;
    - instalira u sve verzije JAWS-a od 2025 nadalje, u korisničku mapu.
 9. README i dokumentacija.
