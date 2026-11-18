@@ -61,6 +61,9 @@ const
 	; list events stay quiet after Insert (milliseconds)
 	tcMarkResultDelay = 3,
 	tcInsertQuietTicks = 800,
+	; Keys that mark or unmark many items at once, lower case, as KeyPressedEvent names them
+	tcSelectAllKey = "control+a",
+	tcBulkMarkKeys = "|control+a|control+numpadplus|control+numpadminus|control+shift+numpadplus|control+shift+numpadminus|shift+numpadstar|numpadstar|numpadslash|alt+numpadplus|alt+numpadminus|",
 	; Column numbers in a Full view row
 	tcColumnSize = 2,
 	tcColumnDate = 3,
@@ -100,5 +103,7 @@ globals
 	string gsTcLastRow,
 	; Time of the last Insert marking (TcMarkAndMove)
 	int giTcInsertTick,
+	; Speak the marked count when focus returns to the file list (after a selection dialog)
+	int gbTcCountOnReturn,
 	; Set while a help text of the scripts is shown in the virtual viewer
 	int gbTcHelpShown

@@ -58,7 +58,7 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 - Insert+slovo nije slobodno za naše tipke (JAWS: Insert+S screen echo, Insert+D rječnik; laptop raspored: Insert+A čitaj sve, Insert+P JAWS kursor), pa ostaje obitelj Alt+Shift (odluka 2026-11-18). Alt+Shift+A u rasporedu Classic Laptop zamjenjuje SaySelectedText.
 - Profili tipkovnice A i B: vidi CLAUDE.md. Autor u radu koristi profil A.
 - Insert označavanje, GOTOVO 2026-11-18 i provjereno uhom: nakon Inserta "N / M file(s), N / M dir(s)" iz statusne trake (bez veličine), pa stavka na koju si sletio. Profil A: ExtInsert=TcInsertMark; profil B: JAWSKey=TcJawsKeyTwice (u B nije isprobano).
-- Nakon skupnih radnji označavanja (Ctrl+A, Ctrl+Num plus/minus, Num zvjezdica, Num plus/minus) izgovoriti isto (TcStatusCounts). Prijedlog, nije dogovoreno.
+- Skupno označavanje, GOTOVO 2026-11-18 i provjereno uhom (profil A): Ctrl+A, Ctrl+Num plus/minus, Shift+Num zvjezdica daju brojeve iz statusne trake. Tipke se NE presreću (TypeCurrentScriptKey numeričke tipke nije ispravno proslijedio TC-u), nego ih prati KeyPressedEvent. Ctrl+A je JAWS-ova skripta SelectAll, pa je iznimka. Dijalozi "Expand selection"/"Shrink selection" najavljuju naslov, a pri povratku brojeve. JAWS izmijenjenu .jkm učitava tek nakon ponovnog pokretanja (važno za installer). U profilu B Num zvjezdica, kosa crta i Alt+Num nisu isprobani.
 - Dijalog "Expand selection" (Num plus): jednom se čuo dugi naslov glavnog prozora, nepoznatim putem.
 - Ideje iz NVDA dodatka extendedTotalCmd (GPL-2.0, uzimamo samo ideje, ne kod):
   - Alt+Shift+P: GOTOVO 2026-11-17, provjereno uhom u obje ploče, u Dokumentima i na Ovaj PC ("\\Ovaj PC", ostaje TC-ov oblik). Potvrda kopiranja je JAWS-ova poruka "Copied" (cmsg52_S);

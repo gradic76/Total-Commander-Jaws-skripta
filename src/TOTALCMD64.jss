@@ -272,10 +272,17 @@ if GetWindowClass (hwnd) == wcTcMain
 	return true
 endIf
 ; Copy/move dialog (F5/F6) and input dialogs such as F7: JAWS announced them as
-; "Combo box Total Commander";
-; the focused field's own label ("Copy 1 file(s) to") already says what it is.
+; "Combo box Total Commander"; the focused field's own label ("Copy 1 file(s) to")
+; already says what it is. A title other than the program name is TC's own and says
+; what the dialog does ("Expand selection", "Shrink selection"), so it is spoken;
+; such dialogs change the marks, so the marked count is spoken when focus returns.
 if GetWindowClass (hwnd) == wcTcCopyDlg
 || GetWindowClass (hwnd) == wcTcComboInputDlg then
+	if GetWindowName (hwnd)
+	&& GetWindowName (hwnd) != tcProductName then
+		Say (GetWindowName (hwnd), OT_DIALOG_NAME)
+		let gbTcCountOnReturn = true
+	endIf
 	return true
 endIf
 return HandleCustomRealWindows (hwnd)
@@ -480,6 +487,10 @@ endIf
 var string sPanel
 if GetWindowClass (hwnd) == wcTcFileList
 && IsPCCursor () then
+	if gbTcCountOnReturn then
+		let gbTcCountOnReturn = false
+		TcSayMarkCounts ()
+	endIf
 	let sPanel = GetObjectName (false, 1)
 	if sPanel then
 		Say (sPanel, OT_CONTROL_NAME)
@@ -1141,6 +1152,18 @@ let sFiles = StringSegment (sBefore, " ", -1)
 return sFiles + " " + StringChopLeft (sStatus, StringContains (sStatus, "/") + StringLength (StringSegment (sStatus, "/", 2)))
 EndFunction
 
+void function TcSayMarkCounts ()
+; The marked count of the active panel, e.g. "12 / 12 file(s), 3 / 3 dir(s)".
+var string sStatus
+if !TcIsFileListFocused () then
+	return
+endIf
+let sStatus = TcPanelStatus (GetFocus ())
+if sStatus then
+	Say (TcStatusCounts (sStatus), OT_ITEM_STATE)
+endIf
+EndFunction
+
 void function TcSayMarkResult ()
 var string sStatus
 if !TcIsFileListFocused () then
@@ -1174,3 +1197,26 @@ if IsSameScript () then
 	TcMarkAndMove ()
 endIf
 EndScript
+
+Void Function KeyPressedEvent (int nKey, string strKeyName, int nIsBrailleKey, int nIsScriptKey)
+; Keys that change the marks of many items without moving the focus (Ctrl+A,
+; Ctrl+Num Plus/Minus, Shift+Num Star and, in profile B, the keypad keys): the keys
+; are not intercepted, since passing numpad keys on from a script did not reach TC
+; correctly (2026-11-18). When such a key went to TC, the marked count is spoken.
+; Ctrl+A runs JAWS's own SelectAll script, which passes the key on to TC, so it counts
+; even though it is a script key (measured 2026-11-18).
+var string sKey
+KeyPressedEvent (nKey, strKeyName, nIsBrailleKey, nIsScriptKey)
+if !TcIsFileListFocused () then
+	return
+endIf
+let sKey = StringLower (strKeyName)
+if nIsScriptKey
+&& sKey != tcSelectAllKey then
+	return
+endIf
+if StringContains (tcBulkMarkKeys, "|" + sKey + "|") then
+	let giTcInsertTick = GetTickCount ()
+	ScheduleFunction ("TcSayMarkCounts", tcMarkResultDelay)
+endIf
+EndFunction
