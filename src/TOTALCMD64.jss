@@ -60,6 +60,17 @@ endWhile
 return hFound
 EndFunction
 
+handle function TcQuickSearchBox ()
+; The quick search box (Ctrl+Alt+letters) if it is open. JAWS does not move its focus
+; there, so the box is found as a visible top-level window (measured 2026-11-18).
+var handle h
+let h = FindTopLevelWindow (wcTcQuickSearch, cscNull)
+if h && IsWindowVisible (h) then
+	return h
+endIf
+return 0
+EndFunction
+
 int function TcIsWindowInside (handle hwnd, handle hContainer)
 var handle h
 let h = hwnd
@@ -264,6 +275,12 @@ if TcIsMessageDialog (hwnd) then
 		SayMessage (OT_DIALOG_TEXT, sSummary)
 		return true
 	endIf
+endIf
+; Quick search box (Ctrl+Alt+letters): a TQUICKSEARCH window titled "QUICKSEARCH";
+; "Quick search" is said instead (decision 2026-11-18).
+if GetWindowClass (hwnd) == wcTcQuickSearch then
+	Say (msgTcQuickSearch, OT_DIALOG_NAME)
+	return true
 endIf
 ; Back in the main window after a dialog: the same long title, as in HandleCustomAppWindows.
 if GetWindowClass (hwnd) == wcTcMain
@@ -515,6 +532,16 @@ endIf
 var string sPanel
 if GetWindowClass (hwnd) == wcTcFileList
 && IsPCCursor () then
+	; Quick search box open: JAWS keeps the focus in the list and announces the panel
+	; again when the box appears (measured 2026-11-18). "Quick search" and the item found.
+	if TcQuickSearchBox () then
+		if !gbTcQuickSearchSaid then
+			let gbTcQuickSearchSaid = true
+			Say (msgTcQuickSearch, OT_DIALOG_NAME)
+		endIf
+		TcSayListItemName ()
+		return true
+	endIf
 	if gbTcCountOnReturn then
 		let gbTcCountOnReturn = false
 		TcSayMarkCounts ()
@@ -1240,10 +1267,37 @@ Void Function KeyPressedEvent (int nKey, string strKeyName, int nIsBrailleKey, i
 ; even though it is a script key (measured 2026-11-18).
 var string sKey
 KeyPressedEvent (nKey, strKeyName, nIsBrailleKey, nIsScriptKey)
+let sKey = StringLower (strKeyName)
+; Quick search box: JAWS did not say what Backspace removed; the remaining text is said.
+; Quick search box (Ctrl+Alt+letters). JAWS keeps its focus in the list; the box's text
+; is read as the MSAA value of its edit field (its MSAA name is the painted label
+; "Search:"), and the caret position is tracked by the scripts (measured 2026-11-18).
+if StringLeft (sKey, StringLength (tcQuickSearchKeyStart)) == tcQuickSearchKeyStart
+&& StringLength (sKey) == StringLength (tcQuickSearchKeyStart) + 1
+&& TcIsFileListFocused () then
+	let gsTcQuickSearchText = cscNull
+	let giTcQuickSearchCaret = 0
+	let gbTcQuickSearchSaid = false
+	ScheduleFunction ("TcQuickSearchOpened", tcMarkResultDelay)
+	return
+endIf
+if TcQuickSearchBox () then
+	if sKey == tcEscapeKey then
+		let gbTcQuickSearchSaid = false
+		ScheduleFunction ("TcAfterQuickSearchClosed", tcMarkResultDelay)
+		return
+	endIf
+	if sKey == tcEnterKey then
+		let gbTcQuickSearchSaid = false
+		return
+	endIf
+	let gsTcQuickSearchKey = sKey
+	ScheduleFunction ("TcQuickSearchAfterKey", tcQuickSearchDelay)
+	return
+endIf
 if !TcIsFileListFocused () then
 	return
 endIf
-let sKey = StringLower (strKeyName)
 if nIsScriptKey
 && sKey != tcSelectAllKey then
 	return
@@ -1251,5 +1305,117 @@ endIf
 if StringContains (tcBulkMarkKeys, "|" + sKey + "|") then
 	let giTcInsertTick = GetTickCount ()
 	ScheduleFunction ("TcSayMarkCounts", tcMarkResultDelay)
+endIf
+EndFunction
+
+
+void function TcAfterQuickSearchClosed ()
+; JAWS never moved its focus away from the list, so closing the box was silent;
+; the usual panel entry is spoken instead.
+if TcIsFileListFocused ()
+&& !TcQuickSearchBox () then
+	HandleCustomWindows (GetFocus ())
+endIf
+EndFunction
+
+
+
+string function TcQuickSearchValue ()
+; Text in the quick search box: the MSAA value of its edit field.
+var
+	handle hEdit,
+	object oEdit,
+	int nChild
+let hEdit = FindWindow (TcQuickSearchBox (), wcEdit)
+if !hEdit then
+	return cscNull
+endIf
+let oEdit = GetObjectFromEvent (hEdit, tcObjIdClient, 0, nChild)
+if !oEdit then
+	return cscNull
+endIf
+return oEdit.accValue (nChild)
+EndFunction
+
+void function TcQuickSearchOpened ()
+; Ctrl+Alt+letter: once the box is open, "Quick search" is said (once per box).
+if !TcQuickSearchBox () then
+	return
+endIf
+let gsTcQuickSearchText = TcQuickSearchValue ()
+let giTcQuickSearchCaret = StringLength (gsTcQuickSearchText)
+if !gbTcQuickSearchSaid then
+	let gbTcQuickSearchSaid = true
+	Say (msgTcQuickSearch, OT_DIALOG_NAME)
+endIf
+EndFunction
+
+void function TcSayQuickSearchChar (int nPos)
+; The character to the right of the caret (1-based position), as in an edit field.
+if nPos >= 1
+&& nPos <= StringLength (gsTcQuickSearchText) then
+	Say (SubString (gsTcQuickSearchText, nPos, 1), OT_CHAR)
+endIf
+EndFunction
+
+void function TcQuickSearchAfterKey ()
+; Runs after a key in the quick search box, once TC has updated the box.
+var
+	string sOld,
+	string sNew,
+	int nLen,
+	int i
+if !TcQuickSearchBox () then
+	return
+endIf
+let sOld = gsTcQuickSearchText
+let sNew = TcQuickSearchValue ()
+let gsTcQuickSearchText = sNew
+let nLen = StringLength (sNew)
+if gsTcQuickSearchKey == tcBackspaceKey then
+	; say the removed character: the first position where old and new differ
+	let i = 1
+	while i <= StringLength (sNew)
+	&& SubString (sOld, i, 1) == SubString (sNew, i, 1)
+		let i = i + 1
+	endWhile
+	if StringLength (sOld) > nLen then
+		Say (SubString (sOld, i, 1), OT_CHAR)
+		let giTcQuickSearchCaret = i - 1
+	endIf
+	if !nLen then
+		Say (msgTcQuickSearch, OT_DIALOG_NAME)
+	endIf
+	return
+endIf
+if gsTcQuickSearchKey == tcLeftKey then
+	if giTcQuickSearchCaret > 0 then
+		let giTcQuickSearchCaret = giTcQuickSearchCaret - 1
+	endIf
+	TcSayQuickSearchChar (giTcQuickSearchCaret + 1)
+	return
+endIf
+if gsTcQuickSearchKey == tcRightKey then
+	if giTcQuickSearchCaret < nLen then
+		let giTcQuickSearchCaret = giTcQuickSearchCaret + 1
+	endIf
+	TcSayQuickSearchChar (giTcQuickSearchCaret + 1)
+	return
+endIf
+if gsTcQuickSearchKey == tcHomeKey then
+	let giTcQuickSearchCaret = 0
+	TcSayQuickSearchChar (1)
+	return
+endIf
+if gsTcQuickSearchKey == tcEndKey then
+	let giTcQuickSearchCaret = nLen
+	return
+endIf
+; typed characters: the caret moves by the number of characters added
+if nLen > StringLength (sOld) then
+	let giTcQuickSearchCaret = giTcQuickSearchCaret + nLen - StringLength (sOld)
+endIf
+if giTcQuickSearchCaret > nLen then
+	let giTcQuickSearchCaret = nLen
 endIf
 EndFunction

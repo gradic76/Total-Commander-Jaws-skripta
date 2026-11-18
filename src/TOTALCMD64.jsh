@@ -18,6 +18,8 @@ const
 	wcTcCopyDlg = "TInpComboDlg",
 	; Input dialog with a combo box, e.g. F7 new folder
 	wcTcComboInputDlg = "TCOMBOINPUT",
+	; Quick search box (Ctrl+Alt+letters)
+	wcTcQuickSearch = "TQUICKSEARCH",
 	tcMsgMaxLines = 20,
 	wcButton = "Button",
 	; Copy/move progress window; matched as a prefix (seen: TDLG2FILEACTIONMIN)
@@ -65,6 +67,20 @@ const
 	tcInsertQuietTicks = 800,
 	; Keys that mark or unmark many items at once, lower case, as KeyPressedEvent names them
 	tcSelectAllKey = "control+a",
+	tcBackspaceKey = "backspace",
+	tcEscapeKey = "escape",
+	tcEnterKey = "enter",
+	tcSpaceKey = "space",
+	tcLeftKey = "leftarrow",
+	tcRightKey = "rightarrow",
+	tcHomeKey = "home",
+	tcEndKey = "end",
+	; MSAA OBJID_CLIENT
+	tcObjIdClient = -4,
+	; Tenths of a second after a key in the quick search box before it is read
+	tcQuickSearchDelay = 1,
+	; Key names of Ctrl+Alt+letter as KeyPressedEvent gives them, lower case ("Alt+Control+D")
+	tcQuickSearchKeyStart = "alt+control+",
 	tcBulkMarkKeys = "|control+a|control+numpadplus|control+numpadminus|control+shift+numpadplus|control+shift+numpadminus|shift+numpadstar|numpadstar|numpadslash|alt+numpadplus|alt+numpadminus|",
 	; Column numbers in a Full view row
 	tcColumnSize = 2,
@@ -107,5 +123,10 @@ globals
 	int giTcInsertTick,
 	; Speak the marked count when focus returns to the file list (after a selection dialog)
 	int gbTcCountOnReturn,
+	; Quick search box: text typed so far, and whether "Quick search" was said
+	string gsTcQuickSearchText,
+	int gbTcQuickSearchSaid,
+	int giTcQuickSearchCaret,
+	string gsTcQuickSearchKey,
 	; Set while a help text of the scripts is shown in the virtual viewer
 	int gbTcHelpShown
