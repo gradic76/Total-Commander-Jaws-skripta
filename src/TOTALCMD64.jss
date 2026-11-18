@@ -454,7 +454,35 @@ if hwnd != hFocus
 && TcGetBackgroundDialog (hwnd) then
 	return true
 endIf
+; The panel path line ("c:\Folder\*.*") is repainted after Tab and on entering a folder;
+; with the default layout JAWS spoke it each time (measured 2026-11-18). The path has its
+; own key, Alt+Shift+P, and ".." says where it leads.
+if hwnd != hFocus
+&& TcIsPanelLine (StringTrimTrailingBlanks (StringTrimLeadingBlanks (buffer)), tcPanelLinePath) then
+	return true
+endIf
 return NewTextEventShouldBeSilent (hFocus, hwnd, buffer, nAttributes, nTextColor, nBackgroundColor, nEcho, sFrameName)
+EndFunction
+
+void function TcSayButtonBarKind (handle hwnd)
+; Button bars (Alt+Shift+F11, Alt+Shift+F12): the focus is on a plain "Window" directly
+; under the main window; JAWS gives it the current button's hint as name, not the bar
+; file name (measured 2026-11-18). The kind is said, told apart by shape.
+var
+	int nLeft,
+	int nRight,
+	int nTop,
+	int nBottom
+if GetWindowClass (hwnd) != wcTcPlainWindow
+|| GetWindowClass (GetParent (hwnd)) != wcTcMain then
+	return
+endIf
+GetWindowRect (hwnd, nLeft, nRight, nTop, nBottom)
+if nBottom - nTop > nRight - nLeft then
+	Say (msgTcVerticalButtonBar, OT_CONTROL_TYPE)
+else
+	Say (msgTcButtonBar, OT_CONTROL_TYPE)
+endIf
 EndFunction
 
 int function HandleCustomWindows (handle hwnd)
@@ -829,6 +857,11 @@ if hwndFocus == hwndPrevFocus
 		endIf
 	endIf
 	return
+endIf
+; Focus entering a button bar: say which bar before the button (HandleCustomWindows
+; is not called for the bar window; measured 2026-11-18).
+if hwndFocus != hwndPrevFocus then
+	TcSayButtonBarKind (hwndFocus)
 endIf
 FocusChangedEventEx (hwndFocus, nObject, nChild, hwndPrevFocus, nPrevObject, nPrevChild, nChangeDepth)
 EndFunction

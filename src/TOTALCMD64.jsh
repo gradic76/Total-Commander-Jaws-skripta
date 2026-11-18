@@ -34,6 +34,8 @@ const
 	tcUpDir = "..",
 	; Filter shown in the path line when all files are listed
 	tcAllFilesFilter = "*.*",
+	; Button bars are plain windows directly under the main window
+	wcTcPlainWindow = "Window",
 	; Kinds of panel text lines
 	tcPanelLinePath = 1,
 	tcPanelLineStatus = 2,

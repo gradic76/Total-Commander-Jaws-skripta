@@ -98,3 +98,10 @@ Zaključak: TC 11.56 sam daje JAWS-u dosta podataka (MSAA). Popis, izbornici, di
 - U 64-bitnom TC-u glavni izbornik je uvijek iscrtan od TC-a (owner-draw, HISTORY.TXT 10.09.17), kao i izbornik pogona (19.11.08).
 - Točkice izbora (npr. Show > Full, All Files, Name) samo su iscrtane: GetMenuState ni dok je izbornik otvoren ne vraća "checked" (MFS_CHECKED). Zato ih JAWS ne može izgovoriti.
 - "selected" ispred stavki izbornika dolazio je od JAWS-ove postavke IndicateSelected=1 iz njegove totalcmd64.jcf. Vrijednost 2 dodaje "Not Selected" svakoj neoznačenoj stavci popisa. Vrijednost 0 ne dodaje ništa, pa naša TOTALCMD64.jcf koristi 0, a skripta sama kaže "selected" na označenim datotekama. Provjereno uhom.
+
+### Tvorničke postavke (izmjereno 2026-11-18, kopija "Total Commander Portable (OS)")
+
+- Zadani izgled ima i gornju gumbnu traku (DEFAULT.BAR, preko cijele širine), okomitu gumbnu traku između ploča (VERTICAL.BAR) i vidljiv naredbeni redak. Gumbi funkcijskih tipki nisu uključeni.
+- Ploče su iznutra iste. Skripta radi jednako i s tvorničkim i s autorovim postavkama (provjereno uhom).
+- Gumbne trake (Alt+Shift+F11, Alt+Shift+F12) su čitljive: svaki gumb ima opis, kretanje je strelicama lijevo i desno. JAWS kao ime prozora trake daje opis trenutnog gumba, a ne ime datoteke trake. Skripta pri ulasku kaže "Button bar" ili "Vertical button bar".
+- S tvorničkim izgledom JAWS je nakon Taba i ulaska u mapu izgovarao redak s putanjom ("c:\*.*"). Skripta ga utišava (NewTextEventShouldBeSilent).

@@ -50,6 +50,15 @@ minus
 Compression ratio %1
 @@
 
+; Said when focus enters a button bar (Alt+Shift+F11, Alt+Shift+F12), as TC names them in its options
+@msgTcButtonBar
+Button bar
+@@
+
+@msgTcVerticalButtonBar
+Vertical button bar
+@@
+
 ; Alt+Shift+A: %1 = panel name as Total Commander gives it ("LEFT" or "RIGHT")
 @msgTcActivePanel
 %1 panel active
