@@ -1,8 +1,8 @@
 [Options]
 ; JAWS's shared totalcmd64.jcf sets IndicateSelected=1, which adds "selected" in menus
 ; and the drive menu; 2 adds "Not Selected" to every unmarked item (measured 2026-11-17).
-; 0 is expected to say neither; the scripts say
-; "selected" for marked files themselves.
+; 0 says neither; the scripts say "selected" for marked files themselves.
 IndicateSelected=0
-; Only Numpad Insert acts as JAWS key; Extended Insert goes to Total Commander (mark item)
+; JAWSInsertKey: 1 = profile A (Extended Insert to TC), 2 = profile B (Extended Insert is the JAWS key)
+; Profile A is the default; tools\deploy.ps1 -Profile B (and the installer) set 2.
 JAWSInsertKey=1
