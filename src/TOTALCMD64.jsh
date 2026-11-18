@@ -79,8 +79,6 @@ const
 	tcObjIdClient = -4,
 	; Tenths of a second after a key in the quick search box before it is read
 	tcQuickSearchDelay = 1,
-	; Key names of Ctrl+Alt+letter as KeyPressedEvent gives them, lower case ("Alt+Control+D")
-	tcQuickSearchKeyStart = "alt+control+",
 	tcBulkMarkKeys = "|control+a|control+numpadplus|control+numpadminus|control+shift+numpadplus|control+shift+numpadminus|shift+numpadstar|numpadstar|numpadslash|alt+numpadplus|alt+numpadminus|",
 	; Column numbers in a Full view row
 	tcColumnSize = 2,

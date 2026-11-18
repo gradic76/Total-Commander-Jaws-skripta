@@ -535,10 +535,7 @@ if GetWindowClass (hwnd) == wcTcFileList
 	; Quick search box open: JAWS keeps the focus in the list and announces the panel
 	; again when the box appears (measured 2026-11-18). "Quick search" and the item found.
 	if TcQuickSearchBox () then
-		if !gbTcQuickSearchSaid then
-			let gbTcQuickSearchSaid = true
-			Say (msgTcQuickSearch, OT_DIALOG_NAME)
-		endIf
+		TcQuickSearchOpened ()
 		TcSayListItemName ()
 		return true
 	endIf
@@ -1269,19 +1266,16 @@ var string sKey
 KeyPressedEvent (nKey, strKeyName, nIsBrailleKey, nIsScriptKey)
 let sKey = StringLower (strKeyName)
 ; Quick search box: JAWS did not say what Backspace removed; the remaining text is said.
-; Quick search box (Ctrl+Alt+letters). JAWS keeps its focus in the list; the box's text
-; is read as the MSAA value of its edit field (its MSAA name is the painted label
-; "Search:"), and the caret position is tracked by the scripts (measured 2026-11-18).
-if StringLeft (sKey, StringLength (tcQuickSearchKeyStart)) == tcQuickSearchKeyStart
-&& StringLength (sKey) == StringLength (tcQuickSearchKeyStart) + 1
-&& TcIsFileListFocused () then
-	let gsTcQuickSearchText = cscNull
-	let giTcQuickSearchCaret = 0
-	let gbTcQuickSearchSaid = false
-	ScheduleFunction ("TcQuickSearchOpened", tcMarkResultDelay)
-	return
-endIf
+; Quick search box. TC opens it with Ctrl+Alt+letters (default) or with letters alone,
+; depending on its options; the box is recognized whenever it appears.
+; JAWS keeps its focus in the list; the box's text is read as the MSAA value of its edit
+; field (its MSAA name is the painted label "Search:"), and the caret position is tracked
+; by the scripts (measured 2026-11-18).
 if TcQuickSearchBox () then
+	if !gbTcQuickSearchSaid then
+		; opened by the previous key, or by something the scripts did not see
+		TcQuickSearchOpened ()
+	endIf
 	if sKey == tcEscapeKey then
 		let gbTcQuickSearchSaid = false
 		ScheduleFunction ("TcAfterQuickSearchClosed", tcMarkResultDelay)
@@ -1294,6 +1288,11 @@ if TcQuickSearchBox () then
 	let gsTcQuickSearchKey = sKey
 	ScheduleFunction ("TcQuickSearchAfterKey", tcQuickSearchDelay)
 	return
+endIf
+; No box: any key typed in the file list may open it, so it is checked shortly after.
+let gbTcQuickSearchSaid = false
+if TcIsFileListFocused () then
+	ScheduleFunction ("TcQuickSearchOpened", tcMarkResultDelay)
 endIf
 if !TcIsFileListFocused () then
 	return
@@ -1338,7 +1337,8 @@ return oEdit.accValue (nChild)
 EndFunction
 
 void function TcQuickSearchOpened ()
-; Ctrl+Alt+letter: once the box is open, "Quick search" is said (once per box).
+; The quick search box has opened: its text and caret are taken as the starting point,
+; and "Quick search" is said once per box.
 if !TcQuickSearchBox () then
 	return
 endIf
