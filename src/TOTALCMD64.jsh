@@ -38,6 +38,8 @@ const
 	tcAllFilesFilter = "*.*",
 	; Button bars are plain windows directly under the main window
 	wcTcPlainWindow = "Window",
+	; Combo box class of TC (drive box, command line)
+	wcTcDriveBoxClass = "LCLComboBox",
 	; Kinds of panel text lines
 	tcPanelLinePath = 1,
 	tcPanelLineStatus = 2,

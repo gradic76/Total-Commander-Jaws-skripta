@@ -504,6 +504,15 @@ EndFunction
 
 int function HandleCustomWindows (handle hwnd)
 var string sName
+; Command line: an Edit in a combo box directly in the bottom part of the main window
+; (edit fields in dialogs sit in the dialog instead). JAWS said only "Edit"; it is named
+; "Command line", without the painted path prompt (decision 2026-11-18).
+if GetWindowClass (hwnd) == wcEdit
+&& GetWindowClass (GetParent (hwnd)) == wcTcDriveBoxClass
+&& GetWindowClass (GetParent (GetParent (GetParent (hwnd)))) == wcTcMain then
+	IndicateControlType (WT_EDIT, msgTcCommandLine, GetObjectValue ())
+	return true
+endIf
 if GetWindowClass (hwnd) == wcButton then
 	let sName = GetObjectName ()
 	; TC check boxes are three-state buttons; JAWS calls them "3 state button".

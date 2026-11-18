@@ -50,6 +50,11 @@ minus
 Compression ratio %1
 @@
 
+; Name of the command line edit field (JAWS said only "Edit")
+@msgTcCommandLine
+Command line
+@@
+
 ; Said when the quick search box opens (Ctrl+Alt+letters); not "Search", which is the big search dialog
 @msgTcQuickSearch
 Quick search
