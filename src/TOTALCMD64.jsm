@@ -50,6 +50,11 @@ minus
 Compression ratio %1
 @@
 
+; Alt+Shift+A: %1 = panel name as Total Commander gives it ("LEFT" or "RIGHT")
+@msgTcActivePanel
+%1 panel active
+@@
+
 ; Alt+Shift+S / Alt+Shift+D when the row has no such column (e.g. Brief view)
 @msgTcNotAvailable
 Not available

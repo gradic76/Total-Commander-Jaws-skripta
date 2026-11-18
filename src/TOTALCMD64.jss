@@ -1102,5 +1102,5 @@ if !TcIsFileListFocused () then
 	TypeCurrentScriptKey ()
 	return
 endIf
-SayMessage (OT_USER_REQUESTED_INFORMATION, GetObjectName (false, 1))
+SayMessage (OT_USER_REQUESTED_INFORMATION, FormatString (msgTcActivePanel, GetObjectName (false, 1)))
 EndScript
