@@ -55,6 +55,30 @@ Compression ratio %1
 Not available
 @@
 
+; Insert+H: keys added by the scripts (shown in the virtual viewer).
+; %1 to %7 are the actual keys, filled in by the scripts (the JAWS key named Insert).
+@msgTcHotKeyHelp
+Total Commander script keys:
+%1: size of the item in focus.
+%2: date and time of the item in focus.
+%3: path of the active panel; pressed twice quickly, copies it to the clipboard.
+%4: whole row of the item, with its position.
+%5: status line of the active panel; in the progress window, a progress summary.
+%6: in the overwrite, progress and message dialogs, reads the whole dialog.
+%7: script version.
+Extended Insert marks the item; Numpad Insert remains the JAWS key.
+@@
+
+; Insert+F1 in the file list; %1 = key for the whole row, %2 = key for the key list
+@msgTcListHelp
+File list. The arrow keys read the item name, and "selected" for marked items. ".." also says the folder it leads to. Space and Insert mark items. %1 reads the whole row, and %2 lists the script keys.
+@@
+
+; Insert+F1 pressed twice: general help; %1 = version, %2 = key for the key list
+@msgTcAppHelp
+Total Commander JAWS scripts, version %1. The scripts shorten what is spoken in the file list, read the overwrite, progress and message dialogs, and add keys for size, date and path. For the list of keys, press %2.
+@@
+
 ; Shown when the progress window text could not be read
 @msgTcProgressUnknown
 Progress not available

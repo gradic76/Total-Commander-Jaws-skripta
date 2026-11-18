@@ -45,7 +45,7 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 5. F5 dijalog (TInpComboDlg), gotovo 2026-11-17 i provjereno uhom: pri otvaranju samo polje s natpisom (bez "Combo box Total Commander"), Insert+B čita cijeli dijalog. Ostaje:
    - zbroj "7,75 M 4 1": brojevi datoteka i mapa nemaju oznaku (na ekranu su ikone). Treba dvije riječi u .jsm ili oznake grafika;
    - TInpComboDlg vjerojatno koriste i drugi dijalozi s poljem (npr. F7): provjeriti da im ne nedostaje najava.
-6. Vlastita pomoć na Insert+F1.
+6. Pomoć, gotovo 2026-11-18 i provjereno uhom: Insert+H popis tipki, Insert+F1 pomoć za popis datoteka, dvaput Insert+F1 opća pomoć; tipke se zovu "Insert...". Nakon zatvaranja preglednog prozora JAWS interno pročita cijeli redak, a skripta ga nakon 0,2 s prekine kratkom najavom ploče. Pratiti u hodu.
 7. Hrvatski .jsm u mapi jezika JAWS-a (odluka 2026-11-17: poruke prate jezik JAWS-a). Provjeriti naziv mape za hrvatski.
 8. Instalacijski program (Inno Setup):
    - po izboru postavlja naše preporučene TC postavke (ini). U njima je ekstenzija uz ime, jer skripta ime uzima iz prvog stupca. Zaseban stupac ekstenzije skripta zasad ne podržava;

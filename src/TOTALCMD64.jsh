@@ -49,6 +49,11 @@ const
 	ssfPersonal = 5,
 	ssfNetwork = 18,
 	tcColumnDelim = "\t",
+	; Help texts name the JAWS key "Insert" (convention 2026-11-18); key names in .jkm use "JAWSKey"
+	tcJawsKeyName = "JAWSKey",
+	tcInsertKeyName = "Insert",
+	; Tenths of a second after the help viewer closes before the short panel entry is spoken
+	tcAfterHelpDelay = 2,
 	; Column numbers in a Full view row
 	tcColumnSize = 2,
 	tcColumnDate = 3,
@@ -85,4 +90,6 @@ globals
 	; File list: time the last mark change was spoken
 	int giTcStateSpokenTick,
 	; File list: row text when the focused item was last spoken
-	string gsTcLastRow
+	string gsTcLastRow,
+	; Set while a help text of the scripts is shown in the virtual viewer
+	int gbTcHelpShown
