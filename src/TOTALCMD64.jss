@@ -1045,7 +1045,8 @@ TcShowHelp (FormatString (msgTcHotKeyHelp,
 	TcKeyName ("SayLine"),
 	TcKeyName ("SayBottomLineOfWindow"),
 	TcKeyName ("ReadBoxInTabOrder"),
-	TcKeyName ("ScriptFileName")))
+	TcKeyName ("ScriptFileName"),
+	TcKeyName ("TcSayActivePanel")))
 EndScript
 
 Script ScreenSensitiveHelp ()
@@ -1058,4 +1059,48 @@ if TcIsFileListFocused () then
 	return
 endIf
 PerformScript ScreenSensitiveHelp ()
+EndScript
+
+; ---------------------------------------------------------------------------
+; List edges: a short sound when Up Arrow is pressed on the first item or
+; Down Arrow on the last one (the list does not move and was silent before).
+; The position comes from "1 of 18" (first and last number, no words).
+; ---------------------------------------------------------------------------
+
+int function TcListIndex ()
+return StringToInt (StringSegment (PositionInGroup (), " ", 1))
+EndFunction
+
+int function TcListCount ()
+return StringToInt (StringSegment (PositionInGroup (), " ", -1))
+EndFunction
+
+Script SayPriorLine ()
+if TcIsFileListFocused ()
+&& TcListIndex () == 1 then
+	PlaySound (FindJAWSSoundFile (tcListEdgeSound))
+endIf
+PerformScript SayPriorLine ()
+EndScript
+
+Script SayNextLine ()
+var int nCount
+if TcIsFileListFocused () then
+	let nCount = TcListCount ()
+	if nCount > 0
+	&& TcListIndex () == nCount then
+		PlaySound (FindJAWSSoundFile (tcListEdgeSound))
+	endIf
+endIf
+PerformScript SayNextLine ()
+EndScript
+
+Script TcSayActivePanel ()
+; Alt+Shift+A: only the active panel as TC names it ("LEFT"/"RIGHT"); the path has
+; its own key, Alt+Shift+P (decision 2026-11-18).
+if !TcIsFileListFocused () then
+	TypeCurrentScriptKey ()
+	return
+endIf
+SayMessage (OT_USER_REQUESTED_INFORMATION, GetObjectName (false, 1))
 EndScript

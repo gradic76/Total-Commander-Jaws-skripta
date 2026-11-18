@@ -56,12 +56,13 @@ Not available
 @@
 
 ; Insert+H: keys added by the scripts (shown in the virtual viewer).
-; %1 to %7 are the actual keys, filled in by the scripts (the JAWS key named Insert).
+; %1 to %8 are the actual keys, filled in by the scripts (the JAWS key named Insert).
 @msgTcHotKeyHelp
 Total Commander script keys:
 %1: size of the item in focus.
 %2: date and time of the item in focus.
 %3: path of the active panel; pressed twice quickly, copies it to the clipboard.
+%8: which panel is active.
 %4: whole row of the item, with its position.
 %5: status line of the active panel; in the progress window, a progress summary.
 %6: in the overwrite, progress and message dialogs, reads the whole dialog.

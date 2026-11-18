@@ -54,6 +54,9 @@ const
 	tcInsertKeyName = "Insert",
 	; Tenths of a second after the help viewer closes before the short panel entry is spoken
 	tcAfterHelpDelay = 2,
+	; JAWS sound played at the first and last item of a file list (JAWS sound, not the
+	; Windows default beep, so it comes with the speech; decision 2026-11-18)
+	tcListEdgeSound = "TouchKeyboardChildPanelBoundary.wav",
 	; Column numbers in a Full view row
 	tcColumnSize = 2,
 	tcColumnDate = 3,

@@ -1,9 +1,14 @@
 :Script TcSaySize
 :Synopsis Says the size of the item in the file list
 :Description Says the size of the file or folder in focus in the Total Commander file list, as shown in the size column.
+
 :Script TcSayPath
 :Synopsis Says the path of the active panel
 :Description Says the path of the active Total Commander panel. Pressed twice quickly, copies the path to the clipboard.
+
+:Script TcSayActivePanel
+:Synopsis Says the active panel
+:Description Says which Total Commander panel is active (left or right, as Total Commander names it).
 
 :Script TcSayDate
 :Synopsis Says the date of the item in the file list

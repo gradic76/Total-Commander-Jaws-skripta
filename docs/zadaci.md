@@ -55,12 +55,12 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 
 ## Kasnije
 
-- Mogućnost: kratki zvuk za mape na strelicama (ako se pokaže potreba).
+- Insert+slovo nije slobodno za naše tipke (JAWS: Insert+S screen echo, Insert+D rječnik; laptop raspored: Insert+A čitaj sve, Insert+P JAWS kursor), pa ostaje obitelj Alt+Shift (odluka 2026-11-18). Alt+Shift+A u rasporedu Classic Laptop zamjenjuje SaySelectedText.
 - Ideje iz NVDA dodatka extendedTotalCmd (GPL-2.0, uzimamo samo ideje, ne kod):
   - Alt+Shift+P: GOTOVO 2026-11-17, provjereno uhom u obje ploče, u Dokumentima i na Ovaj PC ("\\Ovaj PC", ostaje TC-ov oblik). Potvrda kopiranja je JAWS-ova poruka "Copied" (cmsg52_S);
-  - tipka za aktivnu ploču;
+  - tipka za aktivnu ploču: GOTOVO 2026-11-18, Alt+Shift+A, samo "LEFT"/"RIGHT" (odluka), provjereno uhom;
   - ime trenutne kartice mape;
-  - zvuk na početku i kraju popisa;
+  - zvuk na početku i kraju popisa: GOTOVO 2026-11-18, JAWS-ov zvuk TouchKeyboardChildPanelBoundary.wav, bez naknadne postavke (odluka: ide uz govor, ne sistemski beep), provjereno uhom;
   - javljanje kod Ctrl+A i micanja svih oznaka;
   - tonovi dok traje izračun veličine mape.
 - Usporedba datoteka u dijalogu prepisivanja ("nova je veća i novija"). Za to treba čitati format datuma.
