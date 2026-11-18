@@ -24,6 +24,10 @@ JAWS skripte koje slijepim korisnicima JAWS for Windows omogućuju i olakšavaju
   - vrste i stanja kontrola prepusti JAWS-u (IndicateControlType, IndicateControlState), jer tako prate jezik JAWS-a.
 - Vlastitih riječi neka bude što manje. Idu samo u .jsm, nikad u kod. Jezik .jsm prati jezik JAWS-a (mapa enu, hrv...).
 - U tekstovima koje korisnik čuje ili čita (pomoć, README) JAWS tipka se zove "Insert", a ne "JAWSKey". Nazive tipki skripta slaže sama (GetScriptKeyName, uz zamjenu JAWSKey u Insert), a ne preko %KeyFor (odluka 2026-11-18).
+- Dva profila tipkovnice, grade se paralelno (odluka 2026-11-18):
+  - A, zadani: prošireni Insert ide TC-u (označi i pomakni), numerički Insert je JAWS tipka. Numerička tipkovnica isključena.
+  - B: prošireni Insert je JAWS tipka; dvaput pritisnut propušta Insert TC-u (JAWSKey=JAWSKey u .jkm, kao JAWS-ov laptop raspored za Caps Lock). Numerička tipkovnica uključena, pa TC dobiva Num plus, minus, zvjezdicu i kosu crtu.
+  - Razlika je samo u JAWSInsertKey (.jcf) i jednom retku .jkm. Postavlja je tools\deploy.ps1 -Profile, a kasnije installer, koji u korisnikovu .jcf upisuje samo naše retke.
 - Ne mijenjaj korisnikov postojeći wincmd.ini bez izričitog pristanka.
 - Sve što se doda mora biti dokumentirano u README i u pomoći skripte (Insert+F1).
 

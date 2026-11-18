@@ -1,7 +1,16 @@
 # Development deploy: copies the script set to the current user's JAWS settings and compiles it.
-# Usage: powershell -NoProfile -ExecutionPolicy Bypass -File tools\deploy.ps1 [-JawsVersion 2025] [-Lang enu]
-# The .jcf is copied only when the user has none, so settings changed in Settings Center are kept.
+# Usage: powershell -NoProfile -ExecutionPolicy Bypass -File tools\deploy.ps1 [-Profile A|B] [-JawsVersion 2025] [-Lang enu]
+#
+# Keyboard profiles (decision 2026-11-18):
+#   A (default): Extended Insert goes to Total Commander (mark item), Numpad Insert is the JAWS key.
+#   B: Extended Insert is the JAWS key; pressed twice it passes Insert to Total Commander;
+#      meant for use with NumLock on, so the numeric keypad belongs to Total Commander.
+#
+# The user's TOTALCMD64.jcf is not overwritten: only the script's own option lines are set,
+# so settings changed in Settings Center are kept. The installer must do the same.
 param(
+    [ValidateSet("A", "B")]
+    [string]$Profile = "A",
     [string]$JawsVersion = "2025",
     [string]$Lang = "enu",
     # Alternative source folder, e.g. a temporary variant for a control test
@@ -16,11 +25,39 @@ $compiler = "C:\Program Files\Freedom Scientific\JAWS\$JawsVersion\scompile.exe"
 if (-not (Test-Path $dest)) { throw "JAWS user settings folder not found: $dest" }
 if (-not (Test-Path $compiler)) { throw "Script compiler not found: $compiler" }
 
-foreach ($ext in "jss", "jsh", "jsm", "jkm", "jsd") {
+foreach ($ext in "jss", "jsh", "jsm", "jsd") {
     Copy-Item (Join-Path $src "TOTALCMD64.$ext") $dest -Force
 }
+
+# Key map: profile B adds the double press of the JAWS key.
+$jkmLines = [IO.File]::ReadAllLines((Join-Path $src "TOTALCMD64.jkm"))
+if ($Profile -eq "B") {
+    $jkmLines += "; Profile B: JAWS key pressed twice passes Insert to Total Commander (mark item)"
+    $jkmLines += "JAWSKey=JAWSKey"
+}
+[IO.File]::WriteAllLines((Join-Path $dest "TOTALCMD64.jkm"), $jkmLines)
+
+# Configuration: set the script's option lines in the user's .jcf, keep everything else.
+$options = [ordered]@{
+    "IndicateSelected" = "0"
+    "JAWSInsertKey"    = if ($Profile -eq "B") { "2" } else { "1" }
+}
 $jcf = Join-Path $dest "TOTALCMD64.jcf"
-if (-not (Test-Path $jcf)) { Copy-Item (Join-Path $src "TOTALCMD64.jcf") $dest }
+$lines = if (Test-Path $jcf) { [Collections.Generic.List[string]][IO.File]::ReadAllLines($jcf) } else { [Collections.Generic.List[string]]@("[Options]") }
+if (-not ($lines | Where-Object { $_ -match '^\[Options\]\s*$' })) { $lines.Insert(0, "[Options]") }
+foreach ($key in $options.Keys) {
+    $line = "$key=$($options[$key])"
+    $index = -1
+    for ($i = 0; $i -lt $lines.Count; $i++) { if ($lines[$i] -match "^$key=") { $index = $i; break } }
+    if ($index -ge 0) {
+        $lines[$index] = $line
+    } else {
+        $optionsAt = 0
+        for ($i = 0; $i -lt $lines.Count; $i++) { if ($lines[$i] -match '^\[Options\]\s*$') { $optionsAt = $i; break } }
+        $lines.Insert($optionsAt + 1, $line)
+    }
+}
+[IO.File]::WriteAllLines($jcf, $lines)
 
 Push-Location $dest
 try {
@@ -30,4 +67,5 @@ try {
     Pop-Location
 }
 if ($code -ne 0) { throw "Compilation failed, exit code $code" }
+"Profile $Profile"
 Get-Item (Join-Path $dest "TOTALCMD64.jsb") | Select-Object Name, Length, LastWriteTime
