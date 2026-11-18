@@ -64,3 +64,7 @@ Treće strane (pročitano):
 - JAWS sam umeće "selected" u izgovor o označenoj stavci na fokusu, čak i unutar našeg Say. Ne dodavati ga ručno.
 - Kad aplikacija prepiše redak stavke na fokusu, JAWS javlja FocusChangedEventEx za istu stavku (nChild == nPrevChild) i izgovori cijeli redak.
 - Ispitivanje izgovora: povijest govora. Insert+Razmak pa Shift+H je briše, Insert+Razmak pa Ctrl+H je kopira u međuspremnik, a Claude je pročita. Za traženje izvora govora koriste se privremene oznake ("A", "S", "F"...) u probnoj verziji (deploy.ps1 -SourceDir).
+- Izmijenjenu .jkm JAWS učitava tek nakon ponovnog pokretanja; promijenjena .jsb učita se već pri ponovnom ulasku u program (izmjereno 2026-11-18).
+- Presretanje tipke skriptom pa prosljeđivanje s TypeCurrentScriptKey nije ispravno proslijedilo numeričke tipke s modifikatorima (Ctrl+Num minus) TC-u. Bolje je tipku ne presretati, nego je pratiti u KeyPressedEvent (strKeyName, npr. "Control+NumPadMinus"; nIsScriptKey kaže je li je izvršio JAWS).
+- Tipka JAWS sama (JAWSKey=...) može se vezati u .jkm; dvostruki pritisak hvata IsSameScript (kao JAWS-ov laptop raspored za Caps Lock).
+- Naziv tipke skripte daje GetScriptKeyName; %KeyFor u porukama stvara poveznice i piše "JAWSKey".
