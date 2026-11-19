@@ -18,6 +18,8 @@ const
 	wcTcCopyDlg = "TInpComboDlg",
 	; Input dialog with a combo box, e.g. F7 new folder
 	wcTcComboInputDlg = "TCOMBOINPUT",
+	; Find Files dialog (Alt+F7)
+	wcTcFindDlg = "TFindFile",
 	; Quick search box (Ctrl+Alt+letters)
 	wcTcQuickSearch = "TQUICKSEARCH",
 	tcMsgMaxLines = 20,

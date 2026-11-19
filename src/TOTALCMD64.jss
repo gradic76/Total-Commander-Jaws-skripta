@@ -302,6 +302,11 @@ if GetWindowClass (hwnd) == wcTcCopyDlg
 	endIf
 	return true
 endIf
+; Find Files (Alt+F7): JAWS announced "Combo box Find Files"; only TC's title is said.
+if GetWindowClass (hwnd) == wcTcFindDlg then
+	Say (GetWindowName (hwnd), OT_DIALOG_NAME)
+	return true
+endIf
 return HandleCustomRealWindows (hwnd)
 EndFunction
 
@@ -712,8 +717,15 @@ EndFunction
 
 int function TcIsPanelLine (string sText, int nKind)
 if nKind == tcPanelLinePath then
-	return StringContains (sText, "\\")
-		&& StringContains (StringSegment (sText, "\\", -1), "*")
+	if StringContains (sText, "\\") then
+		return StringContains (StringSegment (sText, "\\", -1), "*")
+	endIf
+	; A panel that is not a folder (search results fed to the panel) shows its name
+	; ending with a colon instead, e.g. "Search result:" (measured 2026-11-19).
+	; The drive line starts with "[" and the status line contains " / ".
+	return StringRight (sText, 1) == ":"
+		&& StringLeft (sText, 1) != "["
+		&& !StringContains (sText, " / ")
 endIf
 if nKind == tcPanelLineStatus then
 	return StringContains (sText, " / ")
@@ -846,8 +858,13 @@ EndFunction
 
 void function TcSayMarkedState ()
 ; "selected" for a marked file. JAWS's own TC setting IndicateSelected=1 made JAWS say it
-; by itself, but also in menus ("selected Files"); TOTALCMD64.jcf sets the default 2,
-; so the file list says it here (decision 2026-11-17).
+; by itself, but also in menus ("selected Files"); TOTALCMD64.jcf sets 0, so the file
+; list says it here (decision 2026-11-17).
+; Only in the file panels, which sit directly in the main window: in lists inside dialogs,
+; such as the Find Files results, the item in focus is always selected (measured 2026-11-19).
+if GetWindowClass (GetParent (GetFocus ())) != wcTcMain then
+	return
+endIf
 if GetControlAttributes () & CTRL_SELECTED then
 	IndicateControlState (WT_LISTBOXITEM, CTRL_SELECTED)
 endIf
@@ -1040,8 +1057,12 @@ if TcIsFileListFocused () then
 	let sText = TcPanelStatus (GetFocus ())
 	if sText then
 		SayMessage (OT_USER_REQUESTED_INFORMATION, sText)
-		return
+	else
+		; e.g. search results fed to the panel have no status line; JAWS would read the
+		; function key bar at the bottom of the window instead (measured 2026-11-19)
+		SayMessage (OT_ERROR, msgTcNotAvailable)
 	endIf
+	return
 endIf
 PerformScript SayBottomLineOfWindow ()
 EndScript
@@ -1075,14 +1096,20 @@ if !sLine then
 	SayMessage (OT_ERROR, msgTcNotAvailable)
 	return
 endIf
-let sPath = TcPathWithoutFilter (sLine)
+if StringContains (sLine, "\\") then
+	let sPath = TcPathWithoutFilter (sLine)
+else
+	; not a folder, e.g. "Search result:": said as TC shows it
+	let sPath = sLine
+endIf
 if IsSameScript () then
 	CopyToClipboard (sPath)
 	SayMessage (OT_JAWS_MESSAGE, cmsg52_S)
 	return
 endIf
 ; a filter other than "*.*" is worth hearing ("e:\Music *.mp3")
-if TcPathFilter (sLine) != tcAllFilesFilter then
+if StringContains (sLine, "\\")
+&& TcPathFilter (sLine) != tcAllFilesFilter then
 	let sPath = sPath + " " + TcPathFilter (sLine)
 endIf
 SayMessage (OT_USER_REQUESTED_INFORMATION, sPath)
