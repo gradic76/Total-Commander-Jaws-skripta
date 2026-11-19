@@ -32,6 +32,14 @@ JAWS skripte koje slijepim korisnicima JAWS for Windows omogućuju i olakšavaju
 - Ne mijenjaj korisnikov postojeći wincmd.ini bez izričitog pristanka.
 - Sve što se doda mora biti dokumentirano u README i u pomoći skripte (Insert+F1).
 
+## Radni postupak
+
+- Instalacija za razvoj: `tools\deploy.ps1` (zadano profil A; autor radi s A). Kopira TOTALCMD64.* u korisničku JAWS 2025 mapu (enu), upisuje samo naše retke u .jcf i prevodi. Dopušteno bez pitanja za TOTALCMD64.*.
+- Izmijenjenu .jkm JAWS učitava tek nakon ponovnog pokretanja; .jsb već pri povratku u TC.
+- Test izgovora: autor obriše povijest govora (Insert+Razmak, Shift+H), napravi test, kopira je (Insert+Razmak, Ctrl+H), a Claude čita međuspremnik. Izvor govora traži se probnom verzijom s oznakama (`deploy.ps1 -SourceDir` iz privremene mape).
+- Mjerenje prozora izvana (PowerShell, Win32/UIA/MSAA, snimke). Paziti: prozor razgovora prekriva desni dio TC-a, pa ondje JAWS-ov off-screen model nema teksta.
+- Stanje i odluke: docs\zadaci.md (popis), docs\stanje.md (mjerenja), docs\jaws-referenca.md (pouke o JAWS skriptiranju).
+
 ## Plan
 
 ### Ciljevi

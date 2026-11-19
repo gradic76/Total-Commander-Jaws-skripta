@@ -1105,17 +1105,72 @@ RestoreCursor ()
 return sChunks
 EndFunction
 
+string function TcColumnCaption (string sHeaders, int nRowColumns, int nColumn)
+; Caption of row column nColumn from the header captions (joined by tcLineDelim).
+; Captions are matched from the right: the row joins name and extension in its first
+; column, while the header shows them as "Name" and "Ext" (measured 2026-11-20).
+; In Comments view TC keeps the Full view header above name and comment (seen on screen
+; 2026-11-20), so captions are used only when header and row match (allowing "Ext").
+var int nOffset
+let nOffset = StringSegmentCount (sHeaders, tcLineDelim) - nRowColumns
+if !sHeaders
+|| nOffset < 0
+|| nOffset > tcHeaderExtraColumns then
+	return cscNull
+endIf
+if nColumn == 1 then
+	return StringTrimTrailingBlanks (StringSegment (sHeaders, tcLineDelim, 1))
+endIf
+return StringTrimTrailingBlanks (StringSegment (sHeaders, tcLineDelim, nColumn + nOffset))
+EndFunction
+
+string function TcCaptioned (string sCaption, string sValue)
+if sCaption then
+	return sCaption + ": " + sValue
+endIf
+return sValue
+EndFunction
+
+void function TcShowRowDetails (string sRow, string sHeaders, int nColumn)
+; Pressed twice: all columns of the item in the JAWS virtual viewer, one per line with its
+; caption, the cursor on the line of the requested column (decision 2026-11-20).
+; The viewer allows arrowing, selecting and copying; Escape returns to the panel.
+var
+	int nCount,
+	int i
+let nCount = StringSegmentCount (sRow, tcColumnDelim)
+if UserBufferIsActive () then
+	UserBufferDeactivate ()
+endIf
+UserBufferClear ()
+let i = 1
+while i <= nCount
+	UserBufferAddText (TcCaptioned (TcColumnCaption (sHeaders, nCount, i),
+		StringTrimTrailingBlanks (StringSegment (sRow, tcColumnDelim, i))) + cScBufferNewLine)
+	let i = i + 1
+endWhile
+UserBufferAddText (cMsgBuffExit)
+UserBufferActivate ()
+let gbTcHelpShown = true
+JAWSTopOfFile ()
+let i = 1
+while i < nColumn
+	NextLine ()
+	let i = i + 1
+endWhile
+SayLine ()
+EndFunction
+
 void function TcSayListColumn (int nColumn)
 ; Speaks one tab separated column of the focused file list row with its caption from the
 ; column header ("Size: 96.082.613"), or passes the key on outside the file list.
 ; The header is painted only and read from the off-screen model (decision 2026-11-20).
+; Pressed twice, shows all columns in the virtual viewer (TcShowRowDetails).
 var
 	string sRow,
 	string sValue,
 	string sHeaders,
-	string sCaption,
-	handle hHeader,
-	int nOffset
+	handle hHeader
 if !TcIsFileListFocused () then
 	TypeCurrentScriptKey ()
 	return
@@ -1124,30 +1179,22 @@ endIf
 ; kept the old row until the focus moved (2026-11-19).
 MSAARefresh (true)
 let sRow = GetObjectName ()
-let sValue = StringTrimTrailingBlanks (StringSegment (sRow, tcColumnDelim, nColumn))
-if !sValue then
-	SayMessage (OT_ERROR, msgTcNotAvailable)
-	return
-endIf
-; Captions are matched from the right: the row joins name and extension in its first
-; column, while the header shows them as "Name" and "Ext" (measured 2026-11-20).
 let hHeader = TcPanelHeader (GetFocus ())
 if hHeader then
 	RefreshWindow (hHeader)
 	let sHeaders = TcHeaderChunks (hHeader)
-	let nOffset = StringSegmentCount (sHeaders, tcLineDelim) - StringSegmentCount (sRow, tcColumnDelim)
-	; In Comments view TC keeps the Full view header above name and comment (seen on screen
-	; 2026-11-20), so captions are used only when header and row match (allowing "Ext").
-	if nOffset >= 0
-	&& nOffset <= tcHeaderExtraColumns then
-		let sCaption = StringTrimTrailingBlanks (StringSegment (sHeaders, tcLineDelim, nColumn + nOffset))
-	endIf
 endIf
-if sCaption then
-	SayMessage (OT_USER_REQUESTED_INFORMATION, sCaption + ": " + sValue)
-else
-	SayMessage (OT_USER_REQUESTED_INFORMATION, sValue)
+let sValue = StringTrimTrailingBlanks (StringSegment (sRow, tcColumnDelim, nColumn))
+if IsSameScript () then
+	TcShowRowDetails (sRow, sHeaders, nColumn)
+	return
 endIf
+if !sValue then
+	SayMessage (OT_ERROR, msgTcNotAvailable)
+	return
+endIf
+SayMessage (OT_USER_REQUESTED_INFORMATION,
+	TcCaptioned (TcColumnCaption (sHeaders, StringSegmentCount (sRow, tcColumnDelim), nColumn), sValue))
 EndFunction
 
 ; Alt+1 to Alt+9: column 2 to 10 of the item in focus (column 1, the name, is said on the

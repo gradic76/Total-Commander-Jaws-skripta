@@ -11,3 +11,6 @@
 # Windows
 Thumbs.db
 desktop.ini
+
+# Session handoff (local only)
+/.claude/handoff.md
