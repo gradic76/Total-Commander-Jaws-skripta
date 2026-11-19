@@ -85,10 +85,12 @@ const
 	tcObjIdClient = -4,
 	; Tenths of a second after a key in the quick search box before it is read
 	tcQuickSearchDelay = 1,
-	tcBulkMarkKeys = "|control+a|control+numpadplus|control+numpadminus|control+shift+numpadplus|control+shift+numpadminus|shift+numpadstar|numpadstar|numpadslash|alt+numpadplus|alt+numpadminus|",
+	tcBulkMarkKeys = "|control+a|control+numpadplus|control+numpadminus|shift+control+numpadplus|shift+control+numpadminus|shift+numpadstar|numpadstar|numpadslash|alt+numpadplus|alt+numpadminus|",
 	; Column numbers in a Full view row
 	tcColumnSize = 2,
 	tcColumnDate = 3,
+	; Comments view rows have two columns: name and comment
+	tcCommentsViewColumns = 2,
 	; After a mark change is spoken, a repeat event for the same item within this time is ignored
 	tcStateEchoTicks = 1500,
 	; Pack files dialog (Alt+F5); its compression ratio button caption is a single digit

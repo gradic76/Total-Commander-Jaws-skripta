@@ -911,6 +911,14 @@ if sName == tcUpDir then
 endIf
 TcSayMarkedState ()
 Say (sName, OT_LINE)
+; Comments view (Ctrl+Shift+F2): the row has two columns, name and comment
+; (Full view has four, Brief one; measured 2026-11-19). The comment follows the name.
+if StringSegmentCount (gsTcLastRow, tcColumnDelim) == tcCommentsViewColumns then
+	let sName = StringTrimTrailingBlanks (StringTrimLeadingBlanks (StringSegment (gsTcLastRow, tcColumnDelim, 2)))
+	if sName then
+		Say (sName, OT_LINE)
+	endIf
+endIf
 EndFunction
 
 void function FocusChangedEventEx (handle hwndFocus, int nObject, int nChild,
@@ -1321,17 +1329,18 @@ EndScript
 
 string function TcViewKeyMessage (string sKey)
 ; Message for TC's view and sort keys (KEYBOARD.TXT), or empty for other keys.
+; JAWS names Ctrl+Shift combinations "Shift+Control+..." (measured 2026-11-19).
 if sKey == "control+f1" then
 	return msgTcViewBrief
 elIf sKey == "control+f2" then
 	return msgTcViewFull
-elIf sKey == "control+shift+f1" then
+elIf sKey == "shift+control+f1" then
 	return msgTcViewThumbnails
-elIf sKey == "control+shift+f2" then
+elIf sKey == "shift+control+f2" then
 	return msgTcViewComments
 elIf sKey == "control+f8" then
 	return msgTcViewTree
-elIf sKey == "control+shift+f8" then
+elIf sKey == "shift+control+f8" then
 	return msgTcViewSeparateTree
 elIf sKey == "control+f3" then
 	return msgTcSortName

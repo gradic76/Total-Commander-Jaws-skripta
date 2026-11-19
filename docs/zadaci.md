@@ -71,3 +71,4 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
   - tonovi dok traje izračun veličine mape.
 - Usporedba datoteka u dijalogu prepisivanja ("nova je veća i novija"). Za to treba čitati format datuma.
 - Ostali prikazi, Lister (F3), arhive, FTP, višestruko preimenovanje, usporedba mapa.
+- Ideja: Alt+Shift+1 do 9 čitaju 1. do 9. stupac stavke (za prilagođene stupce, Shift+F1). Nazivi stupaca u zaglavlju su iscrtani; istražiti po potrebi.
