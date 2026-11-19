@@ -937,6 +937,10 @@ if hwndFocus == hwndPrevFocus
 	let sRow = GetObjectName ()
 	if sRow != gsTcLastRow then
 		let gsTcLastRow = sRow
+		; a view change rewrites the row too; the size is meant only for folder sizes
+		if GetTickCount () - giTcViewKeyTick < tcStateEchoTicks then
+			return
+		endIf
 		let sSize = StringSegment (sRow, tcColumnDelim, 2)
 		if StringContainsChars (sSize, tcDigits) then
 			Say (sSize, OT_LINE)
@@ -1019,6 +1023,9 @@ if !TcIsFileListFocused () then
 	TypeCurrentScriptKey ()
 	return
 endIf
+; JAWS is told to reload the row first (MSAARefresh): after a view change (Ctrl+Shift+F2) JAWS
+; kept the old row until the focus moved (2026-11-19).
+MSAARefresh (true)
 let sValue = StringTrimTrailingBlanks (StringSegment (GetObjectName (), tcColumnDelim, nColumn))
 if sValue then
 	SayMessage (OT_USER_REQUESTED_INFORMATION, sValue)
@@ -1027,19 +1034,50 @@ else
 endIf
 EndFunction
 
-Script TcSaySize ()
-; Size of the item in focus only. The marked items' count and size are in the
-; status line (Insert+Page Down) (decision 2026-11-17).
-TcSayListColumn (tcColumnSize)
+; Alt+1 to Alt+9: column 2 to 10 of the item in focus (column 1, the name, is said on the
+; arrows; decision 2026-11-19), in the order TC shows them, so they
+; follow any view and any custom columns (decision 2026-11-19; replaces Alt+Shift+S/D).
+; In Full view: Alt+1 size, Alt+2 date and time, Alt+3 attributes.
+Script TcSayColumn1 ()
+TcSayListColumn (2)
 EndScript
 
-Script TcSayDate ()
-TcSayListColumn (tcColumnDate)
+Script TcSayColumn2 ()
+TcSayListColumn (3)
+EndScript
+
+Script TcSayColumn3 ()
+TcSayListColumn (4)
+EndScript
+
+Script TcSayColumn4 ()
+TcSayListColumn (5)
+EndScript
+
+Script TcSayColumn5 ()
+TcSayListColumn (6)
+EndScript
+
+Script TcSayColumn6 ()
+TcSayListColumn (7)
+EndScript
+
+Script TcSayColumn7 ()
+TcSayListColumn (8)
+EndScript
+
+Script TcSayColumn8 ()
+TcSayListColumn (9)
+EndScript
+
+Script TcSayColumn9 ()
+TcSayListColumn (10)
 EndScript
 
 Script SayLine ()
 if TcIsFileListFocused () then
 	TcSayMarkedState ()
+	MSAARefresh (true)
 	Say (TcListRowForSpeech (GetObjectName ()), OT_LINE)
 	Say (PositionInGroup (), OT_POSITION)
 	return
@@ -1193,8 +1231,8 @@ EndFunction
 
 Script HotKeyHelp ()
 TcShowHelp (FormatString (msgTcHotKeyHelp,
-	TcKeyName ("TcSaySize"),
-	TcKeyName ("TcSayDate"),
+	TcKeyName ("TcSayColumn1"),
+	TcKeyName ("TcSayColumn9"),
 	TcKeyName ("TcSayPath"),
 	TcKeyName ("SayLine"),
 	TcKeyName ("SayBottomLineOfWindow"),
@@ -1406,6 +1444,7 @@ if TcIsFileListFocused () then
 	; View and sort keys: what they did is said shortly after (decision 2026-11-19)
 	let gsTcViewMessage = TcViewKeyMessage (sKey)
 	if gsTcViewMessage then
+		let giTcViewKeyTick = GetTickCount ()
 		ScheduleFunction ("TcSayViewMessage", tcMarkResultDelay)
 	endIf
 endIf

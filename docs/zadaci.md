@@ -71,4 +71,4 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
   - tonovi dok traje izračun veličine mape.
 - Usporedba datoteka u dijalogu prepisivanja ("nova je veća i novija"). Za to treba čitati format datuma.
 - Ostali prikazi, Lister (F3), arhive, FTP, višestruko preimenovanje, usporedba mapa.
-- Ideja: Alt+Shift+1 do 9 čitaju 1. do 9. stupac stavke (za prilagođene stupce, Shift+F1). Nazivi stupaca u zaglavlju su iscrtani; istražiti po potrebi.
+- Stupci, GOTOVO 2026-11-19 i provjereno uhom: Alt+1 do Alt+9 čitaju 2. do 10. stupac (ime se čuje na strelicama), redom kako ih TC prikazuje; Alt+Shift+S/D uklonjeni. Prije čitanja MSAARefresh, jer JAWS nakon promjene prikaza drži stari redak. Poznato: nakon čitanja u Comments view pa prelaska na Full JAWS izgovori cijeli redak (JAWS vidi promjenu u odnosu na osvježeni redak); prihvaćeno. Provjeriti broj stupaca u Configure custom columns (Shift+F1).

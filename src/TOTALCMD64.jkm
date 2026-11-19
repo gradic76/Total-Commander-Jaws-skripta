@@ -1,10 +1,18 @@
 ; Total Commander JAWS scripts: key assignments
 ; Copyright (c) 2026 author. MIT License.
-; Alt+Shift+letter family: free in Total Commander 11.56 and in JAWS 2025 defaults.
+; Alt+digit (columns) and Alt+Shift+letter families: free in Total Commander 11.56 and in
+; JAWS 2025 defaults (Alt+8/9 only in the Classic Laptop layout).
 ; Subject to change (decision 2026-11-17).
 
 [Common Keys]
-Alt+Shift+S=TcSaySize
-Alt+Shift+D=TcSayDate
+Alt+1=TcSayColumn1
+Alt+2=TcSayColumn2
+Alt+3=TcSayColumn3
+Alt+4=TcSayColumn4
+Alt+5=TcSayColumn5
+Alt+6=TcSayColumn6
+Alt+7=TcSayColumn7
+Alt+8=TcSayColumn8
+Alt+9=TcSayColumn9
 Alt+Shift+P=TcSayPath
 Alt+Shift+A=TcSayActivePanel

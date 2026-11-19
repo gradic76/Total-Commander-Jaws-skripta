@@ -1,6 +1,38 @@
-:Script TcSaySize
-:Synopsis Says the size of the item in the file list
-:Description Says the size of the file or folder in focus in the Total Commander file list, as shown in the size column.
+:Script TcSayColumn1
+:Synopsis Says column 2 of the item in the file list
+:Description Says column 2 of the file or folder in focus (the columns after the name), in the order Total Commander shows them.
+
+:Script TcSayColumn2
+:Synopsis Says column 3 of the item in the file list
+:Description Says column 3 of the file or folder in focus (the columns after the name), in the order Total Commander shows them.
+
+:Script TcSayColumn3
+:Synopsis Says column 4 of the item in the file list
+:Description Says column 4 of the file or folder in focus (the columns after the name), in the order Total Commander shows them.
+
+:Script TcSayColumn4
+:Synopsis Says column 5 of the item in the file list
+:Description Says column 5 of the file or folder in focus (the columns after the name), in the order Total Commander shows them.
+
+:Script TcSayColumn5
+:Synopsis Says column 6 of the item in the file list
+:Description Says column 6 of the file or folder in focus (the columns after the name), in the order Total Commander shows them.
+
+:Script TcSayColumn6
+:Synopsis Says column 7 of the item in the file list
+:Description Says column 7 of the file or folder in focus (the columns after the name), in the order Total Commander shows them.
+
+:Script TcSayColumn7
+:Synopsis Says column 8 of the item in the file list
+:Description Says column 8 of the file or folder in focus (the columns after the name), in the order Total Commander shows them.
+
+:Script TcSayColumn8
+:Synopsis Says column 9 of the item in the file list
+:Description Says column 9 of the file or folder in focus (the columns after the name), in the order Total Commander shows them.
+
+:Script TcSayColumn9
+:Synopsis Says column 10 of the item in the file list
+:Description Says column 10 of the file or folder in focus (the columns after the name), in the order Total Commander shows them.
 
 :Script TcSayPath
 :Synopsis Says the path of the active panel
@@ -9,7 +41,3 @@
 :Script TcSayActivePanel
 :Synopsis Says the active panel
 :Description Says which Total Commander panel is active (left or right, as Total Commander names it).
-
-:Script TcSayDate
-:Synopsis Says the date of the item in the file list
-:Description Says the date and time of the file or folder in focus in the Total Commander file list, as shown in the date column.

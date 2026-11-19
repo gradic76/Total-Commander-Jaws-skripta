@@ -129,7 +129,7 @@ Vertical button bar
 %1 panel active
 @@
 
-; Alt+Shift+S / Alt+Shift+D when the row has no such column (e.g. Brief view)
+; Alt+1 to Alt+9 when the row has no such column (e.g. Brief view), and other missing information
 @msgTcNotAvailable
 Not available
 @@
@@ -138,8 +138,7 @@ Not available
 ; %1 to %8 are the actual keys, filled in by the scripts (the JAWS key named Insert).
 @msgTcHotKeyHelp
 Total Commander script keys:
-%1: size of the item in focus.
-%2: date and time of the item in focus.
+%1 to %2: the columns after the name of the item in focus, in the order Total Commander shows them, so they follow any view and your own custom columns. In Full view: 1 size, 2 date and time, 3 attributes.
 %3: path of the active panel; pressed twice quickly, copies it to the clipboard.
 %8: which panel is active.
 %4: whole row of the item, with its position.
