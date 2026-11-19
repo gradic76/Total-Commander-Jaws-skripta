@@ -68,3 +68,5 @@ Treće strane (pročitano):
 - Presretanje tipke skriptom pa prosljeđivanje s TypeCurrentScriptKey nije ispravno proslijedilo numeričke tipke s modifikatorima (Ctrl+Num minus) TC-u. Bolje je tipku ne presretati, nego je pratiti u KeyPressedEvent (strKeyName, npr. "Control+NumPadMinus"; nIsScriptKey kaže je li je izvršio JAWS).
 - Tipka JAWS sama (JAWSKey=...) može se vezati u .jkm; dvostruki pritisak hvata IsSameScript (kao JAWS-ov laptop raspored za Caps Lock).
 - Naziv tipke skripte daje GetScriptKeyName; %KeyFor u porukama stvara poveznice i piše "JAWSKey".
+- Iscrtani tekst koji JAWS-ov off-screen model vidi može se čitati po dijelovima (GetChunk, NextChunk s nevidljivim kursorom); svaki naslov stupca u TC-ovu zaglavlju je zaseban dio (2026-11-20).
+- Dio prozora prekriven drugim prozorom Windows ne iscrtava, pa ga JAWS-ov off-screen model nema. Kod testiranja paziti da TC nije prekriven (npr. prozorom razgovora).

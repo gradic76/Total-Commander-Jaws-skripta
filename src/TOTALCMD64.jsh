@@ -88,6 +88,11 @@ const
 	tcBulkMarkKeys = "|control+a|control+numpadplus|control+numpadminus|shift+control+numpadplus|shift+control+numpadminus|shift+numpadstar|numpadstar|numpadslash|alt+numpadplus|alt+numpadminus|",
 	; Comments view rows have two columns: name and comment
 	tcCommentsViewColumns = 2,
+	; Column header: allowed gap in pixels between header and list, and most captions read
+	tcHeaderGap = 3,
+	tcMaxColumns = 15,
+	; Header captions without a column in the row (TC shows "Ext" apart, the row joins it to the name)
+	tcHeaderExtraColumns = 1,
 	; After a mark change is spoken, a repeat event for the same item within this time is ignored
 	tcStateEchoTicks = 1500,
 	; Pack files dialog (Alt+F5); its compression ratio button caption is a single digit

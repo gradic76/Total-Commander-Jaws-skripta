@@ -1015,10 +1015,107 @@ EndFunction
 
 
 
+handle function TcPanelHeader (handle hList)
+; The column header of a file list: a plain window without text in the list's panel whose
+; bottom edge touches the top of the list (the header is painted only; measured 2026-11-20).
+var
+	handle hPanel,
+	handle hChild,
+	handle hGrand,
+	int nListLeft,
+	int nListRight,
+	int nListTop,
+	int nListBottom,
+	int nLeft,
+	int nRight,
+	int nTop,
+	int nBottom
+GetWindowRect (hList, nListLeft, nListRight, nListTop, nListBottom)
+let hPanel = GetFirstChild (GetParent (hList))
+while hPanel
+	GetWindowRect (hPanel, nLeft, nRight, nTop, nBottom)
+	if hPanel != hList
+	&& IsWindowVisible (hPanel)
+	&& nLeft <= nListLeft && nRight >= nListRight then
+		let hChild = GetFirstChild (hPanel)
+		while hChild
+			if TcIsHeaderOf (hChild, nListTop) then
+				return hChild
+			endIf
+			let hGrand = GetFirstChild (hChild)
+			while hGrand
+				if TcIsHeaderOf (hGrand, nListTop) then
+					return hGrand
+				endIf
+				let hGrand = GetNextWindow (hGrand)
+			endWhile
+			let hChild = GetNextWindow (hChild)
+		endWhile
+	endIf
+	let hPanel = GetNextWindow (hPanel)
+endWhile
+return 0
+EndFunction
+
+int function TcIsHeaderOf (handle hwnd, int nListTop)
+var
+	int nLeft,
+	int nRight,
+	int nTop,
+	int nBottom
+if !IsWindowVisible (hwnd)
+|| GetWindowClass (hwnd) != wcTcPlainWindow then
+	return false
+endIf
+GetWindowRect (hwnd, nLeft, nRight, nTop, nBottom)
+return nBottom <= nListTop + tcHeaderGap
+	&& nBottom >= nListTop - tcHeaderGap
+EndFunction
+
+string function TcHeaderChunks (handle hHeader)
+; The painted column captions, read chunk by chunk with the Invisible cursor and joined
+; by tcLineDelim.
+var
+	string sChunks,
+	int nCol,
+	int i
+if !hHeader then
+	return cscNull
+endIf
+SaveCursor ()
+InvisibleCursor ()
+if !MoveToWindow (hHeader) then
+	RestoreCursor ()
+	return cscNull
+endIf
+let sChunks = GetChunk ()
+let i = 1
+while i < tcMaxColumns
+	let nCol = GetCursorCol ()
+	NextChunk ()
+	if GetCursorCol () <= nCol
+	|| GetCurrentWindow () != hHeader then
+		let i = tcMaxColumns
+	else
+		let sChunks = sChunks + tcLineDelim + GetChunk ()
+		let i = i + 1
+	endIf
+endWhile
+RestoreCursor ()
+return sChunks
+EndFunction
+
 void function TcSayListColumn (int nColumn)
-; Speaks one tab separated column of the focused file list row,
-; or passes the key on to Total Commander outside the file list.
-var string sValue
+; Speaks one tab separated column of the focused file list row with its caption from the
+; column header ("Size: 96.082.613"), or passes the key on outside the file list.
+; The header is painted only and read from the off-screen model (decision 2026-11-20).
+var
+	string sRow,
+	string sValue,
+	string sHeaders,
+	string sCaption,
+	handle hHeader,
+	int nOffset
 if !TcIsFileListFocused () then
 	TypeCurrentScriptKey ()
 	return
@@ -1026,11 +1123,30 @@ endIf
 ; JAWS is told to reload the row first (MSAARefresh): after a view change (Ctrl+Shift+F2) JAWS
 ; kept the old row until the focus moved (2026-11-19).
 MSAARefresh (true)
-let sValue = StringTrimTrailingBlanks (StringSegment (GetObjectName (), tcColumnDelim, nColumn))
-if sValue then
-	SayMessage (OT_USER_REQUESTED_INFORMATION, sValue)
-else
+let sRow = GetObjectName ()
+let sValue = StringTrimTrailingBlanks (StringSegment (sRow, tcColumnDelim, nColumn))
+if !sValue then
 	SayMessage (OT_ERROR, msgTcNotAvailable)
+	return
+endIf
+; Captions are matched from the right: the row joins name and extension in its first
+; column, while the header shows them as "Name" and "Ext" (measured 2026-11-20).
+let hHeader = TcPanelHeader (GetFocus ())
+if hHeader then
+	RefreshWindow (hHeader)
+	let sHeaders = TcHeaderChunks (hHeader)
+	let nOffset = StringSegmentCount (sHeaders, tcLineDelim) - StringSegmentCount (sRow, tcColumnDelim)
+	; In Comments view TC keeps the Full view header above name and comment (seen on screen
+	; 2026-11-20), so captions are used only when header and row match (allowing "Ext").
+	if nOffset >= 0
+	&& nOffset <= tcHeaderExtraColumns then
+		let sCaption = StringTrimTrailingBlanks (StringSegment (sHeaders, tcLineDelim, nColumn + nOffset))
+	endIf
+endIf
+if sCaption then
+	SayMessage (OT_USER_REQUESTED_INFORMATION, sCaption + ": " + sValue)
+else
+	SayMessage (OT_USER_REQUESTED_INFORMATION, sValue)
 endIf
 EndFunction
 
