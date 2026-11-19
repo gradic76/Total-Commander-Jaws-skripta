@@ -50,6 +50,51 @@ minus
 Compression ratio %1
 @@
 
+; View and sort keys (Ctrl+F1 to Ctrl+F8): said after the key, worded as in TC's Show menu
+@msgTcViewBrief
+Brief view
+@@
+
+@msgTcViewFull
+Full view
+@@
+
+@msgTcViewThumbnails
+Thumbnail view
+@@
+
+@msgTcViewComments
+Comments view
+@@
+
+@msgTcViewTree
+Tree view
+@@
+
+@msgTcViewSeparateTree
+Separate tree
+@@
+
+@msgTcSortName
+Sorted by name
+@@
+
+@msgTcSortExtension
+Sorted by extension
+@@
+
+@msgTcSortDate
+Sorted by date
+@@
+
+@msgTcSortSize
+Sorted by size
+@@
+
+@msgTcUnsorted
+Unsorted
+@@
+
 ; Find Files: name of the ">>" button, which opens the Windows folder browser
 @msgTcBrowse
 Browse

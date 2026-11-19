@@ -134,6 +134,8 @@ globals
 	int gbTcQuickSearchSaid,
 	; Set by Shift+F7 until the new folder dialog opens
 	int gbTcOtherPanelFolder,
+	; Message for the last view or sort key, spoken shortly after
+	string gsTcViewMessage,
 	int giTcQuickSearchCaret,
 	string gsTcQuickSearchKey,
 	; Set while a help text of the scripts is shown in the virtual viewer

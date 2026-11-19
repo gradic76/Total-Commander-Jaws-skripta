@@ -1319,6 +1319,41 @@ if IsSameScript () then
 endIf
 EndScript
 
+string function TcViewKeyMessage (string sKey)
+; Message for TC's view and sort keys (KEYBOARD.TXT), or empty for other keys.
+if sKey == "control+f1" then
+	return msgTcViewBrief
+elIf sKey == "control+f2" then
+	return msgTcViewFull
+elIf sKey == "control+shift+f1" then
+	return msgTcViewThumbnails
+elIf sKey == "control+shift+f2" then
+	return msgTcViewComments
+elIf sKey == "control+f8" then
+	return msgTcViewTree
+elIf sKey == "control+shift+f8" then
+	return msgTcViewSeparateTree
+elIf sKey == "control+f3" then
+	return msgTcSortName
+elIf sKey == "control+f4" then
+	return msgTcSortExtension
+elIf sKey == "control+f5" then
+	return msgTcSortDate
+elIf sKey == "control+f6" then
+	return msgTcSortSize
+elIf sKey == "control+f7" then
+	return msgTcUnsorted
+endIf
+return cscNull
+EndFunction
+
+void function TcSayViewMessage ()
+if gsTcViewMessage then
+	Say (gsTcViewMessage, OT_STATUS)
+	let gsTcViewMessage = cscNull
+endIf
+EndFunction
+
 Void Function KeyPressedEvent (int nKey, string strKeyName, int nIsBrailleKey, int nIsScriptKey)
 ; Keys that change the marks of many items without moving the focus (Ctrl+A,
 ; Ctrl+Num Plus/Minus, Shift+Num Star and, in profile B, the keypad keys): the keys
@@ -1359,6 +1394,11 @@ if TcIsFileListFocused () then
 	ScheduleFunction ("TcQuickSearchOpened", tcMarkResultDelay)
 	; Shift+F7: remembered for the new folder dialog that follows
 	let gbTcOtherPanelFolder = (sKey == tcNewFolderOtherKey)
+	; View and sort keys: what they did is said shortly after (decision 2026-11-19)
+	let gsTcViewMessage = TcViewKeyMessage (sKey)
+	if gsTcViewMessage then
+		ScheduleFunction ("TcSayViewMessage", tcMarkResultDelay)
+	endIf
 endIf
 if !TcIsFileListFocused () then
 	return
