@@ -60,6 +60,19 @@ endWhile
 return hFound
 EndFunction
 
+handle function TcFindDialogOf (handle hwnd)
+; The Find Files dialog containing hwnd (its controls sit on tab pages), or 0.
+var handle h
+let h = hwnd
+while h
+	if GetWindowClass (h) == wcTcFindDlg then
+		return h
+	endIf
+	let h = GetParent (h)
+endWhile
+return 0
+EndFunction
+
 handle function TcQuickSearchBox ()
 ; The quick search box (Ctrl+Alt+letters) if it is open. JAWS does not move its focus
 ; there, so the box is found as a visible top-level window (measured 2026-11-18).
@@ -537,6 +550,13 @@ if GetWindowClass (hwnd) == wcButton then
 	; The "-" button caption is punctuation, which JAWS does not speak.
 	if GetWindowName (hwnd) == tcMinusCaption then
 		IndicateControlType (WT_BUTTON, msgTcMinus)
+		return true
+	endIf
+	; Find Files: ">>" after "Search in" opens the Windows folder browser (checked by the
+	; author 2026-11-19); JAWS did not speak the caption.
+	if GetWindowName (hwnd) == tcBrowseCaption
+	&& GetWindowClass (TcFindDialogOf (hwnd)) == wcTcFindDlg then
+		IndicateControlType (WT_BUTTON, msgTcBrowse)
 		return true
 	endIf
 	; Pack dialog: the compression ratio button shows only the digit; its label is painted.

@@ -50,6 +50,11 @@ minus
 Compression ratio %1
 @@
 
+; Find Files: name of the ">>" button, which opens the Windows folder browser
+@msgTcBrowse
+Browse
+@@
+
 ; Shift+F7: said before the new folder field, since the dialog looks the same as for F7
 @msgTcInOtherPanel
 In the other panel

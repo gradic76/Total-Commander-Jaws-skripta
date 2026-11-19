@@ -96,6 +96,8 @@ const
 	tcDigits = "0123456789",
 	; Button captions JAWS does not speak at default punctuation level
 	tcMinusCaption = "-",
+	; Find Files: the folder browse button caption
+	tcBrowseCaption = ">>",
 	; Progress window: automatic announcement every N percent of the total,
 	; checked at most once per this many milliseconds
 	tcProgressAnnounceStep = 10,
