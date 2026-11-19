@@ -74,6 +74,8 @@ const
 	tcBackspaceKey = "backspace",
 	tcEscapeKey = "escape",
 	tcEnterKey = "enter",
+	; Shift+F7: new folder in the other panel
+	tcNewFolderOtherKey = "shift+f7",
 	tcSpaceKey = "space",
 	tcLeftKey = "leftarrow",
 	tcRightKey = "rightarrow",
@@ -128,6 +130,8 @@ globals
 	; Quick search box: text typed so far, and whether "Quick search" was said
 	string gsTcQuickSearchText,
 	int gbTcQuickSearchSaid,
+	; Set by Shift+F7 until the new folder dialog opens
+	int gbTcOtherPanelFolder,
 	int giTcQuickSearchCaret,
 	string gsTcQuickSearchKey,
 	; Set while a help text of the scripts is shown in the virtual viewer

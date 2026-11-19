@@ -50,6 +50,11 @@ minus
 Compression ratio %1
 @@
 
+; Shift+F7: said before the new folder field, since the dialog looks the same as for F7
+@msgTcInOtherPanel
+In the other panel
+@@
+
 ; Name of the command line edit field (JAWS said only "Edit")
 @msgTcCommandLine
 Command line

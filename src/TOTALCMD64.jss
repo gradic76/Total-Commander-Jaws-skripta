@@ -300,6 +300,12 @@ if GetWindowClass (hwnd) == wcTcCopyDlg
 		Say (GetWindowName (hwnd), OT_DIALOG_NAME)
 		let gbTcCountOnReturn = true
 	endIf
+	; Shift+F7 makes the new folder in the other panel; the dialog looks the same as F7
+	; (decision 2026-11-19).
+	if gbTcOtherPanelFolder then
+		let gbTcOtherPanelFolder = false
+		Say (msgTcInOtherPanel, OT_DIALOG_NAME)
+	endIf
 	return true
 endIf
 ; Find Files (Alt+F7): JAWS announced "Combo box Find Files"; only TC's title is said.
@@ -509,11 +515,13 @@ EndFunction
 
 int function HandleCustomWindows (handle hwnd)
 var string sName
-; Command line: an Edit in a combo box directly in the bottom part of the main window
-; (edit fields in dialogs sit in the dialog instead). JAWS said only "Edit"; it is named
+; Command line: an Edit in a combo box in a plain Window directly in the main window
+; (in dialogs such as F7 the combo box sits in the dialog, whose GetParent is also the
+; main window, so the plain Window matters; 2026-11-19). JAWS said only "Edit"; it is named
 ; "Command line", without the painted path prompt (decision 2026-11-18).
 if GetWindowClass (hwnd) == wcEdit
 && GetWindowClass (GetParent (hwnd)) == wcTcDriveBoxClass
+&& GetWindowClass (GetParent (GetParent (hwnd))) == wcTcPlainWindow
 && GetWindowClass (GetParent (GetParent (GetParent (hwnd)))) == wcTcMain then
 	IndicateControlType (WT_EDIT, msgTcCommandLine, GetObjectValue ())
 	return true
@@ -1329,6 +1337,8 @@ endIf
 let gbTcQuickSearchSaid = false
 if TcIsFileListFocused () then
 	ScheduleFunction ("TcQuickSearchOpened", tcMarkResultDelay)
+	; Shift+F7: remembered for the new folder dialog that follows
+	let gbTcOtherPanelFolder = (sKey == tcNewFolderOtherKey)
 endIf
 if !TcIsFileListFocused () then
 	return
