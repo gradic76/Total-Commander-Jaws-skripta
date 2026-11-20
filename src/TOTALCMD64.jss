@@ -281,6 +281,16 @@ return GetWindowClass (hwnd) == wcTcPreviewHost
 	|| GetWindowName (hwnd) == wcTcPreviewHost
 EndFunction
 
+int function IgnoreObjectAtLevel (int level)
+; Focus inside Lister (Explorer Preview, media sliders): JAWS spoke the ancestors, Lister's
+; long title and TC's internal "tc_preview_host_window" (2026-11-20). In Lister the
+; ancestors are skipped; the short title is said by TcSayListerTitle.
+if GetWindowClass (GetTopLevelWindow (GetFocus ())) == wcTcLister then
+	return true
+endIf
+return IgnoreObjectAtLevel (level)
+EndFunction
+
 int function TcSayListerTitle (handle hwnd)
 ; Lister has no child windows, so JAWS said its long title twice on opening (as window and as
 ; focused object) and again after mode keys (2026-11-20). The short title is said once; the
