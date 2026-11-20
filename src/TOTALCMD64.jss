@@ -558,7 +558,8 @@ endIf
 ; what the dialog does ("Expand selection", "Shrink selection"), so it is spoken;
 ; such dialogs change the marks, so the marked count is spoken when focus returns.
 if GetWindowClass (hwnd) == wcTcCopyDlg
-|| GetWindowClass (hwnd) == wcTcComboInputDlg then
+|| GetWindowClass (hwnd) == wcTcComboInputDlg
+|| GetWindowClass (hwnd) == wcTcCheckComboDlg then
 	if GetWindowName (hwnd)
 	&& GetWindowName (hwnd) != tcProductName then
 		Say (GetWindowName (hwnd), OT_DIALOG_NAME)
@@ -1546,6 +1547,153 @@ endIf
 PerformScript SayLine ()
 EndScript
 
+string function TcStatusWord (int nPart)
+; The word TC puts after the file count (nPart 1, "file(s)") or the folder count (nPart 2,
+; "dir(s)") in a panel status line "0 k / 13.441 k in 0 / 21 file(s), 0 / 12 dir(s)";
+; taken from TC so that it follows TC's language (2026-11-20).
+; A panel without folders leaves out the folder part, so a status line with both parts is used.
+var
+	handle hChild,
+	string sStatus
+let hChild = GetFirstChild (GetAppMainWindow (GetFocus ()))
+while hChild
+	if GetWindowClass (hChild) == wcTcFileList
+	&& IsWindowVisible (hChild) then
+		let sStatus = TcPanelStatus (hChild)
+		if StringSegmentCount (sStatus, ",") >= 2 then
+			return StringSegment (StringTrimTrailingBlanks (StringSegment (sStatus, ",", nPart)), " ", -1)
+		endIf
+	endIf
+	let hChild = GetNextWindow (hChild)
+endWhile
+return cscNull
+EndFunction
+
+string function TcSingleSpaces (string sText)
+; Painted text keeps the gaps between its parts as runs of spaces.
+while StringContains (sText, "  ")
+	let sText = StringReplaceSubstrings (sText, "  ", " ")
+endWhile
+return StringTrimTrailingBlanks (StringTrimLeadingBlanks (sText))
+EndFunction
+
+string function TcCopyTotals (string sNumbers)
+; "4,51 G 88 13" -> "4,51 G, 88 file(s), 13 dir(s)": the size is the number followed by a
+; unit (a token not starting with a digit); the other numbers are the file and folder counts.
+var
+	int nCount,
+	int i,
+	int nCounts,
+	string sToken,
+	string sNext,
+	string sSize,
+	string sFiles,
+	string sDirs
+let sNumbers = TcSingleSpaces (sNumbers)
+let nCount = StringSegmentCount (sNumbers, " ")
+let i = 1
+while i <= nCount
+	let sToken = StringSegment (sNumbers, " ", i)
+	let sNext = StringSegment (sNumbers, " ", i + 1)
+	if i < nCount
+	&& !StringToInt (StringLeft (sNext, 1)) && StringLeft (sNext, 1) != "0" then
+		let sSize = sToken + " " + sNext
+		let i = i + 1
+	else
+		let nCounts = nCounts + 1
+		if nCounts == 1 then
+			let sFiles = sToken
+		else
+			let sDirs = sToken
+		endIf
+	endIf
+	let i = i + 1
+endWhile
+if !sFiles then
+	return sNumbers
+endIf
+let sToken = sSize
+if sToken then
+	let sToken = sToken + ", "
+endIf
+let sToken = sToken + sFiles + " " + TcStatusWord (1)
+if sDirs then
+	let sToken = sToken + ", " + sDirs + " " + TcStatusWord (2)
+endIf
+return sToken
+EndFunction
+
+string function TcFieldText (handle hEdit)
+; The content of an edit field: its window text; the painted text in its rectangle may carry
+; other painted text along (an extra "OK" in the F6 dialog, 2026-11-20).
+if GetWindowName (hEdit) then
+	return GetWindowName (hEdit)
+endIf
+return GetWindowText (hEdit, false)
+EndFunction
+
+string function TcCopyDialogText (handle hDlg)
+; Insert+B in the copy and move dialog (F5, F6): the painted label and the target, the filter
+; line, and the painted total "4,51 G 88 13" with TC's words for files and folders. The two
+; combo boxes are found by position; the label is painted above the upper one and the
+; filter line between them (measured 2026-11-20).
+var
+	handle hChild,
+	handle hUpper,
+	handle hLower,
+	int nLeft,
+	int nRight,
+	int nTop,
+	int nBottom,
+	int nUpperTop,
+	int nUpperBottom,
+	int nLowerTop,
+	int nDlgLeft,
+	int nDlgRight,
+	int nCount,
+	string sLabel,
+	string sLine,
+	string sNumbers,
+	string sText
+let hChild = GetFirstChild (hDlg)
+while hChild
+	if GetWindowClass (hChild) == wcTcComboBox
+	&& IsWindowVisible (hChild) then
+		GetWindowRect (hChild, nLeft, nRight, nTop, nBottom)
+		if !hUpper || nTop < nUpperTop then
+			if hUpper then
+				let hLower = hUpper
+				let nLowerTop = nUpperTop
+			endIf
+			let hUpper = hChild
+			let nUpperTop = nTop
+			let nUpperBottom = nBottom
+		else
+			let hLower = hChild
+			let nLowerTop = nTop
+		endIf
+	endIf
+	let hChild = GetNextWindow (hChild)
+endWhile
+if !hUpper || !hLower then
+	return cscNull
+endIf
+GetWindowRect (hDlg, nDlgLeft, nDlgRight, nTop, nBottom)
+let sLabel = StringTrimTrailingBlanks (GetTextInRect (nDlgLeft, nUpperTop - (nLowerTop - nUpperTop),
+	nDlgRight, nUpperTop, 0, IgnoreColor, IgnoreColor, false))
+let sText = sLabel + ": " + TcFieldText (GetFirstChild (hUpper)) + ". "
+let sLine = StringTrimTrailingBlanks (GetTextInRect (nDlgLeft, nUpperBottom, nDlgRight, nLowerTop,
+	0, IgnoreColor, IgnoreColor, false))
+if StringContains (sLine, ":") then
+	; the filter is said only when one is set (decision 2026-11-20)
+	if TcFieldText (GetFirstChild (hLower)) then
+		let sText = sText + StringSegment (sLine, ":", 1) + ": " + TcFieldText (GetFirstChild (hLower)) + ". "
+	endIf
+	let sText = sText + TcCopyTotals (StringChopLeft (sLine, StringContains (sLine, ":")))
+endIf
+return sText
+EndFunction
+
 Script ReadBoxInTabOrder ()
 var handle hDlg
 let hDlg = TcGetOverwriteDialog (GetFocus ())
@@ -1559,6 +1707,11 @@ if hDlg then
 	return
 endIf
 let hDlg = GetRealWindow (GetFocus ())
+if GetWindowClass (hDlg) == wcTcCopyDlg
+&& TcCopyDialogText (hDlg) then
+	SayMessage (OT_USER_REQUESTED_INFORMATION, TcCopyDialogText (hDlg))
+	return
+endIf
 if TcIsMessageDialog (hDlg)
 || GetWindowClass (hDlg) == wcTcCopyDlg then
 	TcSayWindowLines (hDlg)
