@@ -75,4 +75,21 @@ Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 - Stupci, GOTOVO 2026-11-19 i provjereno uhom: Alt+1 do Alt+9 čitaju 2. do 10. stupac (ime se čuje na strelicama), redom kako ih TC prikazuje; Alt+Shift+S/D uklonjeni. Prije čitanja MSAARefresh, jer JAWS nakon promjene prikaza drži stari redak. Poznato: nakon čitanja u Comments view pa prelaska na Full JAWS izgovori cijeli redak (JAWS vidi promjenu u odnosu na osvježeni redak); prihvaćeno. Naslov stupca iz zaglavlja (TC-ov tekst, iscrtan, čita se po dijelovima, GetChunk/NextChunk), npr. "Size: 96.082.613"; uparivanje s desna (Ext je u zaglavlju, a u retku uz ime); kad se ne slaže (Comments view zadržava zaglavlje Full prikaza), bez naslova. Provjereno uhom 2026-11-20. Gumb "+" u Configure custom columns JAWS ne čita (neistraženo).
 - Comments view (Ctrl+Shift+F2), odluka 2026-11-19, potvrđena 2026-11-20: redak ima dva stupca (ime, komentar), pa strelice čitaju ime pa komentar; u ostalim prikazima samo ime.
 - F2 i Ctrl+R (ponovno čitanje ploče), GOTOVO 2026-11-20: TC ne daje nikakvu vidljivu promjenu, pa u popisu datoteka svira JAWS-ov descend.wav (zvuk izabrao autor uhom); svira na pritisak, ne na kraj čitanja. Opisano u pomoći popisa (Insert+F1).
+- Lister (F3), GOTOVO 2026-11-20 i provjereno uhom (odluke autora 2026-11-20):
+  - pri otvaranju "Lister, ime datoteke" bez putanje (riječ "Lister" iz TC-ova naslova), jednom; JAWS za Lister koristi samo HandleCustomWindows (izmjereno probom);
+  - N i P kažu ime nove datoteke (idu samo po datotekama predanima Listeru);
+  - 1 do 8 kažu način prikaza riječima izbornika Options (u .jsm, izbornik je owner-drawn); naslov se pet sekundi nakon tih tipki ne ponavlja (Explorer Preview se javlja kasnije);
+  - F2 (Reload file) svira descend.wav, kao u popisu;
+  - F7 i Enter, F5, Shift+F7: cijeli redak s pronađenim nizom (SayLine), sam niz utišan na sekundu;
+  - F6 kaže "Show text cursor" i JAWS-ov On/Off (CaretVisible). Bez kursora strelice šute; TC pamti stanje. Autor ga je slučajno isključio tijekom testova, a to je izgledalo kao kvar skripte;
+  - pomoć Insert+F1 u Listeru;
+  - traženje: redak čitaju sve tipke iz pomoći Listera (F7 i Ctrl+F; F3, F5 i Shift+F7 sljedeći; Shift+F3 i Shift+F5 prethodni);
+  - Alt+strelica lijevo i desno kažu ime datoteke, kao P i N (JAWS ih zove "alt+leftarrow"/"alt+rightarrow"; usporedba po dijelovima imena zbunjivala je skriptu);
+  - F11 "Maximized window" i Alt+Enter "Full screen mode" uz JAWS-ov On/Off (stilski bitovi prozora); Escape iz cijelog zaslona kaže Off;
+  - Insert+Page Down: položaj u postocima iz okomitog klizača preko MSAA-a (GetObjectFromEvent, OBJID_VSCROLL), rezerva je traka izbornika; JAWS-ov GetScrollBarInfo vraća nule;
+  - veličina slova: Lister prima samo Num plus i Num minus; obični plus i minus (JAWS ih zove "=" i "/" na hrvatskom rasporedu, "-" na engleskom) skripta ne preuzima, nego u KeyPressedEvent doda Num plus ili minus (ideja autora), pa tipke izvan Listera zadržavaju echo; zvukovi PianoUp1-C-D, PianoDown1-D-C, Ctrl+0 triput Piano1-C (autor); nakon toga veličina JAWS-ovim riječima ("12 points", GetCharacterPoints), koja se mijenja otprilike na svaki drugi pritisak jer su Listerovi koraci manji od pointa;
+  - provjereno snimkama i uhom 2026-11-20.
+  - Alt+F3 (bez vanjskog preglednika otvara Lister), Alt+Shift+F3 i Shift+F3 (samo stavka pod kursorom, a F3 sve označene) rade kao F3, bez dodataka skripti; provjereno uhom 2026-11-20. Vanjski preglednici nisu naša briga (autor).
+  - Ostaje: način reprodukcije (multimedija); F4 iz Listera pokreće uređivanje (autor), provjeriti uz F4.
+- Shift+Insert+Page Down u popisu datoteka, GOTOVO 2026-11-20 i provjereno uhom: status i slobodni prostor druge ploče (redak pogona po "[" i "]"), npr. prije kopiranja (ideja autora). Izvan popisa ostaje JAWS-ov ReadToBottomOfColumn.
 - Dvostruki Alt+broj, GOTOVO 2026-11-20 i provjereno uhom: JAWS-ov pregledni prozor sa svim stupcima stavke, jedan po retku s naslovom, kursor na traženom stupcu; Escape vraća u ploču. UserBufferAddText sam završava redak, pa se ne dodaje prijelom (inače prazni retci između). Stupac iza zadnjeg u prikazu: oba pritiska kažu "Not available" i ne otvaraju prozor. Postojeći a prazan stupac: jedan pritisak kaže JAWS-ov "blank" (cmsgBlank1, autor), dvostruki otvara prozor.

@@ -105,3 +105,11 @@ Zaključak: TC 11.56 sam daje JAWS-u dosta podataka (MSAA). Popis, izbornici, di
 - Ploče su iznutra iste. Skripta radi jednako i s tvorničkim i s autorovim postavkama (provjereno uhom).
 - Gumbne trake (Alt+Shift+F11, Alt+Shift+F12) su čitljive: svaki gumb ima opis, kretanje je strelicama lijevo i desno. JAWS kao ime prozora trake daje opis trenutnog gumba, a ne ime datoteke trake. Skripta pri ulasku kaže "Button bar" ili "Vertical button bar".
 - S tvorničkim izgledom JAWS je nakon Taba i ulaska u mapu izgovarao redak s putanjom ("c:\*.*"). Skripta ga utišava (NewTextEventShouldBeSilent).
+
+### Lister, F3 (izmjereno 2026-11-20)
+
+- Prozor klase TLister, vršni (bez roditelja), bez ijednog podređenog prozora: tekst je iscrtan, a JAWS ga čita iz off-screen modela. Naslov: "Lister - [puna putanja]".
+- Tekstna datoteka s postojećim skriptama (autor, uhom): pri otvaranju JAWS kaže naslov, pa prvi redak. Strelice gore i dolje, lijevo i desno (znak), Ctrl+strelice (riječ), Ctrl+Home i Ctrl+End i čitanje svega rade dobro.
+- Tekstni kursor Listera (F6, "Show text cursor"): JAWS strelicama čita samo kad je kursor uključen; bez njega strelice tiho pomiču tekst. TC stanje pamti ([Lister] Caret= u svojim postavkama). Tvornički je uključen (autorova kopija, 2026-11-20). U kopiji (OS) isključio se tijekom testova (slučajni F6 ili tipka 8, neutvrđeno); kontrolna verzija skripte bila je jednako tiha, pa skripta nije uzrok.
+- N i P idu samo po datotekama predanima Listeru (više označenih pa F3), ne po cijeloj mapi.
+- Prečaci iz izbornika Listera (TC 11.56): F2 Reload file, F7 Find, F5 Find next, F6 Show text cursor, 1 do 8 načini prikaza. Izbornik je owner-drawn, pa mu se tekst ne može pročitati izvana.

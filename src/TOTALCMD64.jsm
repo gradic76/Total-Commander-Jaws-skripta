@@ -50,6 +50,59 @@ minus
 Compression ratio %1
 @@
 
+; Lister (F3) keys 1 to 8: said after the key, worded as in Lister's Options menu (TC 11.56);
+; the menu is owner-drawn, so its text cannot be read from the screen
+@msgTcListerText
+Text only
+@@
+
+@msgTcListerBinary
+Binary (fixed line length)
+@@
+
+@msgTcListerHex
+Hex
+@@
+
+@msgTcListerMultimedia
+Image/Multimedia
+@@
+
+@msgTcListerHtml
+HTML text (strip tags)
+@@
+
+@msgTcListerUnicode
+Unicode
+@@
+
+@msgTcListerUtf8
+UTF-8
+@@
+
+@msgTcListerExplorer
+Explorer Preview
+@@
+
+; Insert+F1 in Lister; %1 = key for the key list, %2 = key for the position in percent
+@msgTcListerHelp
+Lister. The scripts say the file name when Lister opens and after N, P, Alt+Left Arrow or Alt+Right Arrow, the display mode after the keys 1 to 8, the whole line after a search (F7, F3, F5 and the other search keys), and whether the text cursor, the maximized window or full screen mode is on after F6, F11 or Alt+Enter. F2, which reloads the file, plays a sound. Plus and minus, on the main keyboard or the numeric keypad, change the font size with a sound and say the new size; Control+0 returns to the stored size. %2 says the position in the file in percent. The arrow keys read the text only while the text cursor is on; F6 turns it on and off, and Total Commander remembers it. %1 lists the script keys.
+@@
+
+; Lister F11 and Alt+Enter, worded as in Lister's help; followed by JAWS's own "On" or "Off"
+@msgTcListerMaximized
+Maximized window
+@@
+
+@msgTcListerFullScreen
+Full screen mode
+@@
+
+; Lister F6, worded as in Lister's Options menu; followed by JAWS's own "On" or "Off"
+@msgTcListerCaret
+Show text cursor
+@@
+
 ; View and sort keys (Ctrl+F1 to Ctrl+F8): said after the key, worded as in TC's Show menu
 @msgTcViewBrief
 Brief view
@@ -135,14 +188,15 @@ Not available
 @@
 
 ; Insert+H: keys added by the scripts (shown in the virtual viewer).
-; %1 to %8 are the actual keys, filled in by the scripts (the JAWS key named Insert).
+; %1 to %9 are the actual keys, filled in by the scripts (the JAWS key named Insert).
 @msgTcHotKeyHelp
 Total Commander script keys:
 %1 to %2: the columns after the name of the item in focus, with the column caption from the header, in the order Total Commander shows them, so they follow any view and your own custom columns. In Full view: 1 size, 2 date and time, 3 attributes. Pressed twice quickly, shows all columns of the item in the virtual viewer, one per line, with the cursor on the requested column.
 %3: path of the active panel; pressed twice quickly, copies it to the clipboard.
 %8: which panel is active.
 %4: whole row of the item, with its position.
-%5: status line of the active panel; in the progress window, a progress summary.
+%5: status line of the active panel; in the progress window, a progress summary; in Lister, the position in the file in percent.
+%9: status line and free space of the other panel, e.g. to check the target before copying.
 %6: in the overwrite, progress and message dialogs, reads the whole dialog.
 %7: script version.
 Insert marks the item and moves to the next one; the scripts then say how many items are marked and the item reached.

@@ -16,3 +16,7 @@ Alt+8=TcSayColumn8
 Alt+9=TcSayColumn9
 Alt+Shift+P=TcSayPath
 Alt+Shift+A=TcSayActivePanel
+; Lister font size, Ctrl+0: back to the stored size, with a sound (decision 2026-11-20).
+; The main keyboard "+" and "-" are not assigned here, so they keep their key echo; the
+; scripts follow them in KeyPressedEvent.
+Control+0=TcListerZoomReset

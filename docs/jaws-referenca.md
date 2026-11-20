@@ -70,3 +70,5 @@ Treće strane (pročitano):
 - Naziv tipke skripte daje GetScriptKeyName; %KeyFor u porukama stvara poveznice i piše "JAWSKey".
 - Iscrtani tekst koji JAWS-ov off-screen model vidi može se čitati po dijelovima (GetChunk, NextChunk s nevidljivim kursorom); svaki naslov stupca u TC-ovu zaglavlju je zaseban dio (2026-11-20).
 - Dio prozora prekriven drugim prozorom Windows ne iscrtava, pa ga JAWS-ov off-screen model nema. Kod testiranja paziti da TC nije prekriven (npr. prozorom razgovora).
+- Vršni prozor bez podređenih prozora (TC-ov Lister): JAWS ga pri otvaranju najavljuje samo kroz HandleCustomWindows; HandleCustomRealWindows i HandleCustomAppWindows se nisu pozvali (proba s oznakama, 2026-11-20). Ime prozora tada dolazi dvaput, kao prozor i kao fokusirani objekt.
+- Kad strelice u prozoru s iscrtanim tekstom odjednom šute, prvo provjeri vidi li JAWS kursor (CaretVisible): bez kursora nema što pratiti. Kontrolna verzija skripte (zadnji commit) brzo odvaja kvar skripte od stanja programa.

@@ -18,6 +18,67 @@ const
 	wcTcCopyDlg = "TInpComboDlg",
 	; Input dialog with a combo box, e.g. F7 new folder
 	wcTcComboInputDlg = "TCOMBOINPUT",
+	; Lister (F3): top-level window without child windows, text painted (measured 2026-11-20);
+	; title "Lister - [full path]"
+	wcTcLister = "TLister",
+	tcListerTitleSep = " - [",
+	tcListerTitleEnd = "]",
+	tcPathSep = "\\",
+	; Lister keys that load the next and previous file
+	tcListerNextKey = "n",
+	tcListerPrevKey = "p",
+	; Lister title repeats within this time (milliseconds) stay silent
+	tcListerTitleQuietTicks = 1500,
+	; after mode keys 1 to 8: Explorer Preview announces the window again seconds later
+	tcListerModeQuietTicks = 5000,
+	; Lister search keys: Find (F7), Find next (F5), Find previous (Shift+F7), from the
+	; Lister menu (TC 11.56), and how long the found text alone stays silent
+	; (Lister help: F7 and Ctrl+F find; F3, F5 and Shift+F7 find next; Shift+F3 and Shift+F5
+	; find previous)
+	tcListerFindKey = "f7",
+	tcListerFindKey2 = "control+f",
+	tcListerFindNextKey = "f5",
+	tcListerFindNextKey2 = "f3",
+	tcListerFindNextKey3 = "shift+f7",
+	tcListerFindPrevKey = "shift+f5",
+	tcListerFindPrevKey2 = "shift+f3",
+	tcListerFindQuietTicks = 1000,
+	; Alt+Left and Alt+Right: previous and next file, as P and N (verified by ear 2026-11-20)
+	tcListerPrevFileKey = "alt+leftarrow",
+	tcListerNextFileKey = "alt+rightarrow",
+	; F11 toggles the maximized window, Alt+Enter full screen mode (Lister help)
+	tcListerMaximizeKey = "f11",
+	tcListerFullScreenKey = "alt+enter",
+	; Window style bits (winuser.h)
+	tcWsMaximize = 0x01000000,
+	tcWsCaption = 0x00C00000,
+	; Height in pixels of the band at the top of Lister holding the title and the menu bar,
+	; whose right end shows the position in percent ("12 %")
+	tcListerMenuBand = 80,
+	tcPercentSign = "%",
+	; Lister font size: the keys Lister takes, as KeyPressedEvent and TypeKey name them, and
+	; the sounds for larger, smaller and the stored size (first picks, to be judged by ear)
+	tcNumPadPlusKey = "numpadplus",
+	tcNumPadMinusKey = "numpadminus",
+	tcNumPadPlusName = "NumPadPlus",
+	tcNumPadMinusName = "NumPadMinus",
+	; main keyboard "+" and "-": JAWS names keys by the US layout, so the Croatian "+" is "="
+	; and the Croatian "-" is "/"; "-" is the US minus (measured 2026-11-20)
+	tcMainPlusKey = "=",
+	tcMainMinusKey = "/",
+	tcMainMinusKey2 = "-",
+	tcZoomInSound = "PianoUp1-C-D.wav",
+	tcZoomOutSound = "PianoDown1-D-C.wav",
+	tcZoomResetSound = "Piano1-C.wav",
+	; the stored size sound is played three times, tenths of a second apart (author, 2026-11-20)
+	tcZoomResetSoundCount = 3,
+	tcZoomResetSoundGap = 2,
+	; tenths of a second before the new font size is read from the screen
+	tcZoomSizeDelay = 5,
+	; MSAA object id of a window's vertical scroll bar (OBJID_VSCROLL)
+	tcObjIdVScroll = -5,
+	; F6 toggles the text cursor; without it the arrow keys scroll silently (2026-11-20)
+	tcListerCaretKey = "f6",
 	; Find Files dialog (Alt+F7)
 	wcTcFindDlg = "TFindFile",
 	; Quick search box (Ctrl+Alt+letters)
@@ -45,6 +106,8 @@ const
 	; Kinds of panel text lines
 	tcPanelLinePath = 1,
 	tcPanelLineStatus = 2,
+	; drive line above the list: "[label]  44.808.184 k of 208.804.860 k free"
+	tcPanelLineDrive = 3,
 	; Drop-down list of the drive box (Alt+F1/Alt+F2); its items read "[-e-]"
 	wcComboList = "ComboLBox",
 	tcDriveItemStart = "[-",
@@ -145,6 +208,13 @@ globals
 	int gbTcOtherPanelFolder,
 	; Message for the last view or sort key, spoken shortly after
 	string gsTcViewMessage,
+	; Lister title before N or P, to tell whether another file was loaded
+	string gsTcListerTitle,
+	int giTcListerTitleTick,
+	int giTcListerModeTick,
+	int giTcListerFindTick,
+	int gbTcListerFind,
+	int giTcZoomResetPlays,
 	; Time of the last view or sort key (the row rewrite it causes is not a folder size)
 	int giTcViewKeyTick,
 	int giTcQuickSearchCaret,

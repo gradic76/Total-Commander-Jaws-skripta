@@ -258,7 +258,149 @@ endWhile
 return sText
 EndFunction
 
+string function TcListerShortTitle (string sTitle)
+; "Lister - [c:\folder\file.txt]" becomes "Lister, file.txt" (decision 2026-11-20): the folder
+; is known from the panel. The word "Lister" is TC's own, so it follows TC's language.
+var
+	int nPos,
+	string sPath
+let nPos = StringContains (sTitle, tcListerTitleSep)
+if !nPos then
+	return sTitle
+endIf
+let sPath = StringChopLeft (sTitle, nPos - 1 + StringLength (tcListerTitleSep))
+if StringRight (sPath, 1) == tcListerTitleEnd then
+	let sPath = StringChopRight (sPath, 1)
+endIf
+return StringLeft (sTitle, nPos - 1) + ", " + StringSegment (sPath, tcPathSep, -1)
+EndFunction
+
+int function TcSayListerTitle (handle hwnd)
+; Lister has no child windows, so JAWS said its long title twice on opening (as window and as
+; focused object) and again after mode keys (2026-11-20). The short title is said once; the
+; focus handlers all route here, and repeats shortly after are silent.
+if GetWindowClass (hwnd) != wcTcLister then
+	return false
+endIf
+if gbTcListerFind then
+	; back from the Find dialog (F7): the line with the match instead of the title
+	let gbTcListerFind = false
+	let giTcListerFindTick = GetTickCount ()
+	ScheduleFunction ("TcSayListerLine", tcMarkResultDelay)
+elIf GetTickCount () - giTcListerModeTick < tcListerModeQuietTicks then
+	; mode keys: Explorer Preview (8) announces the window again a few seconds later
+elIf GetTickCount () - giTcListerTitleTick > tcListerTitleQuietTicks then
+	Say (TcListerShortTitle (GetWindowName (hwnd)), OT_WINDOW_NAME)
+endIf
+let giTcListerTitleTick = GetTickCount ()
+return true
+EndFunction
+
+void function TcSayListerLine ()
+; After a search in Lister (F7, F5, Shift+F7): JAWS said only the found text; the whole line
+; with the match is said (decision 2026-11-20).
+SayLine ()
+EndFunction
+
+void function TcSayListerCaret ()
+; After F6 in Lister: whether the text cursor is now shown. Without it JAWS cannot follow
+; the arrow keys, and TC remembers the setting (Caret= in [Lister]; found 2026-11-20).
+if CaretVisible () then
+	Say (msgTcListerCaret + " " + cmsg_on, OT_STATUS)
+else
+	Say (msgTcListerCaret + " " + cmsg_off, OT_STATUS)
+endIf
+EndFunction
+
+string function TcOnOff (int bOn)
+if bOn then
+	return cmsg_on
+endIf
+return cmsg_off
+EndFunction
+
+void function TcSayListerMaximized ()
+; After F11 in Lister: whether the window is now maximized (style bits, 2026-11-20).
+Say (msgTcListerMaximized + " " + TcOnOff (GetWindowStyleBits (GetTopLevelWindow (GetFocus ())) & tcWsMaximize),
+	OT_STATUS)
+EndFunction
+
+void function TcSayListerFullScreen ()
+; After Alt+Enter in Lister: full screen mode hides the title bar (style bits, 2026-11-20).
+var int nStyle
+let nStyle = GetWindowStyleBits (GetTopLevelWindow (GetFocus ()))
+Say (msgTcListerFullScreen + " " + TcOnOff ((nStyle & tcWsCaption) != tcWsCaption), OT_STATUS)
+EndFunction
+
+string function TcListerPercent (handle hLister)
+; Position in the file as Lister shows it at the right end of its menu bar ("12 %"); the
+; menu is owner-drawn, so the text is taken from the screen band at the top of the window,
+; recognized by the percent sign (2026-11-20).
+var
+	int nLeft,
+	int nRight,
+	int nTop,
+	int nBottom,
+	string sText,
+	int nCount,
+	object oScroll,
+	int nChild
+; First the vertical scroll bar of the window through MSAA, whose value is the position in
+; percent ("5"); it works also when the menu bar is covered by another window (2026-11-20).
+let oScroll = GetObjectFromEvent (hLister, tcObjIdVScroll, 0, nChild)
+if oScroll then
+	let sText = oScroll.accValue (nChild)
+	if sText then
+		return sText + " " + tcPercentSign
+	endIf
+endIf
+GetWindowRect (hLister, nLeft, nRight, nTop, nBottom)
+let sText = GetTextInRect (nLeft, nTop, nRight, nTop + tcListerMenuBand, 0, IgnoreColor, IgnoreColor, false)
+let nCount = StringSegmentCount (sText, tcPercentSign)
+if nCount < 2 then
+	return cscNull
+endIf
+; the number just before the last percent sign
+let sText = StringTrimTrailingBlanks (StringSegment (sText, tcPercentSign, nCount - 1))
+return StringSegment (sText, " ", -1) + " " + tcPercentSign
+EndFunction
+
+void function TcListerFileCheck ()
+; After N or P in Lister: the file name, if another file was loaded.
+var string sTitle
+let sTitle = GetWindowName (GetTopLevelWindow (GetFocus ()))
+if sTitle != gsTcListerTitle then
+	Say (StringSegment (StringChopRight (sTitle, 1), tcPathSep, -1), OT_WINDOW_NAME)
+endIf
+EndFunction
+
+string function TcListerModeMessage (string sKey)
+; Lister keys 1 to 8 switch the display mode (Options menu); empty for other keys.
+if sKey == "1" then
+	return msgTcListerText
+elIf sKey == "2" then
+	return msgTcListerBinary
+elIf sKey == "3" then
+	return msgTcListerHex
+elIf sKey == "4" then
+	return msgTcListerMultimedia
+elIf sKey == "5" then
+	return msgTcListerHtml
+elIf sKey == "6" then
+	return msgTcListerUnicode
+elIf sKey == "7" then
+	return msgTcListerUtf8
+elIf sKey == "8" then
+	return msgTcListerExplorer
+endIf
+return cscNull
+EndFunction
+
 int function HandleCustomAppWindows (handle hwnd)
+; Lister (F3): JAWS said the whole title with the full path; the short title is said.
+if TcSayListerTitle (hwnd) then
+	return true
+endIf
 ; When focus enters Total Commander (e.g. Alt+Tab), JAWS announced the main window as
 ; "List box <user>^ - Total Commander (x64) 11.56 - <licensee>". Only the program name
 ; is spoken; Insert+T still reads the whole title (decision 2026-11-18).
@@ -275,6 +417,9 @@ int function HandleCustomRealWindows (handle hwnd)
 ; For the overwrite dialog, speak the file summary instead of the dialog title
 ; ("Total Commander"), which the progress window owning it has usually just spoken.
 var string sSummary
+if TcSayListerTitle (hwnd) then
+	return true
+endIf
 if GetWindowClass (hwnd) == wcTcOverwrite then
 	let sSummary = TcOverwriteSummary (hwnd)
 	if sSummary then
@@ -495,6 +640,11 @@ if hwnd != hFocus
 && TcGetBackgroundDialog (hwnd) then
 	return true
 endIf
+; Lister search: the found text alone stays silent, the whole line follows (TcSayListerLine).
+if GetWindowClass (GetTopLevelWindow (hFocus)) == wcTcLister
+&& GetTickCount () - giTcListerFindTick < tcListerFindQuietTicks then
+	return true
+endIf
 ; The panel path line ("c:\Folder\*.*") is repainted after Tab and on entering a folder;
 ; with the default layout JAWS spoke it each time (measured 2026-11-18). The path has its
 ; own key, Alt+Shift+P, and ".." says where it leads.
@@ -528,6 +678,9 @@ EndFunction
 
 int function HandleCustomWindows (handle hwnd)
 var string sName
+if TcSayListerTitle (hwnd) then
+	return true
+endIf
 ; Command line: an Edit in a combo box in a plain Window directly in the main window
 ; (in dialogs such as F7 the combo box sits in the dialog, whose GetParent is also the
 ; main window, so the plain Window matters; 2026-11-19). JAWS said only "Edit"; it is named
@@ -759,6 +912,11 @@ if nKind == tcPanelLineStatus then
 	return StringContains (sText, " / ")
 		&& !StringContains (sText, "\\")
 endIf
+if nKind == tcPanelLineDrive then
+	return StringLeft (sText, 1) == "["
+		&& StringContains (sText, "]")
+		&& !StringContains (sText, "\\")
+endIf
 return false
 EndFunction
 
@@ -838,6 +996,22 @@ EndFunction
 
 string function TcPanelStatus (handle hList)
 return TcPanelLine (hList, tcPanelLineStatus)
+EndFunction
+
+handle function TcOtherFileList (handle hList)
+; The file list of the other panel: both lists are children of the main window
+; (measured 2026-11-20).
+var handle hChild
+let hChild = GetFirstChild (GetParent (hList))
+while hChild
+	if hChild != hList
+	&& IsWindowVisible (hChild)
+	&& GetWindowClass (hChild) == wcTcFileList then
+		return hChild
+	endIf
+	let hChild = GetNextWindow (hChild)
+endWhile
+return 0
 EndFunction
 
 string function TcParentFolderName (handle hList)
@@ -1309,7 +1483,76 @@ if TcIsFileListFocused () then
 	endIf
 	return
 endIf
+; Lister: the position in percent from its menu bar (decision 2026-11-20)
+if GetWindowClass (GetTopLevelWindow (GetFocus ())) == wcTcLister then
+	let sText = TcListerPercent (GetTopLevelWindow (GetFocus ()))
+	if sText then
+		SayMessage (OT_USER_REQUESTED_INFORMATION, sText)
+	else
+		SayMessage (OT_ERROR, msgTcNotAvailable)
+	endIf
+	return
+endIf
 PerformScript SayBottomLineOfWindow ()
+EndScript
+
+int function TcInLister ()
+return GetWindowClass (GetTopLevelWindow (GetFocus ())) == wcTcLister
+EndFunction
+
+void function TcSayListerFontSize ()
+; After a font size key in Lister: the size of the text at the cursor in JAWS's own words
+; ("12 points"); TC shows the size nowhere (decision 2026-11-20).
+var int nPoints
+let nPoints = GetCharacterPoints ()
+if nPoints then
+	Say (FormatString (cmsgFontPoints, IntToString (nPoints)), OT_STATUS)
+endIf
+EndFunction
+
+void function TcZoomResetSoundAgain ()
+; The stored size sound is played three times, for a sense of "level" (author, 2026-11-20).
+PlaySound (FindJAWSSoundFile (tcZoomResetSound))
+let giTcZoomResetPlays = giTcZoomResetPlays - 1
+if giTcZoomResetPlays > 0 then
+	ScheduleFunction ("TcZoomResetSoundAgain", tcZoomResetSoundGap)
+endIf
+EndFunction
+
+Script TcListerZoomReset ()
+; Ctrl+0 in Lister: back to the stored font size; JAWS gave the key no name in
+; KeyPressedEvent (2026-11-20), so it has its own script.
+TypeCurrentScriptKey ()
+if TcInLister () then
+	let giTcZoomResetPlays = tcZoomResetSoundCount
+	TcZoomResetSoundAgain ()
+	ScheduleFunction ("TcSayListerFontSize", tcZoomSizeDelay)
+endIf
+EndScript
+
+Script ReadToBottomOfColumn ()
+; Shift+Insert+Page Down in the file list: status line and free space of the other panel,
+; e.g. to check the target before copying (decision 2026-11-20). JAWS's own command reads a
+; table column, which the file list does not have.
+var
+	handle hOther,
+	string sText
+if !TcIsFileListFocused () then
+	PerformScript ReadToBottomOfColumn ()
+	return
+endIf
+let hOther = TcOtherFileList (GetFocus ())
+if hOther then
+	let sText = TcPanelStatus (hOther)
+	if TcPanelLine (hOther, tcPanelLineDrive) then
+		let sText = sText + ", " + TcPanelLine (hOther, tcPanelLineDrive)
+	endIf
+endIf
+if sText then
+	SayMessage (OT_USER_REQUESTED_INFORMATION, sText)
+else
+	SayMessage (OT_ERROR, msgTcNotAvailable)
+endIf
 EndScript
 
 string function TcPathFilter (string sLine)
@@ -1409,7 +1652,8 @@ TcShowHelp (FormatString (msgTcHotKeyHelp,
 	TcKeyName ("SayBottomLineOfWindow"),
 	TcKeyName ("ReadBoxInTabOrder"),
 	TcKeyName ("ScriptFileName"),
-	TcKeyName ("TcSayActivePanel")))
+	TcKeyName ("TcSayActivePanel"),
+	TcKeyName ("ReadToBottomOfColumn")))
 EndScript
 
 Script ScreenSensitiveHelp ()
@@ -1419,6 +1663,10 @@ if IsSameScript () then
 endIf
 if TcIsFileListFocused () then
 	TcShowHelp (FormatString (msgTcListHelp, TcKeyName ("SayLine"), TcKeyName ("HotKeyHelp")))
+	return
+endIf
+if GetWindowClass (GetTopLevelWindow (GetFocus ())) == wcTcLister then
+	TcShowHelp (FormatString (msgTcListerHelp, TcKeyName ("HotKeyHelp"), TcKeyName ("SayBottomLineOfWindow")))
 	return
 endIf
 PerformScript ScreenSensitiveHelp ()
@@ -1582,6 +1830,65 @@ Void Function KeyPressedEvent (int nKey, string strKeyName, int nIsBrailleKey, i
 var string sKey
 KeyPressedEvent (nKey, strKeyName, nIsBrailleKey, nIsScriptKey)
 let sKey = StringLower (strKeyName)
+; Lister (F3): keys 1 to 8 change the display mode without any spoken change, so the mode
+; is said; N and P load the next or previous file (decision 2026-11-20).
+; In Explorer Preview (8) the focus is in a child window, so the top-level window is checked.
+; F2 reloads the file without any change, so it gets the reread sound of the file list;
+; after F7, F5 and Shift+F7 the line with the match is said.
+if GetWindowClass (GetTopLevelWindow (GetFocus ())) == wcTcLister then
+	let gsTcViewMessage = TcListerModeMessage (sKey)
+	if gsTcViewMessage then
+		; the mode change makes JAWS announce the window again; that title stays silent
+		let giTcListerModeTick = GetTickCount ()
+		ScheduleFunction ("TcSayViewMessage", tcMarkResultDelay)
+	elIf sKey == tcListerNextKey
+	|| sKey == tcListerPrevKey
+	|| sKey == tcListerNextFileKey
+	|| sKey == tcListerPrevFileKey then
+		let gsTcListerTitle = GetWindowName (GetTopLevelWindow (GetFocus ()))
+		ScheduleFunction ("TcListerFileCheck", tcMarkResultDelay)
+	elIf sKey == tcRereadKey then
+		PlaySound (FindJAWSSoundFile (tcRereadSound))
+	elIf sKey == tcNumPadPlusKey then
+		PlaySound (FindJAWSSoundFile (tcZoomInSound))
+		ScheduleFunction ("TcSayListerFontSize", tcZoomSizeDelay)
+	elIf sKey == tcNumPadMinusKey then
+		PlaySound (FindJAWSSoundFile (tcZoomOutSound))
+		ScheduleFunction ("TcSayListerFontSize", tcZoomSizeDelay)
+	elIf sKey == tcMainPlusKey then
+		; Lister ignores the main keyboard "+" and "-" (measured 2026-11-20); the key went on
+		; unchanged, and Num Plus or Num Minus is sent after it (idea of the author)
+		TypeKey (tcNumPadPlusName)
+		PlaySound (FindJAWSSoundFile (tcZoomInSound))
+		ScheduleFunction ("TcSayListerFontSize", tcZoomSizeDelay)
+	elIf sKey == tcMainMinusKey
+	|| sKey == tcMainMinusKey2 then
+		TypeKey (tcNumPadMinusName)
+		PlaySound (FindJAWSSoundFile (tcZoomOutSound))
+		ScheduleFunction ("TcSayListerFontSize", tcZoomSizeDelay)
+	elIf sKey == tcListerCaretKey then
+		ScheduleFunction ("TcSayListerCaret", tcMarkResultDelay)
+	elIf sKey == tcListerMaximizeKey then
+		ScheduleFunction ("TcSayListerMaximized", tcMarkResultDelay)
+	elIf sKey == tcListerFullScreenKey then
+		ScheduleFunction ("TcSayListerFullScreen", tcMarkResultDelay)
+	elIf sKey == tcEscapeKey
+	&& (GetWindowStyleBits (GetTopLevelWindow (GetFocus ())) & tcWsCaption) != tcWsCaption then
+		; Escape in full screen mode leaves it instead of closing Lister (author, 2026-11-20)
+		ScheduleFunction ("TcSayListerFullScreen", tcMarkResultDelay)
+	elIf sKey == tcListerFindKey
+	|| sKey == tcListerFindKey2 then
+		let gbTcListerFind = true
+	elIf sKey == tcListerFindNextKey
+	|| sKey == tcListerFindNextKey2
+	|| sKey == tcListerFindNextKey3
+	|| sKey == tcListerFindPrevKey
+	|| sKey == tcListerFindPrevKey2 then
+		let giTcListerFindTick = GetTickCount ()
+		ScheduleFunction ("TcSayListerLine", tcMarkResultDelay)
+	endIf
+	return
+endIf
 ; Quick search box: JAWS did not say what Backspace removed; the remaining text is said.
 ; Quick search box. TC opens it with Ctrl+Alt+letters (default) or with letters alone,
 ; depending on its options; the box is recognized whenever it appears.
