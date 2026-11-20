@@ -1146,9 +1146,11 @@ UserBufferClear ()
 let i = 1
 while i <= nCount
 	UserBufferAddText (TcCaptioned (TcColumnCaption (sHeaders, nCount, i),
-		StringTrimTrailingBlanks (StringSegment (sRow, tcColumnDelim, i))) + cScBufferNewLine)
+		StringTrimTrailingBlanks (StringSegment (sRow, tcColumnDelim, i))))
 	let i = i + 1
 endWhile
+; UserBufferAddText ends each call with a new line itself (2026-11-20); one blank line before the hint.
+UserBufferAddText (cScBufferNewLine)
 UserBufferAddText (cMsgBuffExit)
 UserBufferActivate ()
 let gbTcHelpShown = true
@@ -1185,12 +1187,18 @@ if hHeader then
 	let sHeaders = TcHeaderChunks (hHeader)
 endIf
 let sValue = StringTrimTrailingBlanks (StringSegment (sRow, tcColumnDelim, nColumn))
+; A column beyond the last one of the view is not available on either press (2026-11-20).
+if nColumn > StringSegmentCount (sRow, tcColumnDelim) then
+	SayMessage (OT_ERROR, msgTcNotAvailable)
+	return
+endIf
 if IsSameScript () then
 	TcShowRowDetails (sRow, sHeaders, nColumn)
 	return
 endIf
 if !sValue then
-	SayMessage (OT_ERROR, msgTcNotAvailable)
+	; An existing but empty column says JAWS's own "blank" (author, 2026-11-20).
+	SayMessage (OT_USER_REQUESTED_INFORMATION, cmsgBlank1)
 	return
 endIf
 SayMessage (OT_USER_REQUESTED_INFORMATION,

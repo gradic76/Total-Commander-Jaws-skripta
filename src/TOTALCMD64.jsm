@@ -138,7 +138,7 @@ Not available
 ; %1 to %8 are the actual keys, filled in by the scripts (the JAWS key named Insert).
 @msgTcHotKeyHelp
 Total Commander script keys:
-%1 to %2: the columns after the name of the item in focus, with the column caption from the header, in the order Total Commander shows them, so they follow any view and your own custom columns. In Full view: 1 size, 2 date and time, 3 attributes.
+%1 to %2: the columns after the name of the item in focus, with the column caption from the header, in the order Total Commander shows them, so they follow any view and your own custom columns. In Full view: 1 size, 2 date and time, 3 attributes. Pressed twice quickly, shows all columns of the item in the virtual viewer, one per line, with the cursor on the requested column.
 %3: path of the active panel; pressed twice quickly, copies it to the clipboard.
 %8: which panel is active.
 %4: whole row of the item, with its position.
