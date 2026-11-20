@@ -275,6 +275,12 @@ endIf
 return StringLeft (sTitle, nPos - 1) + ", " + StringSegment (sPath, tcPathSep, -1)
 EndFunction
 
+int function TcIsPreviewHost (handle hwnd)
+; TC's host window for Explorer Preview, recognized by its class or, failing that, its name
+return GetWindowClass (hwnd) == wcTcPreviewHost
+	|| GetWindowName (hwnd) == wcTcPreviewHost
+EndFunction
+
 int function TcSayListerTitle (handle hwnd)
 ; Lister has no child windows, so JAWS said its long title twice on opening (as window and as
 ; focused object) and again after mode keys (2026-11-20). The short title is said once; the
@@ -369,10 +375,97 @@ void function TcListerFileCheck ()
 ; After N or P in Lister: the file name, if another file was loaded.
 var string sTitle
 let sTitle = GetWindowName (GetTopLevelWindow (GetFocus ()))
-if sTitle != gsTcListerTitle then
+if sTitle == gsTcListerTitle then
+	return
+endIf
+if StringContains (sTitle, tcListerTitleSep) then
 	Say (StringSegment (StringChopRight (sTitle, 1), tcPathSep, -1), OT_WINDOW_NAME)
+else
+	; media files: TC puts the track and artist in the title (Lister help)
+	Say (sTitle, OT_WINDOW_NAME)
 endIf
 EndFunction
+
+int function TcIsListerSlider (handle hwnd)
+; The position and volume sliders of Lister's media player (measured 2026-11-20).
+return GetWindowClass (hwnd) == wcTcTrackBar
+	&& GetWindowClass (GetTopLevelWindow (hwnd)) == wcTcLister
+EndFunction
+
+Void Function ValueChangedEvent (handle hwnd, int objId, int childId, int nObjType, string sObjName, string sObjValue, optional int bIsFocusObject)
+; Lister's media player: JAWS spoke every percent of the position while playing. Only
+; changes shortly after a key are spoken (decision 2026-11-20).
+if TcIsListerSlider (hwnd)
+&& GetTickCount () - giTcListerKeyTick > tcMediaKeyTicks then
+	return
+endIf
+ValueChangedEvent (hwnd, objId, childId, nObjType, sObjName, sObjValue, bIsFocusObject)
+EndFunction
+
+; The next track that the media player starts by itself is not announced: JAWS got no event
+; for the title change, and the author does not need it (2026-11-20).
+
+int function TcPassSliderKey ()
+; Shift+arrows on Lister's media sliders: JAWS's text selection scripts said "selected";
+; the key goes to the slider, whose new value ValueChangedEvent speaks (2026-11-20).
+if TcIsListerSlider (GetFocus ()) then
+	let giTcListerKeyTick = GetTickCount ()
+	TypeCurrentScriptKey ()
+	return true
+endIf
+return false
+EndFunction
+
+Script SelectNextLine ()
+if !TcPassSliderKey () then
+	PerformScript SelectNextLine ()
+endIf
+EndScript
+
+Script SelectPriorLine ()
+if !TcPassSliderKey () then
+	PerformScript SelectPriorLine ()
+endIf
+EndScript
+
+Script SelectNextCharacter ()
+if !TcPassSliderKey () then
+	PerformScript SelectNextCharacter ()
+endIf
+EndScript
+
+Script SelectPriorCharacter ()
+if !TcPassSliderKey () then
+	PerformScript SelectPriorCharacter ()
+endIf
+EndScript
+
+; Ctrl+Up and Ctrl+Down: Lister changes the volume by 10 % (Lister help) or goes to the start
+; on the position slider; JAWS's own scripts on these keys made the volume jump (author,
+; 2026-11-20), so on the sliders the key goes to Lister.
+Script ControlUpArrow ()
+if !TcPassSliderKey () then
+	PerformScript ControlUpArrow ()
+endIf
+EndScript
+
+Script ControlDownArrow ()
+if !TcPassSliderKey () then
+	PerformScript ControlDownArrow ()
+endIf
+EndScript
+
+Script ControlUpArrowPCCursor ()
+if !TcPassSliderKey () then
+	PerformScript ControlUpArrowPCCursor ()
+endIf
+EndScript
+
+Script ControlDownArrowPCCursor ()
+if !TcPassSliderKey () then
+	PerformScript ControlDownArrowPCCursor ()
+endIf
+EndScript
 
 string function TcListerModeMessage (string sKey)
 ; Lister keys 1 to 8 switch the display mode (Options menu); empty for other keys.
@@ -418,6 +511,9 @@ int function HandleCustomRealWindows (handle hwnd)
 ; ("Total Commander"), which the progress window owning it has usually just spoken.
 var string sSummary
 if TcSayListerTitle (hwnd) then
+	return true
+endIf
+if TcIsPreviewHost (hwnd) then
 	return true
 endIf
 if GetWindowClass (hwnd) == wcTcOverwrite then
@@ -679,6 +775,11 @@ EndFunction
 int function HandleCustomWindows (handle hwnd)
 var string sName
 if TcSayListerTitle (hwnd) then
+	return true
+endIf
+; Explorer Preview in Lister (8): JAWS said TC's internal window name
+; "tc_preview_host_window" on entering and leaving it (author: silence it, 2026-11-20).
+if TcIsPreviewHost (hwnd) then
 	return true
 endIf
 ; Command line: an Edit in a combo box in a plain Window directly in the main window
@@ -1169,6 +1270,11 @@ EndFunction
 void function ObjStateChangedEvent (handle hObj, optional int iObjType, int nChangedState, int nState, int nOldState)
 ; Marking a file (Space, Insert): speak the new state and the name,
 ; including when the mark is removed, which JAWS does not announce.
+; Lister's position slider marks the played part as a selection range; JAWS said
+; "selected" over and over while playing (2026-11-20).
+if TcIsListerSlider (hObj) then
+	return
+endIf
 if hObj == GetFocus ()
 && GetWindowClass (hObj) == wcTcFileList
 && IsPCCursor () then
@@ -1836,6 +1942,7 @@ let sKey = StringLower (strKeyName)
 ; F2 reloads the file without any change, so it gets the reread sound of the file list;
 ; after F7, F5 and Shift+F7 the line with the match is said.
 if GetWindowClass (GetTopLevelWindow (GetFocus ())) == wcTcLister then
+	let giTcListerKeyTick = GetTickCount ()
 	let gsTcViewMessage = TcListerModeMessage (sKey)
 	if gsTcViewMessage then
 		; the mode change makes JAWS announce the window again; that title stays silent
@@ -1848,7 +1955,10 @@ if GetWindowClass (GetTopLevelWindow (GetFocus ())) == wcTcLister then
 		let gsTcListerTitle = GetWindowName (GetTopLevelWindow (GetFocus ()))
 		ScheduleFunction ("TcListerFileCheck", tcMarkResultDelay)
 	elIf sKey == tcRereadKey then
-		PlaySound (FindJAWSSoundFile (tcRereadSound))
+		; the media player does not reload on F2 (author, 2026-11-20), so no sound there
+		if !TcIsListerSlider (GetFocus ()) then
+			PlaySound (FindJAWSSoundFile (tcRereadSound))
+		endIf
 	elIf sKey == tcNumPadPlusKey then
 		PlaySound (FindJAWSSoundFile (tcZoomInSound))
 		ScheduleFunction ("TcSayListerFontSize", tcZoomSizeDelay)
@@ -1867,7 +1977,11 @@ if GetWindowClass (GetTopLevelWindow (GetFocus ())) == wcTcLister then
 		PlaySound (FindJAWSSoundFile (tcZoomOutSound))
 		ScheduleFunction ("TcSayListerFontSize", tcZoomSizeDelay)
 	elIf sKey == tcListerCaretKey then
-		ScheduleFunction ("TcSayListerCaret", tcMarkResultDelay)
+		; only in the text views, where the focus is Lister itself; in the media player and
+		; Explorer Preview the text cursor does not apply (2026-11-20)
+		if GetWindowClass (GetFocus ()) == wcTcLister then
+			ScheduleFunction ("TcSayListerCaret", tcMarkResultDelay)
+		endIf
 	elIf sKey == tcListerMaximizeKey then
 		ScheduleFunction ("TcSayListerMaximized", tcMarkResultDelay)
 	elIf sKey == tcListerFullScreenKey then

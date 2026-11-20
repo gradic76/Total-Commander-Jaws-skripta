@@ -21,6 +21,12 @@ const
 	; Lister (F3): top-level window without child windows, text painted (measured 2026-11-20);
 	; title "Lister - [full path]"
 	wcTcLister = "TLister",
+	; Lister's media player: position and volume sliders (standard trackbars, 2026-11-20),
+	; and how long after a key their changes are spoken (milliseconds)
+	wcTcTrackBar = "msctls_trackbar32",
+	; Lister's Explorer Preview (8) host window; JAWS spoke this internal name (2026-11-20)
+	wcTcPreviewHost = "tc_preview_host_window",
+	tcMediaKeyTicks = 700,
 	tcListerTitleSep = " - [",
 	tcListerTitleEnd = "]",
 	tcPathSep = "\\",
@@ -215,6 +221,8 @@ globals
 	int giTcListerFindTick,
 	int gbTcListerFind,
 	int giTcZoomResetPlays,
+	; time of the last key pressed in Lister
+	int giTcListerKeyTick,
 	; Time of the last view or sort key (the row rewrite it causes is not a folder size)
 	int giTcViewKeyTick,
 	int giTcQuickSearchCaret,

@@ -72,3 +72,7 @@ Treće strane (pročitano):
 - Dio prozora prekriven drugim prozorom Windows ne iscrtava, pa ga JAWS-ov off-screen model nema. Kod testiranja paziti da TC nije prekriven (npr. prozorom razgovora).
 - Vršni prozor bez podređenih prozora (TC-ov Lister): JAWS ga pri otvaranju najavljuje samo kroz HandleCustomWindows; HandleCustomRealWindows i HandleCustomAppWindows se nisu pozvali (proba s oznakama, 2026-11-20). Ime prozora tada dolazi dvaput, kao prozor i kao fokusirani objekt.
 - Kad strelice u prozoru s iscrtanim tekstom odjednom šute, prvo provjeri vidi li JAWS kursor (CaretVisible): bez kursora nema što pratiti. Kontrolna verzija skripte (zadnji commit) brzo odvaja kvar skripte od stanja programa.
+- Shift+strelice i Ctrl+strelice su u JAWS-ovu rasporedu skripte (SelectNextLine, SelectPriorLine, SelectNextCharacter, SelectPriorCharacter; ControlUpArrow, ControlDownArrow i inačice ...PCCursor za tipke iz bloka strelica, u .jkm "Extended"). Na kontrolama koje te tipke same koriste (klizači) JAWS govori "selected" ili remeti kontrolu; nadjačati skriptu istog imena i propustiti tipku (TypeCurrentScriptKey) samo na toj kontroli (2026-11-20).
+- Tipka dodana u .jkm gubi JAWS-ov echo jer je TypeCurrentScriptKey propušta bez izgovora. Kad tipku samo treba pratiti, bolje je KeyPressedEvent (2026-11-20).
+- JAWS imenuje tipke po američkom rasporedu: hrvatski "+" je "=", hrvatski "-" je "/"; u .jkm Equals, Dash, Slash. Ctrl+0 u KeyPressedEvent dolazi bez imena.
+- Promjena naslova vršnog prozora (TC-ov Lister) nije stigla kao NameChangedEvent.
