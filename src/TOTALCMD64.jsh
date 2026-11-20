@@ -76,6 +76,11 @@ const
 	tcEnterKey = "enter",
 	; Shift+F7: new folder in the other panel
 	tcNewFolderOtherKey = "shift+f7",
+	; F2 and Ctrl+R reread the panel without any visible change, so a JAWS sound confirms
+	; the key (author, 2026-11-20); sound chosen by the author by ear
+	tcRereadKey = "f2",
+	tcRereadDirKey = "control+r",
+	tcRereadSound = "descend.wav",
 	tcSpaceKey = "space",
 	tcLeftKey = "leftarrow",
 	tcRightKey = "rightarrow",

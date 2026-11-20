@@ -1618,6 +1618,10 @@ if TcIsFileListFocused () then
 		let giTcViewKeyTick = GetTickCount ()
 		ScheduleFunction ("TcSayViewMessage", tcMarkResultDelay)
 	endIf
+	if sKey == tcRereadKey
+	|| sKey == tcRereadDirKey then
+		PlaySound (FindJAWSSoundFile (tcRereadSound))
+	endIf
 endIf
 if !TcIsFileListFocused () then
 	return

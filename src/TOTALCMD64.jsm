@@ -150,7 +150,7 @@ Insert marks the item and moves to the next one; the scripts then say how many i
 
 ; Insert+F1 in the file list; %1 = key for the whole row, %2 = key for the key list
 @msgTcListHelp
-File list. The arrow keys read the item name, and "selected" for marked items. ".." also says the folder it leads to. Space and Insert mark items. %1 reads the whole row, and %2 lists the script keys.
+File list. The arrow keys read the item name, and "selected" for marked items. ".." also says the folder it leads to. Space and Insert mark items. F2 and Control+R, which reread the panel, play a sound. %1 reads the whole row, and %2 lists the script keys.
 @@
 
 ; Insert+F1 pressed twice: general help; %1 = version, %2 = key for the key list
