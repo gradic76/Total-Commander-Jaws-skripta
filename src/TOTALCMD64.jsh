@@ -35,6 +35,14 @@ const
 	tcListerTitleSep = " - [",
 	tcListerTitleEnd = "]",
 	tcPathSep = "\\",
+	; folder tree (Ctrl+F8): separator of the remembered open branches, the keys that open
+	; and close a branch, and Windows' file system object for subfolders
+	tcTreeSep = "|",
+	tcRightArrowKey = "rightarrow",
+	tcLeftArrowKey = "leftarrow",
+	; the focus moving within this time (ms) after Right Arrow counts as its result
+	tcTreeKeyTicks = 1000,
+	tcFsoProgId = "Scripting.FileSystemObject",
 	; Lister keys that load the next and previous file
 	tcListerNextKey = "n",
 	tcListerPrevKey = "p",
@@ -152,6 +160,9 @@ const
 	tcEnterKey = "enter",
 	; Shift+F7: new folder in the other panel
 	tcNewFolderOtherKey = "shift+f7",
+	; Alt+F8: command line history; the list opening within this time (ms) gets the name
+	tcHistoryKey = "alt+f8",
+	tcHistoryKeyTicks = 1500,
 	; F2 and Ctrl+R reread the panel without any visible change, so a JAWS sound confirms
 	; the key (author, 2026-11-20); sound chosen by the author by ear
 	tcRereadKey = "f2",
@@ -176,6 +187,8 @@ const
 	tcHeaderExtraColumns = 1,
 	; After a mark change is spoken, a repeat event for the same item within this time is ignored
 	tcStateEchoTicks = 1500,
+	; after a view or sort key, how long the panel and item announcements stay silent (ms)
+	tcViewQuietTicks = 1500,
 	; Pack files dialog (Alt+F5); its compression ratio button caption is a single digit
 	wcTcPackDlg = "TDLGZIP",
 	tcDigits = "0123456789",
@@ -230,6 +243,17 @@ globals
 	int giTcZoomResetPlays,
 	; time of the last key pressed in Lister
 	int giTcListerKeyTick,
+	; time of the last Alt+F8
+	int giTcHistoryKeyTick,
+	; folder tree: remembered open branches, the previous item and its list position, and
+	; the item and direction of the last Right or Left Arrow
+	string gsTcTreeOpen,
+	string gsTcTreePrev,
+	int giTcTreePrevIndex,
+	string gsTcTreeKeyPath,
+	int giTcTreeKeyIndex,
+	int giTcTreeKeyTick,
+	int gbTcTreeKeyOpen,
 	; Time of the last view or sort key (the row rewrite it causes is not a folder size)
 	int giTcViewKeyTick,
 	int giTcQuickSearchCaret,

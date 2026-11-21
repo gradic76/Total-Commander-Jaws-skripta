@@ -275,6 +275,17 @@ endIf
 return StringLeft (sTitle, nPos - 1) + ", " + StringSegment (sPath, tcPathSep, -1)
 EndFunction
 
+void function TcSayHistoryName (handle hwnd)
+; Alt+F8 opens the command line's drop-down list with its history; JAWS said only
+; "List box". Its name is said once, before JAWS's own announcement, from whichever
+; event comes first for the list (2026-11-21).
+if GetTickCount () - giTcHistoryKeyTick < tcHistoryKeyTicks
+&& (GetWindowClass (hwnd) == wcComboList || GetWindowClass (GetFocus ()) == wcComboList) then
+	let giTcHistoryKeyTick = 0
+	Say (msgTcCommandHistory, OT_CONTROL_NAME)
+endIf
+EndFunction
+
 int function TcIsPreviewHost (handle hwnd)
 ; TC's host window for Explorer Preview, recognized by its class or, failing that, its name
 return GetWindowClass (hwnd) == wcTcPreviewHost
@@ -788,6 +799,7 @@ var string sName
 if TcSayListerTitle (hwnd) then
 	return true
 endIf
+TcSayHistoryName (hwnd)
 ; Explorer Preview in Lister (8): JAWS said TC's internal window name
 ; "tc_preview_host_window" on entering and leaving it (author: silence it, 2026-11-20).
 if TcIsPreviewHost (hwnd) then
@@ -857,6 +869,10 @@ if GetWindowClass (hwnd) == wcTcFileList
 	if gbTcCountOnReturn then
 		let gbTcCountOnReturn = false
 		TcSayMarkCounts ()
+	endIf
+	; after a view key the view name was said; the panel is not announced again
+	if GetTickCount () - giTcViewKeyTick < tcViewQuietTicks then
+		return true
 	endIf
 	let sPanel = GetObjectName (false, 1)
 	if sPanel then
@@ -1192,6 +1208,160 @@ if GetControlAttributes () & CTRL_SELECTED then
 endIf
 EndFunction
 
+int function TcIsTreeRow (string sRow)
+; The folder tree (Ctrl+F8) is drawn in the same list as the files; its items are full
+; paths ("C:", "C:\Program Files", "\\Desktop"), without columns. File names cannot hold
+; "\" or ":", so these characters tell a tree item (measured 2026-11-21).
+return !StringContains (sRow, tcColumnDelim)
+	&& (StringContains (sRow, tcPathSep) || StringRight (sRow, 1) == ":")
+EndFunction
+
+int function TcTreeLevel (string sPath)
+; Level from the path: "C:" 1, "C:\Program Files" 2; empty segments (the leading "\\" of
+; virtual folders, a trailing "\") are not counted.
+var
+	int nCount,
+	int i,
+	int nLevel
+let nCount = StringSegmentCount (sPath, tcPathSep)
+let i = 1
+while i <= nCount
+	if StringSegment (sPath, tcPathSep, i) then
+		let nLevel = nLevel + 1
+	endIf
+	let i = i + 1
+endWhile
+return nLevel
+EndFunction
+
+; Open branches of the folder tree. TC exposes no branch state, and the screen model did not
+; show the indentation of the next line (2026-11-21), so the scripts remember open branches
+; from what is seen and pressed: the parents of a visible item are open; an item followed
+; directly by its subfolder is open; moving down to an item that is not its subfolder means
+; it is closed; Right Arrow on a branch opens it, Left Arrow on an open branch closes it.
+; Paths are kept in one string between separators.
+
+string function TcTreeParent (string sPath)
+var int nCount
+let nCount = StringSegmentCount (sPath, tcPathSep)
+if nCount < 2 then
+	return cscNull
+endIf
+return StringChopRight (sPath, StringLength (StringSegment (sPath, tcPathSep, nCount)) + 1)
+EndFunction
+
+int function TcTreeIsOpen (string sPath)
+return sPath && StringContains (gsTcTreeOpen, tcTreeSep + sPath + tcTreeSep)
+EndFunction
+
+void function TcTreeSetOpen (string sPath, int bOpen)
+if !sPath then
+	return
+endIf
+if !gsTcTreeOpen then
+	let gsTcTreeOpen = tcTreeSep
+endIf
+let gsTcTreeOpen = StringReplaceSubstrings (gsTcTreeOpen, tcTreeSep + sPath + tcTreeSep, tcTreeSep)
+if bOpen then
+	let gsTcTreeOpen = gsTcTreeOpen + sPath + tcTreeSep
+endIf
+EndFunction
+
+void function TcTreeLearn (string sPath, int nIndex)
+; Updates the open branches from the move to sPath (list position nIndex).
+var string sParent
+let sParent = TcTreeParent (sPath)
+while sParent
+	TcTreeSetOpen (sParent, true)
+	let sParent = TcTreeParent (sParent)
+endWhile
+if gsTcTreePrev && gsTcTreePrev != sPath then
+	if TcTreeParent (sPath) == gsTcTreePrev then
+		TcTreeSetOpen (gsTcTreePrev, true)
+	elIf nIndex == giTcTreePrevIndex + 1 then
+		; the next line is not its subfolder: the previous item is closed (or a leaf)
+		TcTreeSetOpen (gsTcTreePrev, false)
+	endIf
+endIf
+let gsTcTreePrev = sPath
+let giTcTreePrevIndex = nIndex
+EndFunction
+
+int function TcHasSubfolders (string sPath)
+; Through Windows (FileSystemObject); virtual folders ("\\...") are not checked.
+var object oFso
+if StringLeft (sPath, 2) == tcPathSep + tcPathSep then
+	return false
+endIf
+if StringRight (sPath, 1) == ":" then
+	let sPath = sPath + tcPathSep
+endIf
+let oFso = CreateObject (tcFsoProgId)
+if !oFso then
+	return false
+endIf
+if !oFso.FolderExists (sPath) then
+	return false
+endIf
+return oFso.GetFolder (sPath).SubFolders.Count > 0
+EndFunction
+
+string function TcTreeItemName (string sPath)
+var string sName
+let sName = StringSegment (StringTrimTrailingBlanks (sPath), tcPathSep, -1)
+if !sName then
+	return sPath
+endIf
+return sName
+EndFunction
+
+void function TcTreeAfterKey ()
+; After Right or Left Arrow in the tree: if the focus stayed on the item, TC opened or
+; closed it, which is said; a move to another item is spoken by the focus handling.
+; The list position tells whether the focus stayed: the name did not, for Right Arrow
+; (2026-11-21).
+var string sPath
+if TcListIndex () != giTcTreeKeyIndex then
+	return
+endIf
+let sPath = gsTcTreeKeyPath
+if gbTcTreeKeyOpen then
+	if TcHasSubfolders (sPath) || StringLeft (sPath, 2) == tcPathSep + tcPathSep then
+		TcTreeSetOpen (sPath, true)
+		Say (TcTreeItemName (sPath) + " " + cmsgControlStateOpened, OT_ITEM_STATE)
+	endIf
+elIf TcTreeIsOpen (sPath) then
+	TcTreeSetOpen (sPath, false)
+	Say (TcTreeItemName (sPath) + " " + cmsgControlStateClosed + ", "
+		+ FormatString (cmsg233_L, IntToString (TcTreeLevel (sPath))), OT_ITEM_STATE)
+endIf
+EndFunction
+
+string function TcTreeItemSpeech (string sPath)
+; "Braille, Closed, level 3": the folder name, the branch state in JAWS's words and the
+; level (decision 2026-11-21): open as remembered (TcTreeLearn), closed if the folder has
+; subfolders, nothing for a leaf.
+; Right Arrow on a closed branch opens it and moves to its first subfolder at once
+; (measured 2026-11-21): the opening is said first, "C: opened, $Recycle.Bin, ...".
+var
+	string sText,
+	string sOpened
+if gbTcTreeKeyOpen
+&& GetTickCount () - giTcTreeKeyTick < tcTreeKeyTicks
+&& TcTreeParent (sPath) == gsTcTreeKeyPath
+&& !TcTreeIsOpen (gsTcTreeKeyPath) then
+	let sOpened = TcTreeItemName (gsTcTreeKeyPath) + " " + cmsgControlStateOpened + ", "
+endIf
+TcTreeLearn (sPath, TcListIndex ())
+let sText = sOpened + TcTreeItemName (sPath)
+if TcTreeIsOpen (sPath) then
+	let sText = sText + ", " + cMsgOpen
+elIf TcHasSubfolders (sPath) then
+	let sText = sText + ", " + cMsgClosed
+endIf
+return sText + ", " + FormatString (cmsg233_L, IntToString (TcTreeLevel (sPath)))
+EndFunction
+
 void function TcSayListItemName ()
 ; Folders are not marked, as in Explorer (decision 2026-11-17): folders are listed
 ; first, and Insert+Up Arrow speaks the whole row including TC's <DIR> marker.
@@ -1199,6 +1369,10 @@ void function TcSayListItemName ()
 ; since they do not speak "..".
 var string sName
 let gsTcLastRow = GetObjectName ()
+if TcIsTreeRow (gsTcLastRow) then
+	Say (TcTreeItemSpeech (gsTcLastRow), OT_LINE)
+	return
+endIf
 let sName = TcListRowName (gsTcLastRow)
 if sName == tcUpDir then
 	let sName = sName + " " + TcParentFolderName (GetFocus ())
@@ -1224,6 +1398,7 @@ void function FocusChangedEventEx (handle hwndFocus, int nObject, int nChild,
 var
 	string sRow,
 	string sSize
+TcSayHistoryName (hwndFocus)
 if hwndFocus == hwndPrevFocus
 && nChild == nPrevChild
 && GetWindowClass (hwndFocus) == wcTcFileList
@@ -1257,6 +1432,7 @@ var
 	string sName
 ; Drive menu (Alt+F1/Alt+F2): the event comes from the open drop-down list (ComboLBox);
 ; items are named "[-e-]", "[-+-]" and so on.
+TcSayHistoryName (curHwnd)
 let sItem = GetObjectName ()
 if GetWindowClass (curHwnd) == wcComboList
 && StringContains (sItem, tcDriveItemStart) then
@@ -1266,6 +1442,13 @@ if GetWindowClass (curHwnd) == wcComboList
 		Say (PositionInGroup (), OT_POSITION)
 		return
 	endIf
+endIf
+if GetWindowClass (curHwnd) == wcTcFileList
+&& curHwnd == GetFocus ()
+&& IsPCCursor ()
+&& GetTickCount () - giTcViewKeyTick < tcViewQuietTicks then
+	; the item after a view change is not said (the view name was, 2026-11-21)
+	return
 endIf
 if GetWindowClass (curHwnd) == wcTcFileList
 && curHwnd == GetFocus ()
@@ -2102,6 +2285,14 @@ elIf sKey == "control+f6" then
 	return msgTcSortSize
 elIf sKey == "control+f7" then
 	return msgTcUnsorted
+elIf sKey == "control+q" then
+	return msgTcViewQuickView
+elIf sKey == "control+t" then
+	return msgTcViewNewTab
+elIf sKey == "control+f10" then
+	return msgTcViewAllFiles
+elIf sKey == "control+f11" then
+	return msgTcViewPrograms
 endIf
 return cscNull
 EndFunction
@@ -2123,6 +2314,9 @@ Void Function KeyPressedEvent (int nKey, string strKeyName, int nIsBrailleKey, i
 var string sKey
 KeyPressedEvent (nKey, strKeyName, nIsBrailleKey, nIsScriptKey)
 let sKey = StringLower (strKeyName)
+if sKey == tcHistoryKey then
+	let giTcHistoryKeyTick = GetTickCount ()
+endIf
 ; Lister (F3): keys 1 to 8 change the display mode without any spoken change, so the mode
 ; is said; N and P load the next or previous file (decision 2026-11-20).
 ; In Explorer Preview (8) the focus is in a child window, so the top-level window is checked.
@@ -2220,11 +2414,27 @@ if TcIsFileListFocused () then
 	ScheduleFunction ("TcQuickSearchOpened", tcMarkResultDelay)
 	; Shift+F7: remembered for the new folder dialog that follows
 	let gbTcOtherPanelFolder = (sKey == tcNewFolderOtherKey)
-	; View and sort keys: what they did is said shortly after (decision 2026-11-19)
+	; Folder tree: Right and Left Arrow open and close branches (TcTreeAfterKey)
+	if (sKey == tcRightArrowKey || sKey == tcLeftArrowKey)
+	&& TcIsTreeRow (GetObjectName ()) then
+		let gsTcTreeKeyPath = GetObjectName ()
+		let giTcTreeKeyIndex = TcListIndex ()
+		let giTcTreeKeyTick = GetTickCount ()
+		let gbTcTreeKeyOpen = false
+		if sKey == tcRightArrowKey then
+			let gbTcTreeKeyOpen = true
+		endIf
+		ScheduleFunction ("TcTreeAfterKey", tcMarkResultDelay)
+	endIf
+	; View and sort keys: what they do is said at once, and the panel, item and position that
+	; JAWS would say after the view change stay silent for a moment (author, 2026-11-21;
+	; before, the message came after them, decision 2026-11-19). Ctrl+F8 is not a switch:
+	; pressed again the tree stays; another view leaves it (2026-11-21).
 	let gsTcViewMessage = TcViewKeyMessage (sKey)
 	if gsTcViewMessage then
 		let giTcViewKeyTick = GetTickCount ()
-		ScheduleFunction ("TcSayViewMessage", tcMarkResultDelay)
+		Say (gsTcViewMessage, OT_STATUS)
+		let gsTcViewMessage = cscNull
 	endIf
 	if sKey == tcRereadKey
 	|| sKey == tcRereadDirKey then

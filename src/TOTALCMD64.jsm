@@ -50,6 +50,11 @@ minus
 Compression ratio %1
 @@
 
+; Alt+F8: name of the drop-down list with the command line history (TC has no word for it)
+@msgTcCommandHistory
+Command line history
+@@
+
 ; Shift+F6: name of the field TC puts into the file list to rename an item in place
 @msgTcRename
 Rename
@@ -153,6 +158,23 @@ Sorted by size
 Unsorted
 @@
 
+; Ctrl+Q, Ctrl+T, Ctrl+F10, Ctrl+F11, worded as in TC's Show menu (2026-11-21)
+@msgTcViewQuickView
+Quick View Panel
+@@
+
+@msgTcViewNewTab
+New Folder Tab
+@@
+
+@msgTcViewAllFiles
+All Files
+@@
+
+@msgTcViewPrograms
+Programs
+@@
+
 ; Find Files: name of the ">>" button, which opens the Windows folder browser
 @msgTcBrowse
 Browse
@@ -209,7 +231,7 @@ Insert marks the item and moves to the next one; the scripts then say how many i
 
 ; Insert+F1 in the file list; %1 = key for the whole row, %2 = key for the key list
 @msgTcListHelp
-File list. The arrow keys read the item name, and "selected" for marked items. ".." also says the folder it leads to. Space and Insert mark items. F2 and Control+R, which reread the panel, play a sound. %1 reads the whole row, and %2 lists the script keys.
+File list. The arrow keys read the item name, and "selected" for marked items. ".." also says the folder it leads to. Space and Insert mark items. F2 and Control+R, which reread the panel, play a sound. In the folder tree (Control+F8) the arrow keys read the folder, whether it is open or closed, and its level; Right Arrow opens a folder and Left Arrow closes it. %1 reads the whole row, and %2 lists the script keys.
 @@
 
 ; Insert+F1 pressed twice: general help; %1 = version, %2 = key for the key list

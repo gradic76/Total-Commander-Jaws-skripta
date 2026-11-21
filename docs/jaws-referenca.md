@@ -76,3 +76,6 @@ Treće strane (pročitano):
 - Tipka dodana u .jkm gubi JAWS-ov echo jer je TypeCurrentScriptKey propušta bez izgovora. Kad tipku samo treba pratiti, bolje je KeyPressedEvent (2026-11-20).
 - JAWS imenuje tipke po američkom rasporedu: hrvatski "+" je "=", hrvatski "-" je "/"; u .jkm Equals, Dash, Slash. Ctrl+0 u KeyPressedEvent dolazi bez imena.
 - Promjena naslova vršnog prozora (TC-ov Lister) nije stigla kao NameChangedEvent.
+- Rezultat usporedbe upisan izravno u varijablu (let b = (sKey == "rightarrow")) nije radio: varijabla je ostala netočna. Uvijek if ... let b = true (2026-11-21).
+- Scripting.FileSystemObject radi preko CreateObject (FolderExists, GetFolder().SubFolders.Count).
+- TC ima interno sučelje WM_USER+50 (ručke ploča, stabla, brojevi), koje NVDA dodatak koristi; iz vanjskog procesa vratilo je nule, nije dalje istraženo.
