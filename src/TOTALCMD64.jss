@@ -793,6 +793,14 @@ endIf
 if TcIsPreviewHost (hwnd) then
 	return true
 endIf
+; Rename in place (Shift+F6): TC puts an edit field into the file list; JAWS took another
+; item's name as its label. The field is named "Rename" (author; TC has no word of its own for
+; it), followed by the type and the name being edited (2026-11-21).
+if GetWindowClass (hwnd) == wcEdit
+&& GetWindowClass (GetParent (hwnd)) == wcTcFileList then
+	IndicateControlType (WT_EDIT, msgTcRename, GetObjectValue ())
+	return true
+endIf
 ; Command line: an Edit in a combo box in a plain Window directly in the main window
 ; (in dialogs such as F7 the combo box sits in the dialog, whose GetParent is also the
 ; main window, so the plain Window matters; 2026-11-19). JAWS said only "Edit"; it is named
@@ -1624,10 +1632,18 @@ return sToken
 EndFunction
 
 string function TcFieldText (handle hEdit)
-; The content of an edit field: its window text; the painted text in its rectangle may carry
-; other painted text along (an extra "OK" in the F6 dialog, 2026-11-20).
-if GetWindowName (hEdit) then
-	return GetWindowName (hEdit)
+; The content of an edit field, through MSAA: GetWindowName gave the field's label, and the
+; painted text in its rectangle carried an extra "OK" along in the F6 dialog (2026-11-21).
+var
+	object oField,
+	int nChild,
+	string sValue
+let oField = GetObjectFromEvent (hEdit, tcObjIdClient, 0, nChild)
+if oField then
+	let sValue = oField.accValue (nChild)
+	if sValue then
+		return sValue
+	endIf
 endIf
 return GetWindowText (hEdit, false)
 EndFunction
@@ -1706,6 +1722,13 @@ if hDlg then
 	TcSayWindowLines (hDlg)
 	return
 endIf
+; Rename in place (Shift+F6): the field is part of the main window, so JAWS read the whole
+; window; the name being edited is said instead (2026-11-21).
+if GetWindowClass (GetFocus ()) == wcEdit
+&& GetWindowClass (GetParent (GetFocus ())) == wcTcFileList then
+	SayMessage (OT_USER_REQUESTED_INFORMATION, GetObjectValue ())
+	return
+endIf
 let hDlg = GetRealWindow (GetFocus ())
 if GetWindowClass (hDlg) == wcTcCopyDlg
 && TcCopyDialogText (hDlg) then
@@ -1713,7 +1736,8 @@ if GetWindowClass (hDlg) == wcTcCopyDlg
 	return
 endIf
 if TcIsMessageDialog (hDlg)
-|| GetWindowClass (hDlg) == wcTcCopyDlg then
+|| GetWindowClass (hDlg) == wcTcCopyDlg
+|| GetWindowClass (hDlg) == wcTcUnpackDlg then
 	TcSayWindowLines (hDlg)
 	return
 endIf

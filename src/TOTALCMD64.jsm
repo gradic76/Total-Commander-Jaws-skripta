@@ -50,6 +50,11 @@ minus
 Compression ratio %1
 @@
 
+; Shift+F6: name of the field TC puts into the file list to rename an item in place
+@msgTcRename
+Rename
+@@
+
 ; Lister (F3) keys 1 to 8: said after the key, worded as in Lister's Options menu (TC 11.56);
 ; the menu is owner-drawn, so its text cannot be read from the screen
 @msgTcListerText

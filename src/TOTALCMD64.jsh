@@ -21,6 +21,8 @@ const
 	; Input dialog with a combo box and check boxes, e.g. Shift+F5 copy in the same folder
 	; ("Copy "file" to" is painted; measured 2026-11-20)
 	wcTcCheckComboDlg = "TCheckComboBox",
+	; Unpack dialog (Alt+F6), "Unpack files"; JAWS's Insert+B read the main window (2026-11-21)
+	wcTcUnpackDlg = "TDLGUNZIPALL",
 	; Lister (F3): top-level window without child windows, text painted (measured 2026-11-20);
 	; title "Lister - [full path]"
 	wcTcLister = "TLister",
