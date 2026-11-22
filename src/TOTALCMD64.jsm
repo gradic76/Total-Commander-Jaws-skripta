@@ -55,6 +55,12 @@ Compression ratio %1
 Command line history
 @@
 
+; Multi-Rename (Ctrl+M): the picture button next to upper/lowercase opens a menu: load names
+; from a file, edit names, configure the editor; TC gives it no text
+@msgTcMrtNamesButton
+Load or edit names
+@@
+
 ; Shift+F6: name of the field TC puts into the file list to rename an item in place
 @msgTcRename
 Rename

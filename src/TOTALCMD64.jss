@@ -135,6 +135,19 @@ string function TcReadGroupLines (handle hGroup)
 return TcReadWindowLines (hGroup, 3, 0)
 EndFunction
 
+handle function TcGroupOf (handle hwnd, handle hDlg)
+; The nearest group box (class Button) that contains hwnd, below the dialog hDlg.
+var handle h
+let h = GetParent (hwnd)
+while h && h != hDlg
+	if GetWindowClass (h) == wcButton then
+		return h
+	endIf
+	let h = GetParent (h)
+endWhile
+return 0
+EndFunction
+
 string function TcCleanCaption (string sCaption)
 ; "Overwrite: " -> "Overwrite"
 var string s
@@ -309,6 +322,7 @@ int function TcSayListerTitle (handle hwnd)
 if GetWindowClass (hwnd) != wcTcLister then
 	return false
 endIf
+let gbTcCountOnReturn = true
 if gbTcListerFind then
 	; back from the Find dialog (F7): the line with the match instead of the title
 	let gbTcListerFind = false
@@ -515,6 +529,10 @@ int function HandleCustomAppWindows (handle hwnd)
 if TcSayListerTitle (hwnd) then
 	return true
 endIf
+; Other TC windows of their own (Multi-Rename): the marked count is checked on the way back
+if GetWindowClass (hwnd) != wcTcMain then
+	let gbTcCountOnReturn = true
+endIf
 ; When focus enters Total Commander (e.g. Alt+Tab), JAWS announced the main window as
 ; "List box <user>^ - Total Commander (x64) 11.56 - <licensee>". Only the program name
 ; is spoken; Insert+T still reads the whole title (decision 2026-11-18).
@@ -531,6 +549,12 @@ int function HandleCustomRealWindows (handle hwnd)
 ; For the overwrite dialog, speak the file summary instead of the dialog title
 ; ("Total Commander"), which the progress window owning it has usually just spoken.
 var string sSummary
+; any TC window other than the main one: the marked count is checked on the way back
+; (not the quick search box, which belongs to moving in the list)
+if GetWindowClass (hwnd) != wcTcMain
+&& GetWindowClass (hwnd) != wcTcQuickSearch then
+	let gbTcCountOnReturn = true
+endIf
 if TcSayListerTitle (hwnd) then
 	return true
 endIf
@@ -570,7 +594,8 @@ endIf
 ; such dialogs change the marks, so the marked count is spoken when focus returns.
 if GetWindowClass (hwnd) == wcTcCopyDlg
 || GetWindowClass (hwnd) == wcTcComboInputDlg
-|| GetWindowClass (hwnd) == wcTcCheckComboDlg then
+|| GetWindowClass (hwnd) == wcTcCheckComboDlg
+|| GetWindowClass (hwnd) == wcTcMultiRename then
 	if GetWindowName (hwnd)
 	&& GetWindowName (hwnd) != tcProductName then
 		Say (GetWindowName (hwnd), OT_DIALOG_NAME)
@@ -758,6 +783,13 @@ if hwnd != hFocus
 && TcGetBackgroundDialog (hwnd) then
 	return true
 endIf
+; Multi-Rename: leaving the preview list (Tab to Rename) repaints its row, which JAWS read
+; out in full; the list is read on the arrow keys (2026-11-22).
+if hwnd != hFocus
+&& GetWindowClass (hwnd) == wcTcFileList
+&& GetWindowClass (GetParent (hwnd)) == wcTcMultiRename then
+	return true
+endIf
 ; Lister search: the found text alone stays silent, the whole line follows (TcSayListerLine).
 if GetWindowClass (GetTopLevelWindow (hFocus)) == wcTcLister
 && GetTickCount () - giTcListerFindTick < tcListerFindQuietTicks then
@@ -799,10 +831,39 @@ var string sName
 if TcSayListerTitle (hwnd) then
 	return true
 endIf
+; Focus in any TC window other than the main one: the marked count is checked on the way
+; back. Multi-Rename came through neither the app nor the real window handling (probe
+; 2026-11-22), so the focused control is where it is noticed.
+if GetRealWindow (hwnd)
+&& GetWindowClass (GetRealWindow (hwnd)) != wcTcMain
+&& GetWindowClass (GetRealWindow (hwnd)) != wcTcQuickSearch then
+	let gbTcCountOnReturn = true
+endIf
 TcSayHistoryName (hwnd)
 ; Explorer Preview in Lister (8): JAWS said TC's internal window name
 ; "tc_preview_host_window" on entering and leaving it (author: silence it, 2026-11-20).
 if TcIsPreviewHost (hwnd) then
+	return true
+endIf
+; Multi-Rename (Ctrl+M): the mask field had no name once the window announcement was taken
+; over (2026-11-22); its label is the caption of the group box around it ("Maska za
+; preimenovanje: Ime"). Fields JAWS names itself are left alone.
+if GetWindowClass (hwnd) == wcEdit
+&& GetWindowClass (GetRealWindow (hwnd)) == wcTcMultiRename
+&& !GetObjectName ()
+&& TcGroupOf (hwnd, GetRealWindow (hwnd)) then
+	IndicateControlType (WT_EDIT,
+		StringReplaceSubstrings (GetWindowName (TcGroupOf (hwnd, GetRealWindow (hwnd))), "&", cscNull),
+		GetObjectValue ())
+	return true
+endIf
+; Multi-Rename: the only button without text is the picture button with the names menu
+; (load from file, edit, configure editor; author checked, 2026-11-22).
+if GetWindowClass (hwnd) == wcButton
+&& GetWindowClass (GetRealWindow (hwnd)) == wcTcMultiRename
+&& !GetWindowName (hwnd)
+&& !GetObjectName () then
+	IndicateControlType (WT_BUTTON, msgTcMrtNamesButton)
 	return true
 endIf
 ; Rename in place (Shift+F6): TC puts an edit field into the file list; JAWS took another
@@ -866,10 +927,6 @@ if GetWindowClass (hwnd) == wcTcFileList
 		TcSayListItemName ()
 		return true
 	endIf
-	if gbTcCountOnReturn then
-		let gbTcCountOnReturn = false
-		TcSayMarkCounts ()
-	endIf
 	; after a view key the view name was said; the panel is not announced again
 	if GetTickCount () - giTcViewKeyTick < tcViewQuietTicks then
 		return true
@@ -880,6 +937,15 @@ if GetWindowClass (hwnd) == wcTcFileList
 	endIf
 	TcSayListItemName ()
 	Say (PositionInGroup (), OT_POSITION)
+	; Back from any TC dialog or window: if items are still marked, their count follows, so
+	; that marks left over are not missed (author, 2026-11-22).
+	; Only the panels of the main window: lists in other TC windows (Multi-Rename preview)
+	; are the same class and used up the flag (2026-11-22).
+	if gbTcCountOnReturn
+	&& GetWindowClass (GetParent (hwnd)) == wcTcMain then
+		let gbTcCountOnReturn = false
+		TcSayMarksOnReturn ()
+	endIf
 	return true
 endIf
 return HandleCustomWindows (hwnd)
@@ -1369,6 +1435,13 @@ void function TcSayListItemName ()
 ; since they do not speak "..".
 var string sName
 let gsTcLastRow = GetObjectName ()
+; Multi-Rename Tool (Ctrl+M): its preview list is the same list class; the row holds the old
+; and the new name in full, which the screen shortens. Both names are said (2026-11-22).
+if GetWindowClass (GetParent (GetFocus ())) == wcTcMultiRename then
+	Say (StringSegment (gsTcLastRow, tcColumnDelim, 1), OT_LINE)
+	Say (StringSegment (gsTcLastRow, tcColumnDelim, 2), OT_LINE)
+	return
+endIf
 if TcIsTreeRow (gsTcLastRow) then
 	Say (TcTreeItemSpeech (gsTcLastRow), OT_LINE)
 	return
@@ -1924,6 +1997,16 @@ if TcIsMessageDialog (hDlg)
 	TcSayWindowLines (hDlg)
 	return
 endIf
+; Any other TC dialog of its own (not a standard Windows dialog): JAWS's Insert+B read the
+; main window instead, e.g. Change attributes and Unpack (2026-11-22). The dialog's lines are
+; read; standard dialogs (#32770, e.g. background jobs) are left to JAWS.
+if hDlg
+&& GetWindowClass (hDlg) != wcDialog
+&& GetWindowClass (hDlg) != wcTcMain
+&& GetWindowClass (hDlg) != wcTcLister then
+	TcSayWindowLines (hDlg)
+	return
+endIf
 PerformScript ReadBoxInTabOrder ()
 EndScript
 
@@ -2212,6 +2295,33 @@ let sBefore = StringTrimTrailingBlanks (StringSegment (sStatus, "/", 2))
 let sFiles = StringSegment (sBefore, " ", -1)
 ; drop "<size> / <total> in " and keep "<files> / ..."
 return sFiles + " " + StringChopLeft (sStatus, StringContains (sStatus, "/") + StringLength (StringSegment (sStatus, "/", 2)))
+EndFunction
+
+int function TcFocusListHasMarks ()
+; Whether the focused panel's status line shows marked items: "1.237 k / 483.772 k in 1 / 8
+; file(s), 0 / 22 dir(s)"; the marked counts are the numbers before " / " in each part.
+var
+	string sCounts,
+	int nCount,
+	int i
+let sCounts = TcStatusCounts (TcPanelStatus (GetFocus ()))
+let nCount = StringSegmentCount (sCounts, ",")
+let i = 1
+while i <= nCount
+	if StringToInt (StringSegment (StringTrimLeadingBlanks (StringSegment (sCounts, ",", i)), " ", 1)) > 0 then
+		return true
+	endIf
+	let i = i + 1
+endWhile
+return false
+EndFunction
+
+void function TcSayMarksOnReturn ()
+; Back in a panel from a dialog: "selected 2 / 13 file(s), 0 / 22 dir(s)", only if anything
+; is marked; JAWS's own word "selected" gives the numbers their meaning (author, 2026-11-22).
+if TcFocusListHasMarks () then
+	Say (cmsg215_L + " " + TcStatusCounts (TcPanelStatus (GetFocus ())), OT_ITEM_STATE)
+endIf
 EndFunction
 
 void function TcSayMarkCounts ()

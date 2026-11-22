@@ -23,6 +23,9 @@ const
 	wcTcCheckComboDlg = "TCheckComboBox",
 	; Unpack dialog (Alt+F6), "Unpack files"; JAWS's Insert+B read the main window (2026-11-21)
 	wcTcUnpackDlg = "TDLGUNZIPALL",
+	; Multi-Rename Tool (Ctrl+M); its preview list is an LCLListBox whose rows hold the old
+	; name, the new name, size, date and location, tab separated (measured 2026-11-22)
+	wcTcMultiRename = "TMultiRename",
 	; Lister (F3): top-level window without child windows, text painted (measured 2026-11-20);
 	; title "Lister - [full path]"
 	wcTcLister = "TLister",
