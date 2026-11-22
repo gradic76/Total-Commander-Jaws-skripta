@@ -113,3 +113,8 @@ Zaključak: TC 11.56 sam daje JAWS-u dosta podataka (MSAA). Popis, izbornici, di
 - Tekstni kursor Listera (F6, "Show text cursor"): JAWS strelicama čita samo kad je kursor uključen; bez njega strelice tiho pomiču tekst. TC stanje pamti ([Lister] Caret= u svojim postavkama). Tvornički je uključen (autorova kopija, 2026-11-20). U kopiji (OS) isključio se tijekom testova (slučajni F6 ili tipka 8, neutvrđeno); kontrolna verzija skripte bila je jednako tiha, pa skripta nije uzrok.
 - N i P idu samo po datotekama predanima Listeru (više označenih pa F3), ne po cijeloj mapi.
 - Prečaci iz izbornika Listera (TC 11.56): F2 Reload file, F7 Find, F5 Find next, F6 Show text cursor, 1 do 8 načini prikaza. Izbornik je owner-drawn, pa mu se tekst ne može pročitati izvana.
+
+### Jezik TC-a u kopiji (OS) (2026-11-22)
+
+- PortableApps pokretač (TotalCommanderPortable.ini, UserDefaultLang=true) pri svakom pokretanju vraćao je TC na jezik sustava/platforme (engleski). Postavljeno UserDefaultLang=false, a u TC-ovim postavkama LanguageIni=WCMD_HR.LNG i Mainmenu=WCMD_HR.MNU (autorov pristanak; kopije .bak-lang uz obje datoteke).
+- Imena ploča ("LIJEVO", "DESNO") TC daje iz datoteke jezika (1331, 1332). Nakon promjene jezika u radu desna je ploča zadržala staro ime "RIGHT" dok se TC nije ponovo pokrenuo.
