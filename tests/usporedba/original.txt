@@ -1,0 +1,40 @@
+Prvi redak: ovaj se redak razlikuje na samom početku datoteke.
+Drugi redak je isti u obje datoteke.
+Treći redak je isti u obje datoteke.
+Četvrti redak je isti u obje datoteke.
+Peti redak je isti u obje datoteke.
+Šesti redak je isti u obje datoteke.
+Sedmi redak je isti u obje datoteke.
+Osmi redak: putujemo u Zagreb sutra ujutro.
+Deveti redak je isti u obje datoteke.
+10: točka dnevnog reda, redak koji počinje brojem i dvotočkom.
+Jedanaesti redak je isti u obje datoteke.
+Dvanaesti redak: razlika je samo u razmacima.
+Trinaesti redak je isti u obje datoteke.
+Četrnaesti redak je isti u obje datoteke.
+Petnaesti redak je isti u obje datoteke.
+Šesnaesti redak je isti u obje datoteke.
+Sedamnaesti redak je isti u obje datoteke.
+Osamnaesti redak je isti u obje datoteke.
+Devetnaesti redak je isti u obje datoteke.
+Blok A1: ovih osam redaka razlikuje se zaredom.
+Blok A2: ovih osam redaka razlikuje se zaredom.
+Blok A3: ovih osam redaka razlikuje se zaredom.
+Blok A4: ovih osam redaka razlikuje se zaredom.
+Blok A5: ovih osam redaka razlikuje se zaredom.
+Blok A6: ovih osam redaka razlikuje se zaredom.
+Blok A7: ovih osam redaka razlikuje se zaredom.
+Blok A8: ovih osam redaka razlikuje se zaredom.
+Dvadeset osmi redak je isti u obje datoteke.
+Dvadeset deveti redak je isti u obje datoteke.
+Ovaj redak postoji samo u originalu i u izmjeni je obrisan.
+Trideseti redak je isti u obje datoteke.
+Trideset prvi redak je isti u obje datoteke.
+Sastanak je u 12:30 kod Ivana.
+Trideset treći redak je isti u obje datoteke.
+Dugi redak: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore. KRAJ A.
+Trideset peti redak je isti u obje datoteke.
+Trideset šesti redak je isti u obje datoteke.
+Kvačice: čaša, ćevap, đak, šuma, žaba.
+Trideset osmi redak je isti u obje datoteke.
+Zadnji redak: ovaj se redak razlikuje na samom kraju datoteke.

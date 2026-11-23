@@ -61,6 +61,25 @@ Command line history
 Load or edit names
 @@
 
+; Insert+F1 in the compare by content window; %1 = key for the files and the status
+@msgTcCompareHelp
+Compare by content. When the window opens and after each comparison, the scripts say the left file, the right file and Total Commander's status line. To hear the differences, first press the Editing button: the panes then get a text cursor, and Next difference and Previous difference say the line from both files, left first, with "blank" for a side without that line. The arrow keys read the lines. Outside Editing mode only the status line is said, since the current difference cannot be known there. Long lines are read as far as the pane shows them. %1 says which file is left and which right, and the status line.
+@@
+
+; Compare by content: the path fields of the two files (TC gives them no label)
+@msgTcCmpLeftFile
+Left file
+@@
+
+@msgTcCmpRightFile
+Right file
+@@
+
+; Compare by content: the two picture buttons open TC's search
+@msgTcCmpSearch
+Search
+@@
+
 ; Shift+F6: name of the field TC puts into the file list to rename an item in place
 @msgTcRename
 Rename

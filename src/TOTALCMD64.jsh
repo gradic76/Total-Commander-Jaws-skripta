@@ -26,6 +26,20 @@ const
 	; Multi-Rename Tool (Ctrl+M); its preview list is an LCLListBox whose rows hold the old
 	; name, the new name, size, date and location, tab separated (measured 2026-11-22)
 	wcTcMultiRename = "TMultiRename",
+	; Compare by content (Files menu): painted file panes, wider and higher than this
+	; (pixels); at most this many differing lines are said; tenths of a second after a key
+	wcTcCompare = "TFileCompForm",
+	tcCmpPaneMin = 100,
+	tcCmpMaxRows = 5,
+	tcCompareDelay = 5,
+	tcCmpRepeatTicks = 1000,
+	; half the height (pixels) of the band read around the text cursor in a compare pane
+	tcCmpRowHalf = 7,
+	tcCmpEdgePad = 6,
+	; after a button key, how long JAWS's reading of repainted pane pieces stays silent (ms)
+	tcCmpQuietTicks = 1500,
+	tcLineBreak = "\n",
+	tcCarriageReturn = "\r",
 	; Lister (F3): top-level window without child windows, text painted (measured 2026-11-20);
 	; title "Lister - [full path]"
 	wcTcLister = "TLister",
@@ -248,6 +262,14 @@ globals
 	int giTcListerKeyTick,
 	; time of the last Alt+F8
 	int giTcHistoryKeyTick,
+	; compare by content: the window, its status line and pane text as last seen
+	handle ghTcCmpForm,
+	string gsTcCmpStatus,
+	string gsTcCmpPanes,
+	int gbTcCmpForce,
+	int giTcCmpKeyTick,
+	string gsTcCmpSaid,
+	int giTcCmpSaidTick,
 	; folder tree: remembered open branches, the previous item and its list position, and
 	; the item and direction of the last Right or Left Arrow
 	string gsTcTreeOpen,
