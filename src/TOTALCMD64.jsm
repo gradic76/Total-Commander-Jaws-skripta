@@ -61,9 +61,101 @@ Command line history
 Load or edit names
 @@
 
+; Insert+F1 in the synchronize dirs window
+@msgTcSyncHelp
+Synchronize directories. After Compare, the arrow keys read each result as the file name and its relation: equal, different, left to right, right to left, left only, right only, not compared yet, or skip; Insert+Up Arrow reads the whole row with sizes and dates. Space changes the copy direction of a row or switches it off (skip); Total Commander's own announcement of the changed row is read by JAWS as it is. The Show buttons are only painted; switch them with Control+Shift plus L (left to right), E (equal), N (different), R (right to left), D (duplicates) or S (singles), and the scripts say which one and Total Commander's status line with the shown and hidden counts. Synchronize opens a dialog with the copy directions and their target folders.
+@@
+
 ; Insert+F1 in the compare by content window; %1 = key for the files and the status
 @msgTcCompareHelp
 Compare by content. When the window opens and after each comparison, the scripts say the left file, the right file and Total Commander's status line. To hear the differences, first press the Editing button: the panes then get a text cursor, and Next difference and Previous difference say the line from both files, left first, with "blank" for a side without that line. The arrow keys read the lines. Outside Editing mode only the status line is said, since the current difference cannot be known there. Long lines are read as far as the pane shows them. %1 says which file is left and which right, and the status line.
+@@
+
+; Synchronize dirs (Commands menu): the relation of a result row, from TC's codes EQ, UNEQ,
+; UNKNOWN, "L to R", "R to L" and the side mark L, R or 2 (both)
+@msgTcSyncEqual
+equal
+@@
+
+@msgTcSyncUnequal
+different
+@@
+
+@msgTcSyncUnknown
+not compared yet
+@@
+
+@msgTcSyncLeftNewer
+left to right
+@@
+
+@msgTcSyncRightNewer
+right to left
+@@
+
+@msgTcSyncLeftOnly
+left only
+@@
+
+@msgTcSyncRightOnly
+right only
+@@
+
+@msgTcSyncSkip
+skip
+@@
+
+; Synchronize dirs: the Show buttons, switched with Ctrl+Shift+L, E, N, R, D, S (TC help)
+@msgTcSyncShowLeft
+show left to right
+@@
+
+@msgTcSyncShowEqual
+show equal
+@@
+
+@msgTcSyncShowUnequal
+show different
+@@
+
+@msgTcSyncShowRight
+show right to left
+@@
+
+@msgTcSyncShowDuplicates
+show duplicates
+@@
+
+@msgTcSyncShowSingles
+show singles
+@@
+
+; Synchronize dirs: the picture button left of the left folder (menu: add the current folders
+; and settings to the list) and the "1x" button (opens the file filter)
+@msgTcSyncSaved
+Saved comparisons
+@@
+
+@msgTcSyncFilter
+File filter
+@@
+
+; Synchronize dirs, start dialog: the target folder field under each copy direction
+@msgTcSyncTarget
+Target folder
+@@
+
+; Synchronize dirs: the three fields at the top (TC gives them no label)
+@msgTcSyncLeftFolder
+Left folder
+@@
+
+@msgTcSyncMask
+File mask
+@@
+
+@msgTcSyncRightFolder
+Right folder
 @@
 
 ; Compare by content: the path fields of the two files (TC gives them no label)

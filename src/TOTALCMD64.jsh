@@ -29,6 +29,12 @@ const
 	; Compare by content (Files menu): painted file panes, wider and higher than this
 	; (pixels); at most this many differing lines are said; tenths of a second after a key
 	wcTcCompare = "TFileCompForm",
+	; Synchronize dirs (Commands menu); its result list is an LCLListBox (2026-11-23)
+	wcTcSync = "TCmpForm",
+	; its start dialog ("Uskladi...")
+	wcTcSyncStart = "TSyncStartForm",
+	; caption of its file filter button (a symbol, not a word)
+	tcSyncFilterCaption = "1x",
 	tcCmpPaneMin = 100,
 	tcCmpMaxRows = 5,
 	tcCompareDelay = 5,
@@ -268,6 +274,8 @@ globals
 	string gsTcCmpPanes,
 	int gbTcCmpForce,
 	int giTcCmpKeyTick,
+	; synchronize dirs: the name of the last Show key
+	string gsTcSyncShow,
 	string gsTcCmpSaid,
 	int giTcCmpSaidTick,
 	; folder tree: remembered open branches, the previous item and its list position, and
