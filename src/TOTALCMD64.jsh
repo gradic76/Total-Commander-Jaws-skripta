@@ -33,6 +33,10 @@ const
 	wcTcSync = "TCmpForm",
 	; its start dialog ("Uskladi...")
 	wcTcSyncStart = "TSyncStartForm",
+	; FTP connections dialog (Ctrl+F); its list of connections is an LCLListBox (2026-11-24)
+	wcTcFtpConnect = "TCONNECT",
+	; height (pixels) of the band above a combo box searched for its painted label
+	tcLabelBand = 22,
 	; caption of its file filter button (a symbol, not a word)
 	tcSyncFilterCaption = "1x",
 	tcCmpPaneMin = 100,

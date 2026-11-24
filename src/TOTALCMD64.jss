@@ -135,6 +135,18 @@ string function TcReadGroupLines (handle hGroup)
 return TcReadWindowLines (hGroup, 3, 0)
 EndFunction
 
+string function TcLabelAbove (handle hControl)
+; The painted text in a band just above a control, across its width.
+var
+	int nLeft,
+	int nRight,
+	int nTop,
+	int nBottom
+GetWindowRect (hControl, nLeft, nRight, nTop, nBottom)
+return StringTrimTrailingBlanks (StringTrimLeadingBlanks (GetTextInRect (nLeft, nTop - tcLabelBand, nRight, nTop,
+	0, IgnoreColor, IgnoreColor, false)))
+EndFunction
+
 handle function TcGroupOf (handle hwnd, handle hDlg)
 ; The nearest group box (class Button) that contains hwnd, below the dialog hDlg.
 var handle h
@@ -811,15 +823,16 @@ if GetWindowClass (hwnd) == wcTcMain
 	Say (tcProductName, OT_WINDOW_NAME)
 	return true
 endIf
-; Copy/move dialog (F5/F6) and input dialogs such as F7: JAWS announced them as
-; "Combo box Total Commander"; the focused field's own label ("Copy 1 file(s) to")
-; already says what it is. A title other than the program name is TC's own and says
-; what the dialog does ("Expand selection", "Shrink selection"), so it is spoken;
-; such dialogs change the marks, so the marked count is spoken when focus returns.
-if GetWindowClass (hwnd) == wcTcCopyDlg
-|| GetWindowClass (hwnd) == wcTcComboInputDlg
-|| GetWindowClass (hwnd) == wcTcCheckComboDlg
-|| GetWindowClass (hwnd) == wcTcMultiRename then
+; TC's own dialogs (general rule, decision 2026-11-24): JAWS announced them with the type of
+; the focused control in front of the title ("Combo box Total Commander", "List box Spoji se
+; na FTP poslužitelj", "Combo box ftp"; F5, F7, Shift+F5, Multi-Rename, FTP...). Only the
+; title is said, then JAWS says the focused control with its own label. A title other than
+; the program name is TC's own and says what the dialog does, so it is spoken. Left to JAWS:
+; standard Windows dialogs (#32770), the progress window, and the windows handled above.
+if GetWindowClass (hwnd) != wcDialog
+&& GetWindowClass (hwnd) != wcTcMain
+&& GetWindowClass (hwnd) != wcTcLister
+&& !TcGetProgressDialog (hwnd) then
 	if GetWindowName (hwnd)
 	&& GetWindowName (hwnd) != tcProductName then
 		Say (GetWindowName (hwnd), OT_DIALOG_NAME)
@@ -831,11 +844,6 @@ if GetWindowClass (hwnd) == wcTcCopyDlg
 		let gbTcOtherPanelFolder = false
 		Say (msgTcInOtherPanel, OT_DIALOG_NAME)
 	endIf
-	return true
-endIf
-; Find Files (Alt+F7): JAWS announced "Combo box Find Files"; only TC's title is said.
-if GetWindowClass (hwnd) == wcTcFindDlg then
-	Say (GetWindowName (hwnd), OT_DIALOG_NAME)
 	return true
 endIf
 return HandleCustomRealWindows (hwnd)
@@ -1156,6 +1164,18 @@ if GetWindowClass (hwnd) == wcButton
 	IndicateControlType (WT_BUTTON, msgTcMrtNamesButton)
 	return true
 endIf
+; A field inside a combo box in a TC dialog without a name of its own (general rule,
+; 2026-11-24): Shift+F5's "Kopiraj "ime" u" is painted just above the combo box, and JAWS
+; found it with the English TC but not with the Croatian one. The painted line right above
+; the combo box is used as the label.
+if GetWindowClass (hwnd) == wcEdit
+&& GetWindowClass (GetParent (hwnd)) == wcTcComboBox
+&& GetWindowClass (GetRealWindow (hwnd)) != wcTcMain
+&& !GetObjectName ()
+&& TcLabelAbove (GetParent (hwnd)) then
+	IndicateControlType (WT_EDIT, TcLabelAbove (GetParent (hwnd)), GetObjectValue ())
+	return true
+endIf
 ; Rename in place (Shift+F6): TC puts an edit field into the file list; JAWS took another
 ; item's name as its label. The field is named "Rename" (author; TC has no word of its own for
 ; it), followed by the type and the name being edited (2026-11-21).
@@ -1188,14 +1208,10 @@ if GetWindowClass (hwnd) == wcButton then
 		IndicateControlType (WT_BUTTON, msgTcMinus)
 		return true
 	endIf
-	; Find Files: ">>" after "Search in" opens the Windows folder browser (checked by the
-	; author 2026-11-19); JAWS did not speak the caption. Compare by content has one after
-	; each path field (2026-11-23).
-	if GetWindowName (hwnd) == tcBrowseCaption
-	&& (GetWindowClass (TcFindDialogOf (hwnd)) == wcTcFindDlg
-		|| GetWindowClass (GetTopLevelWindow (hwnd)) == wcTcCompare
-		|| GetWindowClass (GetTopLevelWindow (hwnd)) == wcTcSync
-		|| GetWindowClass (GetRealWindow (hwnd)) == wcTcSyncStart) then
+	; ">>" next to a path field opens a folder or file browser in every TC dialog met so far
+	; (Find Files, compare by content, synchronize dirs, FTP connection; 2026-11-19 to
+	; 2026-11-24); JAWS did not speak the caption. General rule (decision 2026-11-24).
+	if GetWindowName (hwnd) == tcBrowseCaption then
 		IndicateControlType (WT_BUTTON, msgTcBrowse)
 		return true
 	endIf
@@ -1392,10 +1408,23 @@ EndFunction
 ; With folder tabs shown the lines sit one level deeper (inside SysTabControl32).
 ; ---------------------------------------------------------------------------
 
+string function TcPathSepOf (string sLine)
+; "\" for local paths, "/" for FTP paths such as "0:/pub/*.*" (measured 2026-11-24); a URL
+; ("ftp://demo@host", the FTP drive line) is not a path.
+if StringContains (sLine, "\\") then
+	return "\\"
+endIf
+if StringContains (sLine, "/")
+&& !StringContains (sLine, "://") then
+	return "/"
+endIf
+return cscNull
+EndFunction
+
 int function TcIsPanelLine (string sText, int nKind)
 if nKind == tcPanelLinePath then
-	if StringContains (sText, "\\") then
-		return StringContains (StringSegment (sText, "\\", -1), "*")
+	if TcPathSepOf (sText) then
+		return StringContains (StringSegment (sText, TcPathSepOf (sText), -1), "*")
 	endIf
 	; A panel that is not a folder (search results fed to the panel) shows its name
 	; ending with a colon instead, e.g. "Search result:" (measured 2026-11-19).
@@ -1521,14 +1550,20 @@ var
 	string sLast,
 	string sPrev,
 	string sThisPc,
+	string sSep,
 	int nCount,
 	int i
 let sPath = TcPanelPath (hList)
-let nCount = StringSegmentCount (sPath, "\\")
+; FTP paths ("0:/pub/*.*") use "/"; their top has no This PC above it (2026-11-24)
+let sSep = TcPathSepOf (sPath)
+if !sSep then
+	return cscNull
+endIf
+let nCount = StringSegmentCount (sPath, sSep)
 ; the last segment is the file filter; empty segments come from the leading "\\"
 let i = 1
 while i < nCount
-	let sPart = StringSegment (sPath, "\\", i)
+	let sPart = StringSegment (sPath, sSep, i)
 	if sPart then
 		let sPrev = sLast
 		let sLast = sPart
@@ -1538,7 +1573,8 @@ endWhile
 if sPrev then
 	return sPrev
 endIf
-if !sLast then
+if !sLast
+|| sSep == "/" then
 	return cscNull
 endIf
 let sThisPc = TcDriveMenuName (tcDriveKeyComputer)
@@ -2507,16 +2543,16 @@ endIf
 EndScript
 
 string function TcPathFilter (string sLine)
-; The file filter at the end of a path line: "e:\Music\*.mp3" -> "*.mp3".
-return StringSegment (sLine, "\\", -1)
+; The file filter at the end of a path line: "e:\Music\*.mp3" -> "*.mp3" (FTP: "/").
+return StringSegment (sLine, TcPathSepOf (sLine), -1)
 EndFunction
 
 string function TcPathWithoutFilter (string sLine)
 ; "e:\Music\Rock\*.*" -> "e:\Music\Rock"; a drive root keeps its backslash ("e:\").
 var string sPath
 let sPath = StringChopRight (sLine, StringLength (TcPathFilter (sLine)) + 1)
-if !StringContains (sPath, "\\") then
-	let sPath = sPath + "\\"
+if !StringContains (sPath, TcPathSepOf (sLine)) then
+	let sPath = sPath + TcPathSepOf (sLine)
 endIf
 return sPath
 EndFunction
@@ -2535,7 +2571,7 @@ if !sLine then
 	SayMessage (OT_ERROR, msgTcNotAvailable)
 	return
 endIf
-if StringContains (sLine, "\\") then
+if TcPathSepOf (sLine) then
 	let sPath = TcPathWithoutFilter (sLine)
 else
 	; not a folder, e.g. "Search result:": said as TC shows it
@@ -2547,7 +2583,7 @@ if IsSameScript () then
 	return
 endIf
 ; a filter other than "*.*" is worth hearing ("e:\Music *.mp3")
-if StringContains (sLine, "\\")
+if TcPathSepOf (sLine)
 && TcPathFilter (sLine) != tcAllFilesFilter then
 	let sPath = sPath + " " + TcPathFilter (sLine)
 endIf

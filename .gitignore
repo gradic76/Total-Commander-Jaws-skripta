@@ -18,3 +18,4 @@ desktop.ini
 # Scratch copies for destructive and editing tests
 /tests/usporedba/rad/
 /tests/sinkronizacija/rad/
+/tests/ftp/
