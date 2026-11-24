@@ -76,6 +76,8 @@ Treće strane (pročitano):
 - Tipka dodana u .jkm gubi JAWS-ov echo jer je TypeCurrentScriptKey propušta bez izgovora. Kad tipku samo treba pratiti, bolje je KeyPressedEvent (2026-11-20).
 - JAWS imenuje tipke po američkom rasporedu: hrvatski "+" je "=", hrvatski "-" je "/"; u .jkm Equals, Dash, Slash. Ctrl+0 u KeyPressedEvent dolazi bez imena.
 - Promjena naslova vršnog prozora (TC-ov Lister) nije stigla kao NameChangedEvent.
+- Poruke iz datoteke dok skripta radi (pokus 2026-11-24): IniReadString ("Messages", "kljuc", "zadano", "TOTALCMD64.x.ini") čita datoteku iz korisničke mape postavki; UTF-8 s BOM-om daje hrvatska slova ispravno (čaša, ćevap, đak, šuma, žaba), UTF-16 vratio je zadanu vrijednost ("not found"). Tako u istoj mapi (enu) mogu biti datoteke za više jezika, a jezik se bira postavkom.
+- Više dijelova skripte (pokus 2026-11-24): glavna TOTALCMD64.jss s naredbom use "TOTALCMD64_x.jsb" (iza include redaka) prevodi se i kad poziva funkciju koja postoji samo u tom dijelu; dio se prevodi zasebno (scompile), a poziv radi dok skripta radi ("probe module works"). Iza return u istom bloku ne smije biti koda ("Unexpected word if"). Default.jss se ne dira (pravilo autora: sudari s tuđim skriptama, kao nekad SkypeWatch); sve ide kroz TOTALCMD64.
 - Rezultat usporedbe upisan izravno u varijablu (let b = (sKey == "rightarrow")) nije radio: varijabla je ostala netočna. Uvijek if ... let b = true (2026-11-21).
 - Scripting.FileSystemObject radi preko CreateObject (FolderExists, GetFolder().SubFolders.Count).
 - TC ima interno sučelje WM_USER+50 (ručke ploča, stabla, brojevi), koje NVDA dodatak koristi; iz vanjskog procesa vratilo je nule, nije dalje istraženo.
