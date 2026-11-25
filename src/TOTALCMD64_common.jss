@@ -79,6 +79,55 @@ return StringTrimTrailingBlanks (StringTrimLeadingBlanks (GetTextInRect (nLeft, 
 	0, IgnoreColor, IgnoreColor, false)))
 EndFunction
 
+string function TcCheckLabelFor (handle hEdit)
+; The caption of the check box or radio button that labels a field without a name of its
+; own: a sibling right before it on the same row, or right above it (Configuration, measured
+; 2026-11-25: "Dodatni redci ispod kursora: [4]", "Ignoriraj ... mape:" above the list).
+; Found by position only, so it follows any TC language.
+var
+	handle h,
+	int nType,
+	int nLeft,
+	int nRight,
+	int nTop,
+	int nBottom,
+	int nEditLeft,
+	int nEditRight,
+	int nEditTop,
+	int nEditBottom
+var int nPass
+GetWindowRect (hEdit, nEditLeft, nEditRight, nEditTop, nEditBottom)
+; pass 1: left of the field on the same row; pass 2: right above it and across its width
+; (a check box on the row above may touch the field's corner: Thumbnails, 2026-11-25)
+let nPass = 1
+while nPass <= 2
+	let h = GetFirstChild (GetParent (hEdit))
+	while h
+		if h != hEdit
+		&& GetWindowClass (h) == wcButton
+		&& IsWindowVisible (h) then
+			let nType = GetWindowSubtypeCode (h)
+			if nType == WT_CHECKBOX || nType == WT_3STATE || nType == WT_RADIOBUTTON then
+				GetWindowRect (h, nLeft, nRight, nTop, nBottom)
+				if nPass == 1
+				&& nTop < nEditBottom && nBottom > nEditTop
+				&& nEditLeft - nRight >= -tcLabelGap && nEditLeft - nRight <= tcLabelGap then
+					return StringReplaceSubstrings (GetWindowName (h), "&", cscNull)
+				endIf
+				if nPass == 2
+				&& nEditTop - nBottom >= -tcLabelGap && nEditTop - nBottom <= tcLabelGap
+				&& nLeft <= nEditLeft + tcLabelGap && nRight >= nEditRight - tcLabelGap then
+					return StringReplaceSubstrings (GetWindowName (h), "&", cscNull)
+				endIf
+			endIf
+		endIf
+		let h = GetNextWindow (h)
+	endWhile
+	let nPass = nPass + 1
+endWhile
+return cscNull
+EndFunction
+
 handle function TcGroupOf (handle hwnd, handle hDlg)
 ; The nearest group box (class Button) that contains hwnd, below the dialog hDlg.
 var handle h

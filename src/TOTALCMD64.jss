@@ -274,6 +274,16 @@ if GetWindowClass (hwnd) == wcEdit
 	IndicateControlType (WT_EDIT, TcLabelAbove (GetParent (hwnd)), GetObjectValue ())
 	return true
 endIf
+; A field labelled by the check box or radio button before it (general rule for TC dialogs,
+; 2026-11-25): in Configuration JAWS said only the group name, or a one-character name
+; such as "s", the unit painted after the field.
+if GetWindowClass (hwnd) == wcEdit
+&& GetWindowClass (GetRealWindow (hwnd)) != wcTcMain
+&& StringLength (GetObjectName ()) <= 1
+&& TcCheckLabelFor (hwnd) then
+	IndicateControlType (WT_EDIT, TcCheckLabelFor (hwnd), GetObjectValue ())
+	return true
+endIf
 ; Rename in place (Shift+F6): TC puts an edit field into the file list; JAWS took another
 ; item's name as its label. The field is named "Rename" (author; TC has no word of its own for
 ; it), followed by the type and the name being edited (2026-11-21).

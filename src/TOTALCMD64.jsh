@@ -66,6 +66,9 @@ const
 	tcConfigName = "TOTALCMD64",
 	; height (pixels) of the band above a combo box searched for its painted label
 	tcLabelBand = 22,
+	; largest gap or overlap (pixels) between a field and the check box that labels it
+	; (TcCheckLabelFor; measured -3 to 3 at 150 %)
+	tcLabelGap = 8,
 	; caption of its file filter button (a symbol, not a word)
 	tcSyncFilterCaption = "1x",
 	tcCmpPaneMin = 100,
