@@ -36,19 +36,11 @@ foreach ($ext in "qs", "qsm") { Copy-Item (Join-Path $src "TOTALCMD64.$ext") $de
 
 # Key map: the Insert marking key depends on the profile.
 $jkmLines = [IO.File]::ReadAllLines((Join-Path $src "TOTALCMD64.jkm"))
-if ($Profile -eq "B") {
-    $jkmLines += "; Profile B: JAWS key pressed twice passes Insert to Total Commander (mark item)"
-    $jkmLines += "JAWSKey=TcJawsKeyTwice"
-} else {
-    $jkmLines += "; Profile A: Extended Insert marks the item; the scripts say the marked count"
-    $jkmLines += "ExtInsert=TcInsertMark"
-}
 [IO.File]::WriteAllLines((Join-Path $dest "TOTALCMD64.jkm"), $jkmLines)
 
 # Configuration: set the script's option lines in the user's .jcf, keep everything else.
 $options = [ordered]@{
     "IndicateSelected" = "0"
-    "JAWSInsertKey"    = if ($Profile -eq "B") { "2" } else { "1" }
 }
 $jcf = Join-Path $dest "TOTALCMD64.jcf"
 $lines = if (Test-Path $jcf) { [Collections.Generic.List[string]][IO.File]::ReadAllLines($jcf) } else { [Collections.Generic.List[string]]@("[Options]") }
@@ -75,5 +67,5 @@ try {
     Pop-Location
 }
 if ($code -ne 0) { throw "Compilation failed, exit code $code" }
-"Profile $Profile"
+"Deployed"
 Get-Item (Join-Path $dest "TOTALCMD64.jsb") | Select-Object Name, Length, LastWriteTime

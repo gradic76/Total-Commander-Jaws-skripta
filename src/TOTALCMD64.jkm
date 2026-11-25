@@ -20,3 +20,9 @@ Alt+Shift+A=TcSayActivePanel
 ; The main keyboard "+" and "-" are not assigned here, so they keep their key echo; the
 ; scripts follow them in KeyPressedEvent.
 Control+0=TcListerZoomReset
+; Insert keys (decision 2026-11-25): which Insert marks is set in Quick Settings (Selection key,
+; Usage) and applied while Total Commander has the focus; a line for a key that is a JAWS key
+; is ignored by JAWS.
+ExtInsert=TcInsertMark
+Insert=TcInsertMark
+JAWSKey=TcJawsKeyTwice

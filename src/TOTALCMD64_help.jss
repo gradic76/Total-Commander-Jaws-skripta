@@ -64,6 +64,16 @@ if TcIsFileListFocused () then
 endIf
 EndFunction
 
+string function TcInsertHelp ()
+; The Insert keys of the installed keyboard profile: A, the extended Insert marks items; B, the
+; extended Insert is the JAWS key (JAWSInsertKey in TOTALCMD64.jcf, written by deploy.ps1 and
+; the installer: 1 for A, 2 for B; 2026-11-25).
+if TcDoublePressSelects () then
+	return TcMsg ("msgTcInsertHelpB", msgTcInsertHelpB)
+endIf
+return TcMsg ("msgTcInsertHelpA", msgTcInsertHelpA)
+EndFunction
+
 Script HotKeyHelp ()
 TcShowHelp (FormatString (TcMsg ("msgTcHotKeyHelp", msgTcHotKeyHelp),
 	TcKeyName ("TcSayColumn1"),
@@ -74,7 +84,8 @@ TcShowHelp (FormatString (TcMsg ("msgTcHotKeyHelp", msgTcHotKeyHelp),
 	TcKeyName ("ReadBoxInTabOrder"),
 	TcKeyName ("ScriptFileName"),
 	TcKeyName ("TcSayActivePanel"),
-	TcKeyName ("ReadToBottomOfColumn")))
+	TcKeyName ("ReadToBottomOfColumn"))
+	+ tcLineBreak + TcInsertHelp ())
 EndScript
 
 Script ScreenSensitiveHelp ()
@@ -95,7 +106,7 @@ if GetWindowClass (GetTopLevelWindow (GetFocus ())) == wcTcCompare then
 	return
 endIf
 if GetWindowClass (GetTopLevelWindow (GetFocus ())) == wcTcSync then
-	TcShowHelp (TcMsg ("msgTcSyncHelp", msgTcSyncHelp))
+	TcShowHelp (FormatString (TcMsg ("msgTcSyncHelp", msgTcSyncHelp), TcKeyName ("SayLine")))
 	return
 endIf
 PerformScript ScreenSensitiveHelp ()

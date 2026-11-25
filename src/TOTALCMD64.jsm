@@ -63,12 +63,30 @@ Load or edit names
 
 ; Insert+F1 in the synchronize dirs window
 @msgTcSyncHelp
-Synchronize directories. After Compare, the arrow keys read each result as the file name and its relation: equal, different, left to right, right to left, left only, right only, not compared yet, or skip; Insert+Up Arrow reads the whole row with sizes and dates. Space changes the copy direction of a row or switches it off (skip); Total Commander's own announcement of the changed row is read by JAWS as it is. The Show buttons are only painted; switch them with Control+Shift plus L (left to right), E (equal), N (different), R (right to left), D (duplicates) or S (singles), and the scripts say which one and Total Commander's status line with the shown and hidden counts. Synchronize opens a dialog with the copy directions and their target folders.
+Synchronize directories
+Arrow keys in the results: the file name and its relation: equal, different, left to right, right to left, left only, right only, not compared yet, or skip.
+%1: the whole row with sizes and dates.
+Space: changes the copy direction of the row or switches it off (skip). JAWS reads Total Commander's own announcement of the changed row as it is.
+Control+Shift+L: show left to right.
+Control+Shift+E: show equal.
+Control+Shift+N: show different.
+Control+Shift+R: show right to left.
+Control+Shift+D: show duplicates.
+Control+Shift+S: show singles.
+After each of these keys: Total Commander's status line with the shown and hidden counts.
+Synchronize button: a dialog with the copy directions and their target folders.
 @@
 
 ; Insert+F1 in the compare by content window; %1 = key for the files and the status
 @msgTcCompareHelp
-Compare by content. When the window opens and after each comparison, the scripts say the left file, the right file and Total Commander's status line. To hear the differences, first press the Editing button: the panes then get a text cursor, and Next difference and Previous difference say the line from both files, left first, with "blank" for a side without that line. The arrow keys read the lines. Outside Editing mode only the status line is said, since the current difference cannot be known there. Long lines are read as far as the pane shows them. %1 says which file is left and which right, and the status line.
+Compare by content
+Opening the window, Compare: the left file, the right file and Total Commander's status line.
+Editing: press it first; the panes then get a text cursor.
+Next difference, Previous difference: in Editing mode, the line from both files, left first; "blank" for a side without that line.
+Arrow keys: read the lines.
+Outside Editing mode: only the status line, since the current difference cannot be known there.
+Long lines: read as far as the pane shows them.
+%1: which file is left and which right, and the status line.
 @@
 
 ; Synchronize dirs (Commands menu): the relation of a result row, from TC's codes EQ, UNEQ,
@@ -213,7 +231,25 @@ Explorer Preview
 
 ; Insert+F1 in Lister; %1 = key for the key list, %2 = key for the position in percent
 @msgTcListerHelp
-Lister. The scripts say the file name when Lister opens and after N, P, Alt+Left Arrow or Alt+Right Arrow, the display mode after the keys 1 to 8, the whole line after a search (F7, F3, F5 and the other search keys), and whether the text cursor, the maximized window or full screen mode is on after F6, F11 or Alt+Enter. F2, which reloads the file, plays a sound. Plus and minus, on the main keyboard or the numeric keypad, change the font size with a sound and say the new size; Control+0 returns to the stored size. %2 says the position in the file in percent. The arrow keys read the text only while the text cursor is on; F6 turns it on and off, and Total Commander remembers it. When Lister plays audio or video, the position and volume sliders stay silent while playing and speak only when you move them; Tab moves between them, and Shift or Control with the arrow keys go to Lister, not to JAWS. %1 lists the script keys.
+Lister
+Opening Lister: the file name.
+N, Alt+Right Arrow: the next file, with its name.
+P, Alt+Left Arrow: the previous file, with its name.
+1 to 8: the display mode.
+F7, Control+F: search; then the whole line with the match.
+F3, F5, Shift+F7: the next match, with its line.
+Shift+F3, Shift+F5: the previous match, with its line.
+F2: reloads the file, with a sound.
+F6: text cursor on or off. The arrow keys read the text only while it is on, and Total Commander remembers it.
+F11: maximized window on or off.
+Alt+Enter: full screen mode on or off.
+Plus, Minus: larger or smaller font, with a sound and the new size.
+Control+0: back to the stored font size.
+%2: position in the file in percent.
+Audio and video: the sliders are silent while playing and speak when you move them.
+Tab: moves between the position and volume sliders.
+Shift or Control with the arrow keys on a slider: go to Lister, not to JAWS.
+%1: the list of script keys.
 @@
 
 ; Lister F11 and Alt+Enter, worded as in Lister's help; followed by JAWS's own "On" or "Off"
@@ -334,26 +370,47 @@ Not available
 ; Insert+H: keys added by the scripts (shown in the virtual viewer).
 ; %1 to %9 are the actual keys, filled in by the scripts (the JAWS key named Insert).
 @msgTcHotKeyHelp
-Total Commander script keys:
-%1 to %2: the columns after the name of the item in focus, with the column caption from the header, in the order Total Commander shows them, so they follow any view and your own custom columns. In Full view: 1 size, 2 date and time, 3 attributes. Pressed twice quickly, shows all columns of the item in the virtual viewer, one per line, with the cursor on the requested column.
+Total Commander script keys
+%1 to %2: the columns after the name of the item in focus, with the column caption from the header, in the order Total Commander shows them. They follow every view and your own custom columns. In Full view: 1 size, 2 date and time, 3 attributes. Pressed twice quickly, shows all columns of the item in the virtual viewer, one per line, with the cursor on the requested column.
 %3: path of the active panel; pressed twice quickly, copies it to the clipboard.
 %8: which panel is active.
 %4: whole row of the item, with its position.
 %5: status line of the active panel; in the progress window, a progress summary; in Lister, the position in the file in percent.
 %9: status line and free space of the other panel, e.g. to check the target before copying.
-%6: in the overwrite, progress and message dialogs, reads the whole dialog.
+%6: in Total Commander's dialogs, reads the whole dialog; in the compare by content window, the two files and the status line.
 %7: script version.
-Insert marks the item and moves to the next one; the scripts then say how many items are marked and the item reached.
+@@
+
+; Insert+H, the keyboard profile's Insert keys (A: extended Insert marks; B: extended Insert is the JAWS key)
+@msgTcInsertHelpB
+The extended Insert is the JAWS key.
+Extended Insert pressed twice quickly: passes Insert to Total Commander, which marks the item and moves to the next one; the scripts then say how many items are marked and the item reached.
+Numeric keypad: on, so Total Commander gets Num Plus, Num Minus, Num Star and Num Slash.
+@@
+
+; Insert+H, the keyboard profile's Insert keys (A: extended Insert marks; B: extended Insert is the JAWS key)
+@msgTcInsertHelpA
+The numeric Insert and the extended Insert have different functions. The extended Insert marks items in the panels; the numeric Insert is the JAWS key.
+Extended Insert: marks the item and moves to the next one; the scripts then say how many items are marked and the item reached.
 @@
 
 ; Insert+F1 in the file list; %1 = key for the whole row, %2 = key for the key list
 @msgTcListHelp
-File list. The arrow keys read the item name, and "selected" for marked items. ".." also says the folder it leads to. Space and Insert mark items. F2 and Control+R, which reread the panel, play a sound. In the folder tree (Control+F8) the arrow keys read the folder, whether it is open or closed, and its level; Right Arrow opens a folder and Left Arrow closes it. %1 reads the whole row, and %2 lists the script keys.
+File list
+Arrow keys: the item name, and "selected" for marked items.
+"..": also the folder it leads to.
+Space: marks or unmarks the item.
+F2, Control+R: reread the panel, with a sound.
+Control+F8: folder tree; the arrow keys say the folder, whether it is open or closed, and its level.
+Right Arrow in the tree: opens the folder.
+Left Arrow in the tree: closes the folder.
+%1: the whole row.
+%2: the list of script keys.
 @@
 
 ; Insert+F1 pressed twice: general help; %1 = version, %2 = key for the key list
 @msgTcAppHelp
-Total Commander JAWS scripts, version %1. The scripts shorten what is spoken in the file list, read the overwrite, progress and message dialogs, and add keys for size, date and path. For the list of keys, press %2.
+Total Commander JAWS scripts, version %1. The scripts shorten what is spoken in the file list and the folder tree, make Total Commander's dialogs, Lister, compare by content and synchronize directories usable, and add keys for columns, path and status lines. For the list of keys, press %2.
 @@
 
 ; Shown when the progress window text could not be read

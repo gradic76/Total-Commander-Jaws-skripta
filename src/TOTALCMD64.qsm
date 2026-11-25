@@ -10,6 +10,37 @@
 			<HelpMsg>Language of the messages and help the scripts add. Total Commander's own words follow Total Commander's language.</HelpMsg>
 		</DisplayName>
 		<DisplayName ID="TcSettings.Language.en" Text="English"/>
+		<DisplayName ID="TcSettings.Language.cs" Text="Čeština"/>
+		<DisplayName ID="TcSettings.Language.da" Text="Dansk"/>
+		<DisplayName ID="TcSettings.Language.de" Text="Deutsch"/>
+		<DisplayName ID="TcSettings.Language.es" Text="Español"/>
+		<DisplayName ID="TcSettings.Language.fr" Text="Français"/>
 		<DisplayName ID="TcSettings.Language.hr" Text="Hrvatski"/>
+		<DisplayName ID="TcSettings.Language.it" Text="Italiano"/>
+		<DisplayName ID="TcSettings.Language.hu" Text="Magyar"/>
+		<DisplayName ID="TcSettings.Language.nl" Text="Nederlands"/>
+		<DisplayName ID="TcSettings.Language.nb" Text="Norsk"/>
+		<DisplayName ID="TcSettings.Language.pl" Text="Polski"/>
+		<DisplayName ID="TcSettings.Language.ro" Text="Română"/>
+		<DisplayName ID="TcSettings.Language.sk" Text="Slovenčina"/>
+		<DisplayName ID="TcSettings.Language.sl" Text="Slovenščina"/>
+		<DisplayName ID="TcSettings.Language.sr" Text="Srpski"/>
+		<DisplayName ID="TcSettings.Language.sv" Text="Svenska"/>
+		<DisplayName ID="TcSettings.Language.ru" Text="Русский"/>
+		<DisplayName ID="TcSettings.Language.uk" Text="Українська"/>
+		<DisplayName ID="TcSettings.Language.ko" Text="한국어"/>
+		<DisplayName ID="TcSettings.Language.zh" Text="中文"/>
+		<DisplayName ID="TcSettings.SelectKey" Text="Selection key">
+			<HelpMsg>Which Insert key marks items in Total Commander. The other Insert key stays the JAWS key. None: both Insert keys are JAWS keys, and Space marks.</HelpMsg>
+		</DisplayName>
+		<DisplayName ID="TcSettings.SelectKey.ext" Text="Extended Insert"/>
+		<DisplayName ID="TcSettings.SelectKey.num" Text="Numeric Insert"/>
+		<DisplayName ID="TcSettings.SelectKey.both" Text="Both"/>
+		<DisplayName ID="TcSettings.SelectKey.none" Text="None (use Space)"/>
+		<DisplayName ID="TcSettings.SelectUsage" Text="Usage">
+			<HelpMsg>Single press: the selection key marks with one press. Double press: both Insert keys stay JAWS keys, and either one pressed twice quickly marks.</HelpMsg>
+		</DisplayName>
+		<DisplayName ID="TcSettings.SelectUsage.single" Text="Single press"/>
+		<DisplayName ID="TcSettings.SelectUsage.double" Text="Double press"/>
 	</DisplayNameDefinitions>
 </LocalizableDefinitions>

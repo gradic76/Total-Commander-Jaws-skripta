@@ -809,7 +809,11 @@ TcMarkAndMove ()
 EndScript
 
 Script TcJawsKeyTwice ()
-; Profile B: the JAWS key pressed twice passes Insert to TC, as JAWS's own JAWSKey script does.
+; Usage "double press": the JAWS key pressed twice passes Insert to TC; otherwise JAWS's own.
+if !TcDoublePressSelects () then
+	PerformScript JAWSKey ()
+	return
+endIf
 if IsSameScript () then
 	TcMarkAndMove ()
 endIf

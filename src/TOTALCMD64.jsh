@@ -41,15 +41,26 @@ const
 	tcSettingsFile = "TOTALCMD64.jcf",
 	tcSettingsSection = "NonJCFOptions",
 	tcLanguageSetting = "TcLanguage",
-	tcLanguages = "en|hr",
+	tcLanguages = "en|cs|da|de|es|fr|hr|it|hu|nl|nb|pl|ro|sk|sl|sr|sv|ru|uk|ko|zh",
 	tcLanguageSep = "|",
 	tcDefaultLanguage = "en",
 	tcMessagesSection = "Messages",
 	tcLanguageFilePrefix = "TOTALCMD64.",
 	tcLanguageFileSuffix = ".ini",
 	tcLineBreakMark = "\\n",
+	; Insert key settings in Quick Settings (TOTALCMD64_settings.jss)
+	tcSelectKeySetting = "TcSelectKey",
+	tcSelectUsageSetting = "TcSelectUsage",
+	tcSelectKeyNumeric = 1,
+	tcSelectKeyBoth = 2,
+	tcSelectKeyNone = 3,
 	; GetScriptKeyName joins the keys of a script with this
 	tcKeyOrSep = " OR ",
+	; keyboard profile in the application's .jcf: [Options] JAWSInsertKey, 1 = A, 2 = B
+	tcJcfOptionsSection = "Options",
+	tcJawsInsertKeySetting = "JAWSInsertKey",
+	tcProfileAValue = "1",
+	tcProfileBValue = "2",
 	; height (pixels) of the band above a combo box searched for its painted label
 	tcLabelBand = 22,
 	; caption of its file filter button (a symbol, not a word)
@@ -287,6 +298,8 @@ globals
 	int giTcListerKeyTick,
 	; time of the last Alt+F8
 	int giTcHistoryKeyTick,
+	; the Insert key mode last applied (-1 at start: not yet)
+	int giTcInsertMode,
 	; compare by content: the window, its status line and pane text as last seen
 	handle ghTcCmpForm,
 	string gsTcCmpStatus,

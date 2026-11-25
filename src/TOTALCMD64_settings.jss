@@ -32,3 +32,35 @@ if !sText then
 endIf
 return StringReplaceSubstrings (sText, tcLineBreakMark, tcLineBreak)
 EndFunction
+
+; Insert keys (decision 2026-11-25, replacing the keyboard profiles): Quick Settings stores
+; Selection key (0 extended Insert, 1 numeric Insert, 2 both, 3 none: Space marks) and Usage
+; (0 single press, 1 double press). Applied while Total Commander has the focus through JAWS's
+; Insert key mode (OPT_INSERT_KEY_MODE, the JAWSInsertKey values: 0 none, 1 numeric,
+; 2 extended, 3 both Insert keys are JAWS keys).
+
+int function TcSelectKey ()
+return StringToInt (IniReadString (tcSettingsSection, tcSelectKeySetting, "0", tcSettingsFile))
+EndFunction
+
+int function TcDoublePressSelects ()
+return StringToInt (IniReadString (tcSettingsSection, tcSelectUsageSetting, "0", tcSettingsFile)) == 1
+	&& TcSelectKey () != tcSelectKeyNone
+EndFunction
+
+void function TcApplyInsertKeys ()
+; Double press needs both Insert keys as JAWS keys, and so does "none".
+var int nMode
+if TcSelectKey () == tcSelectKeyNone
+|| TcDoublePressSelects () then
+	let nMode = 3
+elIf TcSelectKey () == tcSelectKeyNumeric then
+	let nMode = 2
+elIf TcSelectKey () == tcSelectKeyBoth then
+	let nMode = 0
+else
+	let nMode = 1
+endIf
+; set on every focus change: JAWS restores its own value when another program gets the focus
+SetJCFOption (OPT_INSERT_KEY_MODE, nMode)
+EndFunction

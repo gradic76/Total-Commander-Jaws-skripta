@@ -385,6 +385,8 @@ var
 	string sRow,
 	string sSize
 TcSayHistoryName (hwndFocus)
+; the Insert keys chosen in Quick Settings, while Total Commander has the focus
+TcApplyInsertKeys ()
 if hwndFocus == hwndPrevFocus
 && nChild == nPrevChild
 && GetWindowClass (hwndFocus) == wcTcFileList
