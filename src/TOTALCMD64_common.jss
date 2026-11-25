@@ -129,6 +129,39 @@ endWhile
 return cscNull
 EndFunction
 
+string function TcColorListItem (handle hList, string sItem)
+; The open drop-down list of a colour combo box: its items are numbers too, painted as
+; colour samples or as the default word (2026-11-25). The row is found at the PC cursor.
+var
+	string sPainted,
+	int nLeft,
+	int nRight,
+	int nTop,
+	int nBottom,
+	int nRow,
+	int nCompare
+if !TcIsNumber (sItem) then
+	return cscNull
+endIf
+GetWindowRect (hList, nLeft, nRight, nTop, nBottom)
+let nRow = GetCursorRow ()
+if nRow < nTop || nRow > nBottom then
+	return cscNull
+endIf
+let sPainted = StringTrimTrailingBlanks (StringTrimLeadingBlanks (GetTextInRect (nLeft, nRow - tcRowHalf,
+	nRight, nRow + tcRowHalf, 0, IgnoreColor, IgnoreColor, false)))
+if sPainted == sItem then
+	return cscNull
+endIf
+if sPainted then
+	return sPainted
+endIf
+if TcPaletteColor (sItem) then
+	return TcPaletteColor (sItem)
+endIf
+return TcColorAt (nLeft, nLeft + (nRight - nLeft) / 3, nRow)
+EndFunction
+
 int function TcIsUnderSameCombo (handle hCombo)
 ; Whether a combo box of the same width sits right above hCombo (Configuration, Columns: the
 ; time format under the date format, sharing its label; measured 2026-11-25).
@@ -214,6 +247,75 @@ var
 GetWindowRect (hwnd, nLeft, nRight, nTop, nBottom)
 return StringTrimTrailingBlanks (StringTrimLeadingBlanks (GetTextInRect (nLeft, nTop, nRight, nBottom,
 	0, IgnoreColor, IgnoreColor, false)))
+EndFunction
+
+int function TcIsNumber (string s)
+; Whether s is made of digits only (and not empty).
+var int i
+if !s then
+	return false
+endIf
+let i = 1
+while i <= StringLength (s)
+	if !StringContains (tcDigits, SubString (s, i, 1)) then
+		return false
+	endIf
+	let i = i + 1
+endWhile
+return true
+EndFunction
+
+string function TcColorAt (int nEdge, int nX, int nY)
+; The name of the colour at nX, nY, or JAWS's "blank" when it is the background, which is
+; taken just inside the left edge nEdge.
+var int nCompare
+if GetColorAtPoint (nX, nY) == GetColorAtPoint (nEdge + tcEdgeInset, nY) then
+	return cmsgBlank1
+endIf
+return GetColorName (GetColorApproximation (GetColorAtPoint (nX, nY), nCompare))
+EndFunction
+
+string function TcPaletteColor (string sNumber)
+; The name of a standard TC colour by its item number in a colour combo box: items 1 to 16
+; are the 16 standard colours (measured 2026-11-25, tcColorPalette); JAWS names them from
+; its colour table, in its own language. Empty for other numbers.
+var int n = StringToInt (sNumber)
+if n < 1 || n > StringSegmentCount (tcColorPalette, tcLanguageSep) then
+	return cscNull
+endIf
+return GetColorName (RGBStringToColor (StringSegment (tcColorPalette, tcLanguageSep, n)))
+EndFunction
+
+string function TcColorComboValue (handle hCombo, string sValue)
+; A TC colour combo box (Configuration, Colors and Custom view) gives JAWS only the item
+; number ("0"); on the screen it shows a painted word for the default ("zadano", in TC's
+; language) or a sample of the colour (measured 2026-11-25). Returns what to say instead, or
+; nothing for an ordinary combo box whose painted text is its number ("144").
+var
+	string sPainted,
+	int nLeft,
+	int nRight,
+	int nTop,
+	int nBottom,
+	int nCompare
+if !TcIsNumber (sValue) then
+	return cscNull
+endIf
+let sPainted = TcTextInWindowRect (hCombo)
+if sPainted == sValue then
+	return cscNull
+endIf
+if sPainted then
+	return sPainted
+endIf
+; the 16 standard colours by their item number; others (a custom colour) from the screen
+if TcPaletteColor (sValue) then
+	return TcPaletteColor (sValue)
+endIf
+; the colour sample fills the left part of the box; an item that paints nothing (the last
+; one, a place for a custom colour) shows the background there too (measured 2026-11-25)
+GetWindowRect (hCombo, nLeft, nRight, nTop, nBottom)
+return TcColorAt (nLeft, nLeft + (nRight - nLeft) / 3, (nTop + nBottom) / 2)
 EndFunction
 
 string function TcCleanCaption (string sCaption)

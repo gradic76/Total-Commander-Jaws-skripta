@@ -71,6 +71,14 @@ const
 	tcLabelGap = 8,
 	; menu bar items: the access key is said as Alt and the letter (SayTutorialHelpHotKey)
 	tcAltPrefix = "Alt+",
+	; TC's colour combo boxes, items 1 to 16 (RGB, measured 2026-11-25; 0 is the default,
+	; 17 a custom colour): white, silver, gray, black, red, maroon, green, lime green 2,
+	; blue, navy, yellow, olive, cyan, teal, magenta, purple in JAWS's colour table
+	tcColorPalette = "255255255|192192192|128128128|000000000|255000000|128000000|000255000|000128000|000000255|000000128|255255000|128128000|000255255|000128128|255000255|128000128",
+	; pixels inside a colour box's left edge where its background is taken (TcColorAt)
+	tcEdgeInset = 2,
+	; half the height (pixels) of a list row searched for painted text (TcColorListItem)
+	tcRowHalf = 4,
 	; a time format value contains this ("hh:mm")
 	tcTimeSep = ":",
 	; caption of its file filter button (a symbol, not a word)

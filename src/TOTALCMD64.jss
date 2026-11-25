@@ -32,9 +32,20 @@ EndFunction
 Void Function ValueChangedEvent (handle hwnd, int objId, int childId, int nObjType, string sObjName, string sObjValue, optional int bIsFocusObject)
 ; Lister's media player: JAWS spoke every percent of the position while playing. Only
 ; changes shortly after a key are spoken (decision 2026-11-20).
+var string sValue
 if TcIsListerSlider (hwnd)
 && GetTickCount () - giTcListerKeyTick > tcMediaKeyTicks then
 	return
+endIf
+; Arrow keys in a colour combo box: the painted word or the colour name, not the number
+; (2026-11-25).
+if GetWindowClass (hwnd) == wcTcComboBox
+&& hwnd == GetFocus () then
+	let sValue = TcColorComboValue (hwnd, sObjValue)
+	if sValue then
+		Say (sValue, OT_LINE)
+		return
+	endIf
 endIf
 ValueChangedEvent (hwnd, objId, childId, nObjType, sObjName, sObjValue, bIsFocusObject)
 EndFunction
@@ -144,11 +155,12 @@ if GetWindowClass (GetTopLevelWindow (hwnd)) == wcTcCompare
 	; pieces; typing echo and the arrow keys are JAWS's own (2026-11-23)
 	return true
 endIf
-; Multi-Rename: leaving the preview list (Tab to Rename) repaints its row, which JAWS read
-; out in full; the list is read on the arrow keys (2026-11-22).
+; A list in a TC dialog repaints its selected row when the focus leaves it, and JAWS read
+; that row out: Multi-Rename's preview list (2026-11-22), Configuration's lists ("<zadano>",
+; "Hrvatski (Croatian)"; general rule 2026-11-25). The list is read on the arrow keys.
 if hwnd != hFocus
 && GetWindowClass (hwnd) == wcTcFileList
-&& GetWindowClass (GetParent (hwnd)) == wcTcMultiRename then
+&& GetWindowClass (GetRealWindow (hwnd)) != wcTcMain then
 	return true
 endIf
 ; Lister search: the found text alone stays silent, the whole line follows (TcSayListerLine).
@@ -309,6 +321,16 @@ if GetWindowClass (hwnd) == wcEdit
 && TcLabelAbove (GetParent (hwnd)) then
 	IndicateControlType (WT_EDIT, TcLabelAbove (GetParent (hwnd)), GetObjectValue ())
 	return true
+endIf
+; A colour combo box: the painted "default" word or the name of the colour sample instead
+; of the item number (TcColorComboValue, 2026-11-25).
+if GetWindowClass (hwnd) == wcTcComboBox
+&& GetWindowClass (GetRealWindow (hwnd)) != wcTcMain then
+	let sName = TcColorComboValue (hwnd, GetObjectValue ())
+	if sName then
+		IndicateControlType (WT_COMBOBOX, GetObjectName (), sName)
+		return true
+	endIf
 endIf
 ; The same for a combo box without a field (Configuration, Miscellaneous: the key after
 ; "Ctrl +", "Alt +", "Shift +", "Win +"; Columns: the time format; 2026-11-25).
@@ -472,6 +494,13 @@ if hwndFocus == hwndPrevFocus
 	endIf
 	return
 endIf
+; A check box in a TC dialog getting the focus again: JAWS said it twice, the second time
+; as "3 state button" (Configuration, Folder tabs, 2026-11-25).
+if hwndFocus == hwndPrevFocus
+&& GetWindowClass (hwndFocus) == wcButton
+&& GetWindowSubtypeCode (hwndFocus) == WT_3STATE then
+	return
+endIf
 ; Focus entering a button bar: say which bar before the button (HandleCustomWindows
 ; is not called for the bar window; measured 2026-11-18).
 if hwndFocus != hwndPrevFocus then
@@ -492,6 +521,15 @@ let sItem = GetObjectName ()
 if GetWindowClass (curHwnd) == wcComboList
 && StringContains (sItem, tcDriveItemStart) then
 	let sName = TcDriveMenuName (StringSegment (sItem, "-", 2))
+	if sName then
+		Say (sName, OT_LINE)
+		Say (PositionInGroup (), OT_POSITION)
+		return
+	endIf
+endIf
+; the open list of a colour combo box: the colour or the default word, not the number
+if GetWindowClass (curHwnd) == wcComboList then
+	let sName = TcColorListItem (curHwnd, sItem)
 	if sName then
 		Say (sName, OT_LINE)
 		Say (PositionInGroup (), OT_POSITION)
