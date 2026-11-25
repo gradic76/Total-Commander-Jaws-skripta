@@ -69,6 +69,10 @@ const
 	; largest gap or overlap (pixels) between a field and the check box that labels it
 	; (TcCheckLabelFor; measured -3 to 3 at 150 %)
 	tcLabelGap = 8,
+	; menu bar items: the access key is said as Alt and the letter (SayTutorialHelpHotKey)
+	tcAltPrefix = "Alt+",
+	; a time format value contains this ("hh:mm")
+	tcTimeSep = ":",
 	; caption of its file filter button (a symbol, not a word)
 	tcSyncFilterCaption = "1x",
 	tcCmpPaneMin = 100,

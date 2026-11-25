@@ -429,4 +429,10 @@ Total Commander JAWS scripts, version %1. The scripts shorten what is spoken in 
 @msgTcProgressUnknown
 Progress not available
 @@
+
+; Configuration, Columns: the combo box with the time format ("hh:mm") under the date
+; format, which has no label of its own
+@msgTcTimeFormat
+Time format
+@@
 EndMessages

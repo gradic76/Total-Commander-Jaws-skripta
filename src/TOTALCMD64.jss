@@ -166,8 +166,26 @@ endIf
 return NewTextEventShouldBeSilent (hFocus, hwnd, buffer, nAttributes, nTextColor, nBackgroundColor, nEcho, sFrameName)
 EndFunction
 
+int function SayTutorialHelpHotKey (handle hHotKeyWindow, int IsScriptKey)
+; Menu bar items (Total Commander, Lister): JAWS said only the letter ("Datoteka d"); from the
+; window the menu opens with Alt and the letter, so that is said, as NVDA does (author,
+; 2026-11-25). Items in an open menu keep the letter alone, which is what is pressed there.
+var string sKey
+if GlobalMenuMode == MENUBAR_ACTIVE then
+	; GetHotKey gives "Alt+d" here (measured 2026-11-25); the letter is taken after the last "+"
+	let sKey = StringSegment (GetHotKey (), "+", -1)
+	if sKey then
+		Say (tcAltPrefix + StringUpper (sKey), OT_ACCESS_KEY)
+		return true
+	endIf
+endIf
+return SayTutorialHelpHotKey (hHotKeyWindow, IsScriptKey)
+EndFunction
+
 int function HandleCustomWindows (handle hwnd)
-var string sName
+var
+	string sName,
+	handle hLabelled
 if TcSayListerTitle (hwnd) then
 	return true
 endIf
@@ -262,6 +280,24 @@ if GetWindowClass (hwnd) == wcButton
 	IndicateControlType (WT_BUTTON, TcMsg ("msgTcMrtNamesButton", msgTcMrtNamesButton))
 	return true
 endIf
+; A field labelled by the check box or radio button before it (general rule for TC dialogs,
+; 2026-11-25): in Configuration JAWS said only the group name, or a one-character name
+; such as "s", the unit painted after the field. Checked before the painted text above,
+; which there is the captions of other check boxes ("Alijas:" field under "Alt + Shift + Win +").
+if GetWindowClass (hwnd) == wcEdit
+&& GetWindowClass (GetRealWindow (hwnd)) != wcTcMain
+&& StringLength (GetObjectName ()) <= 1 then
+	; a field inside a combo box is placed by its combo box
+	let hLabelled = hwnd
+	if GetWindowClass (GetParent (hwnd)) == wcTcComboBox then
+		let hLabelled = GetParent (hwnd)
+	endIf
+	let sName = TcCheckLabelFor (hLabelled)
+	if sName then
+		IndicateControlType (WT_EDIT, sName, GetObjectValue ())
+		return true
+	endIf
+endIf
 ; A field inside a combo box in a TC dialog without a name of its own (general rule,
 ; 2026-11-24): Shift+F5's "Kopiraj "ime" u" is painted just above the combo box, and JAWS
 ; found it with the English TC but not with the Croatian one. The painted line right above
@@ -274,15 +310,32 @@ if GetWindowClass (hwnd) == wcEdit
 	IndicateControlType (WT_EDIT, TcLabelAbove (GetParent (hwnd)), GetObjectValue ())
 	return true
 endIf
-; A field labelled by the check box or radio button before it (general rule for TC dialogs,
-; 2026-11-25): in Configuration JAWS said only the group name, or a one-character name
-; such as "s", the unit painted after the field.
-if GetWindowClass (hwnd) == wcEdit
+; The same for a combo box without a field (Configuration, Miscellaneous: the key after
+; "Ctrl +", "Alt +", "Shift +", "Win +"; Columns: the time format; 2026-11-25).
+if GetWindowClass (hwnd) == wcTcComboBox
 && GetWindowClass (GetRealWindow (hwnd)) != wcTcMain
-&& StringLength (GetObjectName ()) <= 1
-&& TcCheckLabelFor (hwnd) then
-	IndicateControlType (WT_EDIT, TcCheckLabelFor (hwnd), GetObjectValue ())
-	return true
+&& StringLength (GetObjectName ()) <= 1 then
+	let sName = TcCheckLabelFor (hwnd)
+	if sName then
+		IndicateControlType (WT_COMBOBOX, sName, GetObjectValue ())
+		return true
+	endIf
+	; the time format ("hh:mm") under the date format, which TC labels once for both
+	if StringContains (GetObjectValue (), tcTimeSep)
+	&& TcIsUnderSameCombo (hwnd) then
+		IndicateControlType (WT_COMBOBOX, TcMsg ("msgTcTimeFormat", msgTcTimeFormat), GetObjectValue ())
+		return true
+	endIf
+endIf
+; A list without a name in a TC dialog: the caption of its group box, then JAWS's own
+; item and position (Configuration, Custom view: "Korisnički prikazi"; 2026-11-25).
+if GetWindowClass (hwnd) == wcTcFileList
+&& GetWindowClass (GetRealWindow (hwnd)) != wcTcMain
+&& !GetObjectName (false, 1) then
+	let hLabelled = TcGroupOf (hwnd, GetRealWindow (hwnd))
+	if hLabelled then
+		Say (TcCleanCaption (StringTrimLeadingBlanks (GetWindowName (hLabelled))), OT_CONTROL_NAME)
+	endIf
 endIf
 ; Rename in place (Shift+F6): TC puts an edit field into the file list; JAWS took another
 ; item's name as its label. The field is named "Rename" (author; TC has no word of its own for
@@ -307,6 +360,10 @@ if GetWindowClass (hwnd) == wcButton then
 	let sName = GetObjectName ()
 	; TC check boxes are three-state buttons; JAWS calls them "3 state button".
 	if GetWindowSubtypeCode (hwnd) == WT_3STATE then
+		; a box without a caption is labelled by the push button right after it
+		if !sName then
+			let sName = TcButtonLabelFor (hwnd)
+		endIf
 		IndicateControlType (WT_CHECKBOX, sName)
 		IndicateControlState (WT_CHECKBOX, GetControlAttributes ())
 		return true

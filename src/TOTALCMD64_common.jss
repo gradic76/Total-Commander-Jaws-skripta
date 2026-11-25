@@ -80,10 +80,11 @@ return StringTrimTrailingBlanks (StringTrimLeadingBlanks (GetTextInRect (nLeft, 
 EndFunction
 
 string function TcCheckLabelFor (handle hEdit)
-; The caption of the check box or radio button that labels a field without a name of its
-; own: a sibling right before it on the same row, or right above it (Configuration, measured
-; 2026-11-25: "Dodatni redci ispod kursora: [4]", "Ignoriraj ... mape:" above the list).
-; Found by position only, so it follows any TC language.
+; The caption of the check box or radio button that labels a field or combo box without a
+; name of its own: a sibling right before it on the same row, or right above it (Configuration,
+; measured 2026-11-25: "Dodatni redci ispod kursora: [4]", "Ignoriraj ... mape:" above the
+; list, "Win +" before the key of a shortcut). Found by position only, so it follows any TC
+; language.
 var
 	handle h,
 	int nType,
@@ -124,6 +125,68 @@ while nPass <= 2
 		let h = GetNextWindow (h)
 	endWhile
 	let nPass = nPass + 1
+endWhile
+return cscNull
+EndFunction
+
+int function TcIsUnderSameCombo (handle hCombo)
+; Whether a combo box of the same width sits right above hCombo (Configuration, Columns: the
+; time format under the date format, sharing its label; measured 2026-11-25).
+var
+	handle h,
+	int nLeft,
+	int nRight,
+	int nTop,
+	int nBottom,
+	int nMyLeft,
+	int nMyRight,
+	int nMyTop,
+	int nMyBottom
+GetWindowRect (hCombo, nMyLeft, nMyRight, nMyTop, nMyBottom)
+let h = GetFirstChild (GetParent (hCombo))
+while h
+	if h != hCombo
+	&& GetWindowClass (h) == wcTcComboBox then
+		GetWindowRect (h, nLeft, nRight, nTop, nBottom)
+		if nMyTop - nBottom >= 0 && nMyTop - nBottom <= tcLabelGap * 2
+		&& nLeft - nMyLeft >= -tcLabelGap && nLeft - nMyLeft <= tcLabelGap
+		&& nRight - nMyRight >= -tcLabelGap && nRight - nMyRight <= tcLabelGap then
+			return true
+		endIf
+	endIf
+	let h = GetNextWindow (h)
+endWhile
+return false
+EndFunction
+
+string function TcButtonLabelFor (handle hCheck)
+; The caption of the push button right after a check box without a caption of its own, on
+; the same row (Configuration, Colors: the box before "Odredi boju prema vrsti datoteke...",
+; measured 2026-11-25).
+var
+	handle h,
+	int nLeft,
+	int nRight,
+	int nTop,
+	int nBottom,
+	int nBoxLeft,
+	int nBoxRight,
+	int nBoxTop,
+	int nBoxBottom
+GetWindowRect (hCheck, nBoxLeft, nBoxRight, nBoxTop, nBoxBottom)
+let h = GetFirstChild (GetParent (hCheck))
+while h
+	if h != hCheck
+	&& GetWindowClass (h) == wcButton
+	&& GetWindowSubtypeCode (h) == WT_BUTTON
+	&& IsWindowVisible (h) then
+		GetWindowRect (h, nLeft, nRight, nTop, nBottom)
+		if nTop < nBoxBottom && nBottom > nBoxTop
+		&& nLeft - nBoxRight >= -tcLabelGap && nLeft - nBoxRight <= tcLabelGap then
+			return StringReplaceSubstrings (GetWindowName (h), "&", cscNull)
+		endIf
+	endIf
+	let h = GetNextWindow (h)
 endWhile
 return cscNull
 EndFunction
