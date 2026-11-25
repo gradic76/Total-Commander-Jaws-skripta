@@ -2,6 +2,12 @@
 
 Stanje 2026-11-16. Pojedinosti mjerenja su u stanje.md.
 
+## Nedostaje za prvo izdanje (Gordan, 2026-11-25: vraćamo se na to)
+
+Funkcionalni obilazak TC-a i Konfiguracija su gotovi. Rad je zastao dok traje NVDA projekt (D:\Claude\Total Commander NVDA dodatak); na JAWS projekt vraćamo se radi:
+1. Dokumentacije: README (hrvatski i engleski), HTML priručnik po jeziku (dvostruki Insert+F1; početak u docs\prirucnik-hr.md), pregled pomoći u skripti.
+2. Installera: Inno Setup po dogovoru niže ("Dogovor za installer") i Skladiste\installer\predlozak.iss.
+
 ## Gotovo
 
 - Prošireni Insert u TC-u označava, numerički ostaje JAWS tipka (TOTALCMD64.jcf).
