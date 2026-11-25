@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- Total Commander JAWS scripts: names in Quick Settings. One language per JAWS folder, so
+     the language names are written each in its own language. -->
+<LocalizableDefinitions File="TOTALCMD64.qs">
+	<DisplayNameDefinitions>
+		<DisplayName ID="TcSettings" Text="Total Commander scripts">
+			<HelpMsg>Settings of the Total Commander JAWS scripts.</HelpMsg>
+		</DisplayName>
+		<DisplayName ID="TcSettings.Language" Text="Language / Jezik">
+			<HelpMsg>Language of the messages and help the scripts add. Total Commander's own words follow Total Commander's language.</HelpMsg>
+		</DisplayName>
+		<DisplayName ID="TcSettings.Language.en" Text="English"/>
+		<DisplayName ID="TcSettings.Language.hr" Text="Hrvatski"/>
+	</DisplayNameDefinitions>
+</LocalizableDefinitions>

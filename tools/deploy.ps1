@@ -28,6 +28,11 @@ if (-not (Test-Path $compiler)) { throw "Script compiler not found: $compiler" }
 foreach ($ext in "jss", "jsh", "jsm", "jsd") {
     Copy-Item (Join-Path $src "TOTALCMD64.$ext") $dest -Force
 }
+# Parts of the scripts, included by TOTALCMD64.jss (compiled together with it)
+Copy-Item (Join-Path $src "TOTALCMD64_*.jss") $dest -Force
+# Language files and Quick Settings (Insert+V)
+Copy-Item (Join-Path $src "TOTALCMD64.*.ini") $dest -Force
+foreach ($ext in "qs", "qsm") { Copy-Item (Join-Path $src "TOTALCMD64.$ext") $dest -Force }
 
 # Key map: the Insert marking key depends on the profile.
 $jkmLines = [IO.File]::ReadAllLines((Join-Path $src "TOTALCMD64.jkm"))

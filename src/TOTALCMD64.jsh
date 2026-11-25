@@ -35,6 +35,21 @@ const
 	wcTcSyncStart = "TSyncStartForm",
 	; FTP connections dialog (Ctrl+F); its list of connections is an LCLListBox (2026-11-24)
 	wcTcFtpConnect = "TCONNECT",
+	; Settings and language (TOTALCMD64_settings.jss): the Quick Settings value in the
+	; application's .jcf, the languages in the order of the Quick Settings list, and the
+	; language files TOTALCMD64.<code>.ini
+	tcSettingsFile = "TOTALCMD64.jcf",
+	tcSettingsSection = "NonJCFOptions",
+	tcLanguageSetting = "TcLanguage",
+	tcLanguages = "en|hr",
+	tcLanguageSep = "|",
+	tcDefaultLanguage = "en",
+	tcMessagesSection = "Messages",
+	tcLanguageFilePrefix = "TOTALCMD64.",
+	tcLanguageFileSuffix = ".ini",
+	tcLineBreakMark = "\\n",
+	; GetScriptKeyName joins the keys of a script with this
+	tcKeyOrSep = " OR ",
 	; height (pixels) of the band above a combo box searched for its painted label
 	tcLabelBand = 22,
 	; caption of its file filter button (a symbol, not a word)
