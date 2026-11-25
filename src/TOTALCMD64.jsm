@@ -381,17 +381,29 @@ Total Commander script keys
 %7: script version.
 @@
 
-; Insert+H, the keyboard profile's Insert keys (A: extended Insert marks; B: extended Insert is the JAWS key)
-@msgTcInsertHelpB
-The extended Insert is the JAWS key.
-Extended Insert pressed twice quickly: passes Insert to Total Commander, which marks the item and moves to the next one; the scripts then say how many items are marked and the item reached.
-Numeric keypad: on, so Total Commander gets Num Plus, Num Minus, Num Star and Num Slash.
+; Insert+H, last line: the key that marks items as set in Quick Settings (TcInsertHelp);
+; %1 = a key name below, %2 = single or double press below (author, 2026-11-25)
+@msgTcInsertHelpSelect
+Item selection: %1, %2 (you can change this in Quick Settings).
 @@
-
-; Insert+H, the keyboard profile's Insert keys (A: extended Insert marks; B: extended Insert is the JAWS key)
-@msgTcInsertHelpA
-The numeric Insert and the extended Insert have different functions. The extended Insert marks items in the panels; the numeric Insert is the JAWS key.
-Extended Insert: marks the item and moves to the next one; the scripts then say how many items are marked and the item reached.
+; Selection key "None"
+@msgTcInsertHelpNone
+Item selection: Space (you can change this in Quick Settings).
+@@
+@msgTcExtInsert
+Extended Insert
+@@
+@msgTcNumInsert
+Numeric Insert
+@@
+@msgTcEitherInsert
+Extended or numeric Insert
+@@
+@msgTcSinglePress
+single press
+@@
+@msgTcDoublePress
+double press
 @@
 
 ; Insert+F1 in the file list; %1 = key for the whole row, %2 = key for the key list

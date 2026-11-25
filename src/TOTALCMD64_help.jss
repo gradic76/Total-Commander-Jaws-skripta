@@ -65,13 +65,28 @@ endIf
 EndFunction
 
 string function TcInsertHelp ()
-; The Insert keys of the installed keyboard profile: A, the extended Insert marks items; B, the
-; extended Insert is the JAWS key (JAWSInsertKey in TOTALCMD64.jcf, written by deploy.ps1 and
-; the installer: 1 for A, 2 for B; 2026-11-25).
-if TcDoublePressSelects () then
-	return TcMsg ("msgTcInsertHelpB", msgTcInsertHelpB)
+; One line (author, 2026-11-25): which Insert marks items and how many presses, as set
+; in Quick Settings (Selection key, Usage; TOTALCMD64_settings.jss), read each time.
+var
+	int nSelect = TcSelectKey (),
+	string sKey,
+	string sPress
+if nSelect == tcSelectKeyNone then
+	return TcMsg ("msgTcInsertHelpNone", msgTcInsertHelpNone)
 endIf
-return TcMsg ("msgTcInsertHelpA", msgTcInsertHelpA)
+if nSelect == tcSelectKeyBoth then
+	let sKey = TcMsg ("msgTcEitherInsert", msgTcEitherInsert)
+elIf nSelect == tcSelectKeyNumeric then
+	let sKey = TcMsg ("msgTcNumInsert", msgTcNumInsert)
+else
+	let sKey = TcMsg ("msgTcExtInsert", msgTcExtInsert)
+endIf
+if TcDoublePressSelects () then
+	let sPress = TcMsg ("msgTcDoublePress", msgTcDoublePress)
+else
+	let sPress = TcMsg ("msgTcSinglePress", msgTcSinglePress)
+endIf
+return FormatString (TcMsg ("msgTcInsertHelpSelect", msgTcInsertHelpSelect), sKey, sPress)
 EndFunction
 
 Script HotKeyHelp ()
