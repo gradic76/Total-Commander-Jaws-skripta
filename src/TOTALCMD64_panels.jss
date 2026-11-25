@@ -804,19 +804,43 @@ ScheduleFunction ("TcSayMarkResult", tcMarkResultDelay)
 EndFunction
 
 Script TcInsertMark ()
-; Profile A: Extended Insert.
+; The Insert key chosen in Quick Settings (the other one is the JAWS key, so this script
+; is not called for it). Usage "double press": only the second quick press marks.
+; An Insert that is a JAWS key also runs this line before JAWSKey (measured 2026-11-25):
+; it only notes which key it was for TcJawsKeyTwice.
+var string sKey = GetCurrentScriptKeyName ()
+if TcInsertIsJawsKey (sKey) then
+	let gsTcJawsInsertKey = sKey
+	return
+endIf
+let gsTcJawsInsertKey = cscNull
+if TcDoublePressSelects ()
+&& !IsSameScript () then
+	return
+endIf
 TcMarkAndMove ()
 EndScript
 
 Script TcJawsKeyTwice ()
-; Usage "double press": the JAWS key pressed twice passes Insert to TC; otherwise JAWS's own.
-if !TcDoublePressSelects () then
-	PerformScript JAWSKey ()
+; The JAWS key pressed alone. Needed in the key map: without it the JAWS key pressed
+; alone ran the Insert line (measured 2026-11-25). Does nothing (author, 2026-11-25),
+; except where an Insert that is a JAWS key marks pressed twice (numeric Insert with
+; double press, either Insert with "Both"). Timed here, because IsSameScript is never
+; true for it (tcJawsKeyTwiceTicks).
+if !TcJawsKeyTwiceMarks (gsTcJawsInsertKey) then
+	let giTcJawsKeyTick = 0
 	return
 endIf
-if IsSameScript () then
+; both presses must be the same Insert key
+if giTcJawsKeyTick
+&& gsTcJawsTickKey == gsTcJawsInsertKey
+&& GetTickCount () - giTcJawsKeyTick < tcJawsKeyTwiceTicks then
+	let giTcJawsKeyTick = 0
 	TcMarkAndMove ()
+	return
 endIf
+let giTcJawsKeyTick = GetTickCount ()
+let gsTcJawsTickKey = gsTcJawsInsertKey
 EndScript
 
 string function TcViewKeyMessage (string sKey)

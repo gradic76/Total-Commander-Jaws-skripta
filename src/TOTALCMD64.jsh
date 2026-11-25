@@ -54,13 +54,16 @@ const
 	tcSelectKeyNumeric = 1,
 	tcSelectKeyBoth = 2,
 	tcSelectKeyNone = 3,
+	; Usage list in Quick Settings: single, double, then "Inactive"; the real choice is kept
+	; while Usage is inactive (TcUsageDependeeChanged)
+	tcUsageInactiveIndex = 2,
+	tcSelectUsageLastSetting = "TcSelectUsageLast",
 	; GetScriptKeyName joins the keys of a script with this
 	tcKeyOrSep = " OR ",
-	; keyboard profile in the application's .jcf: [Options] JAWSInsertKey, 1 = A, 2 = B
-	tcJcfOptionsSection = "Options",
+	; JAWS key mode in the user's TOTALCMD64.jcf: [Options] JAWSInsertKey (TcApplyInsertKeys)
+	tcOptionsSection = "Options",
 	tcJawsInsertKeySetting = "JAWSInsertKey",
-	tcProfileAValue = "1",
-	tcProfileBValue = "2",
+	tcConfigName = "TOTALCMD64",
 	; height (pixels) of the band above a combo box searched for its painted label
 	tcLabelBand = 22,
 	; caption of its file filter button (a symbol, not a word)
@@ -206,6 +209,12 @@ const
 	; list events stay quiet after Insert (milliseconds)
 	tcMarkResultDelay = 3,
 	tcInsertQuietTicks = 800,
+	; An Insert key that is a JAWS key runs both its own line and JAWSKey on every press,
+	; so IsSameScript is never true there (measured 2026-11-25); the double press is timed
+	; instead, within this many milliseconds (the Windows default double-click time)
+	tcJawsKeyTwiceTicks = 500,
+	tcNumInsertKey = "NumInsert",
+	tcExtInsertKey = "ExtInsert",
 	; Keys that mark or unmark many items at once, lower case, as KeyPressedEvent names them
 	tcSelectAllKey = "control+a",
 	tcBackspaceKey = "backspace",
@@ -278,6 +287,11 @@ globals
 	string gsTcLastRow,
 	; Time of the last Insert marking (TcMarkAndMove)
 	int giTcInsertTick,
+	; The Insert key that last ran TcInsertMark while being a JAWS key, and when the
+	; JAWS key was last pressed alone (TcJawsKeyTwice)
+	string gsTcJawsInsertKey,
+	int giTcJawsKeyTick,
+	string gsTcJawsTickKey,
 	; Speak the marked count when focus returns to the file list (after a selection dialog)
 	int gbTcCountOnReturn,
 	; Quick search box: text typed so far, and whether "Quick search" was said

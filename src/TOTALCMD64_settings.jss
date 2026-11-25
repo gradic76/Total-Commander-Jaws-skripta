@@ -35,32 +35,101 @@ EndFunction
 
 ; Insert keys (decision 2026-11-25, replacing the keyboard profiles): Quick Settings stores
 ; Selection key (0 extended Insert, 1 numeric Insert, 2 both, 3 none: Space marks) and Usage
-; (0 single press, 1 double press). Applied while Total Commander has the focus through JAWS's
-; Insert key mode (OPT_INSERT_KEY_MODE, the JAWSInsertKey values: 0 none, 1 numeric,
-; 2 extended, 3 both Insert keys are JAWS keys).
+; (0 single press, 1 double press). Applied while Total Commander has the focus by writing
+; JAWSInsertKey (which Insert keys are JAWS keys: 0 none, 1 numeric, 2 extended, 3 both)
+; into the user's TOTALCMD64.jcf (TcApplyInsertKeys).
 
 int function TcSelectKey ()
 return StringToInt (IniReadString (tcSettingsSection, tcSelectKeySetting, "0", tcSettingsFile))
 EndFunction
 
 int function TcDoublePressSelects ()
+; "Both" is always double press: otherwise there would be no JAWS key in TC (author, 2026-11-25).
+if TcSelectKey () == tcSelectKeyBoth then
+	return true
+endIf
 return StringToInt (IniReadString (tcSettingsSection, tcSelectUsageSetting, "0", tcSettingsFile)) == 1
 	&& TcSelectKey () != tcSelectKeyNone
 EndFunction
 
-void function TcApplyInsertKeys ()
-; Double press needs both Insert keys as JAWS keys, and so does "none".
-var int nMode
-if TcSelectKey () == tcSelectKeyNone
-|| TcDoublePressSelects () then
-	let nMode = 3
-elIf TcSelectKey () == tcSelectKeyNumeric then
-	let nMode = 2
-elIf TcSelectKey () == tcSelectKeyBoth then
-	let nMode = 0
-else
-	let nMode = 1
+int function TcJawsKeyTwiceMarks (string sKey)
+; Whether the Insert key sKey (as GetCurrentScriptKeyName names it) is a JAWS key that
+; marks when pressed twice: numeric Insert with double press, and either Insert with "Both".
+if TcSelectKey () == tcSelectKeyBoth then
+	return true
 endIf
-; set on every focus change: JAWS restores its own value when another program gets the focus
-SetJCFOption (OPT_INSERT_KEY_MODE, nMode)
+return TcSelectKey () == tcSelectKeyNumeric
+	&& TcDoublePressSelects ()
+	&& sKey != tcExtInsertKey
+EndFunction
+
+int function TcInsertKeyMode ()
+; Author's scheme (2026-11-25): the other Insert is the JAWS key. Extended Insert with
+; double press is not the JAWS key (single press does nothing, TcInsertMark); numeric
+; Insert with double press is the JAWS key too (single press is the modifier, double
+; press marks in TcJawsKeyTwice). "Both": both are JAWS keys and mark pressed twice.
+; "None": both Insert keys are JAWS keys.
+var int nSelect = TcSelectKey ()
+if nSelect == tcSelectKeyNone
+|| nSelect == tcSelectKeyBoth
+|| (nSelect == tcSelectKeyNumeric && TcDoublePressSelects ()) then
+	return 3
+elIf nSelect == tcSelectKeyNumeric then
+	return 2
+endIf
+return 1
+EndFunction
+
+; Quick Settings, Usage: it has no meaning with Selection key "None" (nothing marks) or
+; "Both" (always double press), and then shows "Inactive" (index tcUsageInactiveIndex).
+; JAWS reads a script-read setting only when Quick Settings opens (measured 2026-11-25),
+; so Usage is a plain file setting, and when Selection key changes (Usage is its
+; dependent; JAWS saves Quick Settings changes at once, even on Cancel, author) the
+; scripts write Usage into the file: "Inactive", keeping the real choice in
+; TcSelectUsageLast, or the real choice back.
+
+void function TcUsageDependeeChanged (string settingID, string sXmlWriteRequest)
+var
+	int nSelect,
+	int nUsage = StringToInt (IniReadString (tcSettingsSection, tcSelectUsageSetting, "0", tcSettingsFile))
+ParseXMLDependenceEvent (sXmlWriteRequest, nSelect)
+if nSelect == tcSelectKeyNone
+|| nSelect == tcSelectKeyBoth then
+	if nUsage != tcUsageInactiveIndex then
+		WriteSettingInteger (tcSettingsSection, tcSelectUsageLastSetting, nUsage, FT_CURRENT_JCF,
+			wdUser, tcConfigName)
+		WriteSettingInteger (tcSettingsSection, tcSelectUsageSetting, tcUsageInactiveIndex,
+			FT_CURRENT_JCF, wdUser, tcConfigName)
+	endIf
+	return
+endIf
+if nUsage == tcUsageInactiveIndex then
+	WriteSettingInteger (tcSettingsSection, tcSelectUsageSetting,
+		StringToInt (IniReadString (tcSettingsSection, tcSelectUsageLastSetting, "0", tcSettingsFile)),
+		FT_CURRENT_JCF, wdUser, tcConfigName)
+endIf
+EndFunction
+
+int function TcInsertIsJawsKey (string sKey)
+; sKey: ExtInsert or NumInsert, as GetCurrentScriptKeyName names it
+var int nMode = TcInsertKeyMode ()
+if sKey == tcExtInsertKey then
+	return nMode == 2 || nMode == 3
+endIf
+return nMode == 1 || nMode == 3
+EndFunction
+
+void function TcApplyInsertKeys ()
+var int nMode = TcInsertKeyMode ()
+; JAWSInsertKey has no OPT_ constant (OPT_INSERT_KEY_MODE is InsertKeyMode, JAWS/sticky;
+; measured 2026-11-25), so the value goes into the user's TOTALCMD64.jcf, which applies
+; only to Total Commander, and the configuration is reloaded. Checked on every focus
+; change (after Quick Settings closes); written only when it differs.
+if ReadSettingInteger (tcOptionsSection, tcJawsInsertKeySetting, -1, FT_CURRENT_JCF,
+	rsNoTransient, tcConfigName) == nMode then
+	return
+endIf
+WriteSettingInteger (tcOptionsSection, tcJawsInsertKeySetting, nMode, FT_CURRENT_JCF,
+	wdUser, tcConfigName)
+ReloadAllConfigs ()
 EndFunction

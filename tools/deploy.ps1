@@ -1,16 +1,12 @@
 # Development deploy: copies the script set to the current user's JAWS settings and compiles it.
-# Usage: powershell -NoProfile -ExecutionPolicy Bypass -File tools\deploy.ps1 [-Profile A|B] [-JawsVersion 2025] [-Lang enu]
+# Usage: powershell -NoProfile -ExecutionPolicy Bypass -File tools\deploy.ps1 [-JawsVersion 2025] [-Lang enu]
 #
-# Keyboard profiles (decision 2026-11-18):
-#   A (default): Extended Insert goes to Total Commander (mark item), Numpad Insert is the JAWS key.
-#   B: Extended Insert is the JAWS key; pressed twice it passes Insert to Total Commander;
-#      meant for use with NumLock on, so the numeric keypad belongs to Total Commander.
+# The Insert keys are chosen in Quick Settings (decision 2026-11-25); the scripts write
+# JAWSInsertKey into the user's TOTALCMD64.jcf themselves.
 #
 # The user's TOTALCMD64.jcf is not overwritten: only the script's own option lines are set,
 # so settings changed in Settings Center are kept. The installer must do the same.
 param(
-    [ValidateSet("A", "B")]
-    [string]$Profile = "A",
     [string]$JawsVersion = "2025",
     [string]$Lang = "enu",
     # Alternative source folder, e.g. a temporary variant for a control test

@@ -31,16 +31,17 @@
 		<DisplayName ID="TcSettings.Language.ko" Text="한국어"/>
 		<DisplayName ID="TcSettings.Language.zh" Text="中文"/>
 		<DisplayName ID="TcSettings.SelectKey" Text="Selection key">
-			<HelpMsg>Which Insert key marks items in Total Commander. The other Insert key stays the JAWS key. None: both Insert keys are JAWS keys, and Space marks.</HelpMsg>
+			<HelpMsg>Which Insert key marks items in Total Commander. The other Insert key stays the JAWS key. Both: both Insert keys stay JAWS keys and mark when pressed twice quickly. None: both Insert keys are JAWS keys, and Space marks.</HelpMsg>
 		</DisplayName>
 		<DisplayName ID="TcSettings.SelectKey.ext" Text="Extended Insert"/>
 		<DisplayName ID="TcSettings.SelectKey.num" Text="Numeric Insert"/>
 		<DisplayName ID="TcSettings.SelectKey.both" Text="Both"/>
 		<DisplayName ID="TcSettings.SelectKey.none" Text="None (use Space)"/>
 		<DisplayName ID="TcSettings.SelectUsage" Text="Usage">
-			<HelpMsg>Single press: the selection key marks with one press. Double press: both Insert keys stay JAWS keys, and either one pressed twice quickly marks.</HelpMsg>
+			<HelpMsg>Single press: the selection key marks with one press. Double press: the selection key marks when pressed twice quickly; a numeric Insert selection key also stays the JAWS key. Inactive while Selection key is Both or None.</HelpMsg>
 		</DisplayName>
 		<DisplayName ID="TcSettings.SelectUsage.single" Text="Single press"/>
 		<DisplayName ID="TcSettings.SelectUsage.double" Text="Double press"/>
+		<DisplayName ID="TcSettings.SelectUsage.inactive" Text="Inactive"/>
 	</DisplayNameDefinitions>
 </LocalizableDefinitions>

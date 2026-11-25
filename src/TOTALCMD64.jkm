@@ -22,7 +22,12 @@ Alt+Shift+A=TcSayActivePanel
 Control+0=TcListerZoomReset
 ; Insert keys (decision 2026-11-25): which Insert marks is set in Quick Settings (Selection key,
 ; Usage) and applied while Total Commander has the focus; a line for a key that is a JAWS key
-; is ignored by JAWS.
+; is not used while JAWSKey has a line of its own: without it, the JAWS key pressed alone
+; ran the Insert line (measured 2026-11-25). The JAWS key alone does nothing, also twice.
+; JAWS's key names (Default.JKM modifiers): ExtInsert, NumInsert, and Insert for either.
+; The numeric Insert as a plain key is NumInsert; with only the Insert line it went to TC
+; without the script (measured 2026-11-25).
 ExtInsert=TcInsertMark
+NumInsert=TcInsertMark
 Insert=TcInsertMark
 JAWSKey=TcJawsKeyTwice

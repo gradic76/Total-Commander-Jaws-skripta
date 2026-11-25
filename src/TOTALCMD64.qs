@@ -38,14 +38,22 @@
 					<Value ID="TcSettings.SelectKey.both"/>
 					<Value ID="TcSettings.SelectKey.none"/>
 				</Values>
+				<!-- Usage follows the choice while Quick Settings is open -->
+				<Dependents>
+					<Dependent ID="TcSettings.SelectUsage"/>
+				</Dependents>
 				<SettingsFile Section="NonJCFOptions" Name="TcSelectKey"/>
 			</Setting>
+			<!-- Usage: "Inactive" while Selection key is "Both" or "None"; the scripts set it
+			     when Selection key changes (TcUsageDependeeChanged, TOTALCMD64_settings.jss) -->
 			<Setting ID="TcSettings.SelectUsage" Type="List">
 				<Values>
 					<Value ID="TcSettings.SelectUsage.single"/>
 					<Value ID="TcSettings.SelectUsage.double"/>
+					<Value ID="TcSettings.SelectUsage.inactive"/>
 				</Values>
-				<SettingsFile Section="NonJCFOptions" Name="TcSelectUsage"/>
+				<SettingsFile Section="NonJCFOptions" Name="TcSelectUsage"
+					OnDependeeChangedEvent="TcUsageDependeeChanged"/>
 			</Setting>
 		</Category>
 	</QuickSettingsDefinitions>
